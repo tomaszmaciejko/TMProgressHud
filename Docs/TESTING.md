@@ -47,6 +47,8 @@ For a signed release, verify its signature against the published certificate fin
 python3 Scripts/audit-xcframework.py Artifacts/TMProgressHudUIKit.xcframework --require-signature --expected-certificate-sha256 "$(cat Certificates/TMProgressHud-signing.fingerprint)"
 ```
 
-CI checks the oldest supported compiler, current iOS/tvOS behavior and coverage, DocC and all four distributions. It builds the binary with Swift 6.0 before consuming it with the current compiler. Automated tests do not replace visual, VoiceOver or physical-device checks.
+Run the local checks above during development. GitHub Actions workflows run only when a maintainer starts them manually, for release qualification or a targeted environment check. Pushes, pull requests and tags do not start CI.
+
+The manual **Library checks** workflow checks the oldest supported compiler, current iOS/tvOS behavior and coverage, DocC and all four distributions. It builds the binary with Swift 6.0 before consuming it with the current compiler. Automated tests do not replace visual, VoiceOver or physical-device checks.
 
 The manual **Minimum iOS runtime** workflow runs the six-mode/action consumer on iOS 15.5 using macOS 15 and Xcode 16.4. iOS 15.0 can be selected for diagnostics, but its runtime is rejected by this host before application launch.
