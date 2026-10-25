@@ -125,10 +125,6 @@ open class TMProgressHud: UIView {
         }
     }
 
-    // The public legacy notification name preserves upstream orientation observation
-    // without referencing its SDK-deprecated constant. Autoresizing also tracks bounds.
-    static let orientationNotification = Notification.Name("UIApplicationDidChangeStatusBarOrientationNotification")
-
     /// Creates a HUD without attaching it to a host.
     public required override init(frame: CGRect) {
         super.init(frame: frame)
@@ -145,10 +141,6 @@ open class TMProgressHud: UIView {
         super.init(coder: coder)
         commonInit()
     }
-
-    #if os(iOS) && !targetEnvironment(macCatalyst)
-        deinit { NotificationCenter.default.removeObserver(self) }
-    #endif
 
     /// Creates, attaches and shows a HUD that removes itself when hidden.
     @objc(showHUDAddedTo:animated:) open dynamic class func showAdded(to view: UIView, animated: Bool) -> Self {
@@ -177,7 +169,8 @@ open class TMProgressHud: UIView {
 
     /// Synchronizes the frame with the host when attached or reparented.
     open override func didMoveToSuperview() {
-        synchronizeHostBounds()
+        super.didMoveToSuperview()
+        if let superview { frame = superview.bounds }
     }
 
     /// Rebuilds the reference bezel/content constraints.
@@ -233,21 +226,5 @@ open class TMProgressHud: UIView {
         layer.allowsGroupOpacity = false
         setupViews()
         updateIndicators()
-        #if os(iOS) && !targetEnvironment(macCatalyst)
-            NotificationCenter.default.addObserver(
-                self, selector: #selector(orientationDidChange), name: Self.orientationNotification, object: nil
-            )
-        #endif
-    }
-
-    #if os(iOS) && !targetEnvironment(macCatalyst)
-        @objc func orientationDidChange() {
-            guard superview != nil else { return }
-            synchronizeHostBounds()
-        }
-    #endif
-
-    func synchronizeHostBounds() {
-        if let superview { frame = superview.bounds }
     }
 }

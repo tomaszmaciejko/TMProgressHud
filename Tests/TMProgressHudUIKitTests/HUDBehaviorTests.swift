@@ -167,10 +167,8 @@ struct HUDBehaviorTests {
         #expect(hud.bezelView.motionEffects.isEmpty)
         hud.areDefaultMotionEffectsEnabled = false
         hud.areDefaultMotionEffectsEnabled = false
-        NotificationCenter.default.post(name: TMProgressHud.orientationNotification, object: nil)
         #expect(hud.frame == host.bounds)
         hud.hide(animated: false)
-        NotificationCenter.default.post(name: TMProgressHud.orientationNotification, object: nil)
     }
 
     @Test func foundationProgressCanBeReplacedAndDetached() {

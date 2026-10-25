@@ -13,7 +13,9 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.
 - The action button has zero intrinsic size until it has both a title and a registered event.
 
-On tvOS the background uses `.regular` blur and omits iOS orientation notifications. iOS uses `.systemThickMaterial`. The caller manages focus; see the tvOS example.
+On tvOS the background uses `.regular` blur; iOS uses `.systemThickMaterial`. The caller manages focus; see the tvOS example.
+
+On both platforms the HUD follows its host size through UIKit autoresizing and synchronizes its frame when attached or reparented. Version 2.0 no longer observes global status-bar orientation notifications.
 
 ## Swift API
 

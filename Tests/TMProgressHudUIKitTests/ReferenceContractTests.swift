@@ -6,25 +6,11 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct ReferenceContractTests {
-    @Test func platformDefaultsAndOrientationObservationMatchOriginal() {
+    @Test func platformBlurDefaultsMatchOriginal() {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let reference = MBProgressHUD(view: host)
         let port = TMProgressHud(view: host)
         #expect(port.bezelView.blurEffectStyle == reference.bezelView.blurEffectStyle)
-        host.addSubview(reference)
-        host.addSubview(port)
-        let detachedFrame = CGRect(x: 4, y: 8, width: 200, height: 100)
-        reference.frame = detachedFrame
-        port.frame = detachedFrame
-        NotificationCenter.default.post(
-            name: Notification.Name("UIApplicationDidChangeStatusBarOrientationNotification"), object: nil)
-        #expect(port.frame == reference.frame)
-        #if os(tvOS)
-            #expect(port.frame == detachedFrame)
-            #expect(!port.responds(to: NSSelectorFromString("orientationDidChange")))
-        #else
-            #expect(port.frame == host.bounds)
-        #endif
     }
 
     @Test func completedHUDsDoNotRetainThemselves() {
