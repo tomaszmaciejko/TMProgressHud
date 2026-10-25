@@ -114,7 +114,8 @@ open class TMProgressHud: UIView {
     private lazy var presentation = HUDPresentation(host: self)
     func setTimingEnvironment(_ timing: HUDTimingEnvironment) { presentation.timing = timing }
     var hasFinished: Bool { presentation.hasFinished }
-    var indicator: UIView?
+    var managedIndicator: HUDIndicator?
+    var indicator: UIView? { managedIndicator?.view }
     var bezelMotionEffects: UIMotionEffectGroup?
     private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
 

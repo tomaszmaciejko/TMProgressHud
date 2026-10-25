@@ -259,6 +259,30 @@
       "target-membership": [
         "TMProgressHudUIKitTests/compile-sources"
       ]
+    },
+    {
+      "path": "../../Sources/TMProgressHudUIKit/HUDIndicator.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "../../Sources/TMProgressHudUIKit/HUDLegacyProgressAdapter.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "../../Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/IndicatorContractTests.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
     }
   ],
   "targets": [

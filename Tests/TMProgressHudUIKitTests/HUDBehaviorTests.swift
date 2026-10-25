@@ -51,7 +51,7 @@ struct HUDBehaviorTests {
         hud.removeFromSuperview()
     }
 
-    @Test func modeChangesPreserveRingQuirkAndCustomDispatch() throws {
+    @Test func modeChangesRestorePieAndPreserveCustomDispatch() throws {
         let hud = TMProgressHud(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         hud.mode = .indeterminate
         hud.mode = .determinate
@@ -62,7 +62,7 @@ struct HUDBehaviorTests {
         #expect(round.isAnnular)
         hud.mode = .determinate
         #expect(hud.indicator === round)
-        #expect(round.isAnnular)
+        #expect(!round.isAnnular)
         hud.mode = .determinateHorizontalBar
         #expect((hud.indicator as? TMBarProgressView)?.progress == 0.25)
         let custom = CustomProgressView()

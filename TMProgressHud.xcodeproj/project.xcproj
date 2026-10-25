@@ -14,7 +14,19 @@
   "packages": [],
   "files": [
     {
+      "path": "Sources/TMProgressHudUIKit/HUDIndicator.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDLayout.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDLegacyProgressAdapter.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
       ]
@@ -92,6 +104,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -141,7 +159,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "000000000000000000000030",
+      "id": "000000000000000000000036",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

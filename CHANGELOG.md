@@ -15,6 +15,8 @@
 - Apply configured container-appearance colors to indicators instead of leaving factory defaults.
 - Preserve direct content colors when modes change; apply bulk color defaults only to newly created indicators unless contentColor is explicitly changed.
 - Respect overridden getters in indicator drawing, bulk color application and Progress observation; retain open classes and Objective-C/KVO integration.
+- Use typed indicator updates and add TMProgressHudProgressReporting for Swift custom views; retain legacy custom progress setters.
+- Restore pie drawing when reusing a ring indicator.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

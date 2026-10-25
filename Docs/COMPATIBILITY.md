@@ -8,7 +8,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 
 - Progress values are stored and forwarded without clamping.
 - Completion and delegate callbacks occur once per completed presentation, in that order. Repeated hide calls after completion do nothing; a new show cancels unfinished hiding and its callback. Re-showing visible content skips the grace delay.
-- Reusing a ring indicator as a pie retains its annular state.
+- Switching between pie and ring updates the reused indicator in both directions.
 - Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress uses KVO while the HUD is presented in a window, with buffered delivery to the main actor. Hiding, detaching or replacing the source ends the previous observation; showing reads the latest value.
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.
 - The action button has zero intrinsic size until it has both a title and a registered event.
@@ -44,3 +44,7 @@ Return stable child-view and progress-source instances between configuration cha
 The 1.0 release was checked with Swift 6.0.3 and the current CI toolchain, with a six-mode/action consumer check on iOS 15.5 and full hosted tests on newer simulators. Those results describe 1.0, not qualification of the unreleased 2.0 line.
 
 Execution on the new minimum iOS 17.0 or tvOS 17.0, physical Apple TV remote input and an actual VoiceOver session remain unverified. The full supported-toolchain matrix is checked separately before release.
+
+## Custom progress views
+
+Adopt `TMProgressHudProgressReporting` on a custom `UIView` to receive unnormalized `progress` values in Swift. Built-in indicators use typed updates. Existing custom views exposing Objective-C `setProgress:` continue to work through a compatibility adapter; plain views are also supported without receiving progress.

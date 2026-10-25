@@ -16,5 +16,11 @@
     "sha256": "8259b993e56a6227e983ea8ea00518d873c0bd3f03901f59b84b17804c162e8d",
     "reason": "Protocol method declaration has no executable body; concrete optional callback delivery is tested in repeatedHideRetainsCallbackOrdering.",
     "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+  },
+  {
+    "file": "Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
+    "sha256": "69165c6683a91eb6972278d5e179c460e18fa1a750f9333ec55de1a1a17d6f36",
+    "reason": "Public protocol declaration has no executable body; Swift/LLVM emitted no coverage regions in the hosted iOS report. Native Swift custom progress delivery is verified by IndicatorContractTests.",
+    "decision": "Declaration-only accounting, not an executable-line exclusion. Reviewed for typed custom indicators."
   }
 ]
