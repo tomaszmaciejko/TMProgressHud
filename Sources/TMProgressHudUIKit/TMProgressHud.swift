@@ -22,7 +22,7 @@ open class TMProgressHud: UIView {
     ///
     /// Nonpositive values show immediately.
     @objc open dynamic var graceTime: TimeInterval = 0
-    /// The minimum visible duration in seconds, initially zero.
+    /// The minimum visible duration in monotonic seconds, initially zero.
     @objc open dynamic var minShowTime: TimeInterval = 0
     /// Whether hiding removes the HUD from its host.
     ///
@@ -107,12 +107,12 @@ open class TMProgressHud: UIView {
     var timing = HUDTimingEnvironment()
     var useAnimation = false
     var hasFinished = false
-    var showStarted: Date?
+    var showStarted: ContinuousClock.Instant?
     var indicator: UIView?
     var bezelMotionEffects: UIMotionEffectGroup?
-    weak var graceTimer: Timer?
-    weak var minShowTimer: Timer?
-    weak var hideDelayTimer: Timer?
+    var graceAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
+    var minimumShowAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
+    var delayedHideAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
     weak var progressDisplayLink: CADisplayLink? {
         didSet {
             if oldValue !== progressDisplayLink {
@@ -186,13 +186,14 @@ open class TMProgressHud: UIView {
         super.layoutSubviews()
     }
 
-    /// Shows the HUD immediately or after graceTime, using the reference timing semantics.
+    /// Shows the HUD immediately or after graceTime, replacing pending minimum/grace actions.
     @objc(showAnimated:) open dynamic func show(animated: Bool) {
-        minShowTimer?.invalidate()
+        graceAction = nil
+        minimumShowAction = nil
         useAnimation = animated
         hasFinished = false
         if graceTime > 0 {
-            graceTimer = timing.schedule(graceTime, self, #selector(handleGraceTimer), nil)
+            graceAction = timing.schedule(graceTime) { [weak self] in self?.handleGraceAction() }
         } else {
             showUsingAnimation(useAnimation)
         }
@@ -200,23 +201,29 @@ open class TMProgressHud: UIView {
 
     /// Hides the HUD after satisfying its minimum visible duration.
     @objc(hideAnimated:) open dynamic func hide(animated: Bool) {
-        graceTimer?.invalidate()
+        graceAction = nil
+        minimumShowAction = nil
         useAnimation = animated
         hasFinished = true
         if minShowTime > 0, let showStarted {
-            let elapsed = timing.now().timeIntervalSince(showStarted)
+            let elapsed = timing.elapsed(since: showStarted)
             if elapsed < minShowTime {
-                minShowTimer = timing.schedule(minShowTime - elapsed, self, #selector(handleMinShowTimer), nil)
+                minimumShowAction = timing.schedule(minShowTime - elapsed) { [weak self] in
+                    guard let self else { return }
+                    self.hideUsingAnimation(self.useAnimation)
+                }
                 return
             }
         }
         hideUsingAnimation(useAnimation)
     }
 
-    /// Replaces any pending delayed-hide request; delay is expressed in seconds.
+    /// Replaces any pending delayed-hide request, in monotonic seconds.
+    ///
+    /// Nonpositive or NaN delays run on the next actor turn. Unrepresentable positive delays remain pending.
     @objc(hideAnimated:afterDelay:) open dynamic func hide(animated: Bool, afterDelay delay: TimeInterval) {
-        hideDelayTimer?.invalidate()
-        hideDelayTimer = timing.schedule(delay, self, #selector(handleHideTimer(_:)), animated)
+        delayedHideAction = nil
+        delayedHideAction = timing.schedule(delay) { [weak self] in self?.hide(animated: animated) }
     }
 
     func commonInit() {

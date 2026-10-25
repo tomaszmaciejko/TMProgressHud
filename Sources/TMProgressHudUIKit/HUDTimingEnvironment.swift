@@ -4,13 +4,17 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import Foundation
 
-// Injected clock/scheduler preserve the reference's wall-time semantics in 1.0.
+/// A monotonic clock and typed scheduling boundary, replaceable in deterministic tests.
 @MainActor
 struct HUDTimingEnvironment {
-    var now: () -> Date = { Date() }
-    var schedule: (TimeInterval, Any, Selector, Any?) -> Timer = { interval, target, action, info in
-        let timer = Timer(timeInterval: interval, target: target, selector: action, userInfo: info, repeats: false)
-        RunLoop.current.add(timer, forMode: .common)
-        return timer
+    var now: () -> ContinuousClock.Instant = { .now }
+    var schedule: (TimeInterval, @escaping @MainActor () -> Void) -> HUDScheduledAction = {
+        HUDScheduledAction.scheduled(after: $0, action: $1)
+    }
+
+    func elapsed(since instant: ContinuousClock.Instant) -> TimeInterval {
+        let duration = instant.duration(to: now()).components
+        let attosecondsPerSecond = 1e18
+        return TimeInterval(duration.seconds) + TimeInterval(duration.attoseconds) / attosecondsPerSecond
     }
 }

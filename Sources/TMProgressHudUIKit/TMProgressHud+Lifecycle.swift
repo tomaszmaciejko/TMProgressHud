@@ -5,20 +5,14 @@
 import UIKit
 
 extension TMProgressHud {
-    @objc func handleGraceTimer() {
+    func handleGraceAction() {
         if !hasFinished { showUsingAnimation(useAnimation) }
-    }
-
-    @objc func handleMinShowTimer() { hideUsingAnimation(useAnimation) }
-
-    @objc func handleHideTimer(_ timer: Timer) {
-        hide(animated: (timer.userInfo as? Bool) ?? false)
     }
 
     func showUsingAnimation(_ animated: Bool) {
         bezelView.layer.removeAllAnimations()
         backgroundView.layer.removeAllAnimations()
-        hideDelayTimer?.invalidate()
+        delayedHideAction = nil
         showStarted = timing.now()
         alpha = 1
         setProgressDisplayLinkEnabled(true)
@@ -32,7 +26,7 @@ extension TMProgressHud {
     }
 
     func hideUsingAnimation(_ animated: Bool) {
-        hideDelayTimer?.invalidate()
+        delayedHideAction = nil
         if animated && showStarted != nil {
             showStarted = nil
             animate(in: false, type: animationType) { _ in self.done() }

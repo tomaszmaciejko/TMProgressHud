@@ -32,6 +32,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDScheduledAction.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -123,7 +129,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "00000000000000000000002A",
+      "id": "00000000000000000000002C",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

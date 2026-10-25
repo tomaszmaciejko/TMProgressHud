@@ -199,6 +199,18 @@
         }
       ],
       "name": "Tests and reference"
+    },
+    {
+      "path": "../../Sources/TMProgressHudUIKit/HUDScheduledAction.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/SchedulingTests.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
     }
   ],
   "targets": [

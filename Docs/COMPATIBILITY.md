@@ -9,7 +9,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 - Progress values are stored and forwarded without clamping.
 - Repeated hide calls can repeat completion and delegate callbacks.
 - Reusing a ring indicator as a pie retains its annular state.
-- Timing uses wall time and the original timer/display-link ownership. Hide the HUD when work finishes; removing its host alone does not end pending work.
+- Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress still uses the original display-link ownership; hide the HUD when work finishes.
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.
 - The action button has zero intrinsic size until it has both a title and a registered event.
 
