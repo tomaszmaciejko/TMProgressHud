@@ -18,7 +18,7 @@ if len(production) != 1 or production[0]["executableLines"] == 0:
 counts = {}
 for file in production[0]["files"]:
     path = Path(file["path"])
-    relative = str(path.relative_to(root))
+    relative = str(path.resolve().relative_to(root))
     if not relative.startswith("Sources/"):
         raise SystemExit(f"Unexpected production source: {relative}")
     archive = json.loads(subprocess.check_output(["xcrun", "xccov", "view", "--archive", "--file", str(path), "--json", str(args.result)]))

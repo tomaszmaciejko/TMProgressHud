@@ -3,6 +3,7 @@
 ## 2.0.0 (Unreleased)
 
 - Raise the minimum iOS and tvOS versions to 17.0.
+- Use UIKit’s duration/bounce spring animations, with a perceived duration of 0.3 seconds and no bounce.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

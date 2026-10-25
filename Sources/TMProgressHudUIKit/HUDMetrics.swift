@@ -4,7 +4,7 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-// Values from the pinned reference implementation, expressed in points/seconds.
+// Layout/style values retain the pinned reference defaults, expressed in points.
 // Float promotion preserves the original C f-suffixed alpha literal exactly.
 enum HUDMetrics {
     static let margin: CGFloat = 20
@@ -18,7 +18,8 @@ enum HUDMetrics {
     static let sidePriority = UILayoutPriority(999)
     static let sizePriority = UILayoutPriority(997)
     static let motionOffset: CGFloat = 10
-    static let animationDuration: TimeInterval = 0.3
+    // Perceived duration in seconds; the spring may settle after this interval.
+    static let animationPerceivedDuration: TimeInterval = 0.3
     static let reducedScale: CGFloat = 0.5
     static let enlargedScale: CGFloat = 1.5
 }

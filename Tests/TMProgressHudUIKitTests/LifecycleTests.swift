@@ -149,6 +149,22 @@ struct LifecycleTests {
         }
     }
 
+    @Test func animatedHideRemovesHUDFromHostBeforeCompletion() async {
+        let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        let hud = TMProgressHud.showAdded(to: host, animated: false)
+        #expect(hud.superview === host)
+        await withCheckedContinuation { continuation in
+            hud.completionBlock = { [weak hud] in
+                #expect(hud?.superview == nil)
+                #expect(hud?.alpha == 0)
+                continuation.resume()
+            }
+            hud.hide(animated: true)
+        }
+        #expect(!host.subviews.contains { $0 === hud })
+        hud.completionBlock = nil
+    }
+
     @Test func completionWithoutFinishedFlagPreservesReshownVisibility() {
         let hud = TMProgressHud(frame: .zero)
         hud.show(animated: false)

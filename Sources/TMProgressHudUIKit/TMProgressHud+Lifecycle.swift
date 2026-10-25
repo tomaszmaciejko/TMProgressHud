@@ -56,8 +56,8 @@ extension TMProgressHud {
             }
         }
         UIView.animate(
-            withDuration: HUDMetrics.animationDuration, delay: 0, usingSpringWithDamping: 1,
-            initialSpringVelocity: 0, options: .beginFromCurrentState,
+            springDuration: HUDMetrics.animationPerceivedDuration, bounce: 0,
+            initialSpringVelocity: 0, delay: 0, options: .beginFromCurrentState,
             animations: {
                 self.applyAnimationState(appearing: appearing, type: resolvedType, small: small, large: large)
             },

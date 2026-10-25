@@ -1,9 +1,9 @@
 [
   {
     "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
-    "sha256": "eac4d81a3a7b46f8594196ef7a2925915fdf04bb6bffe9ac0f623cb7a4ef7894",
+    "sha256": "88797e7aa124642fa1b1cf6f19b0df172c081fc04e7e1eed9c6ef6b27afa8139",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+    "decision": "Reviewed for iOS/tvOS 17 spring modernization: renamed and documented a static duration constant; declaration-only body has no executable-line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
