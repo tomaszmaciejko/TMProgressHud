@@ -12,14 +12,17 @@ final class HUDRoundedButtonView: UIButton {
         static let highlightAlpha: CGFloat = CGFloat(Float(0.1))
     }
 
+    private var borderColorSource: UIColor?
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        layer.borderWidth = Metrics.borderWidth
+        configureBorder()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        layer.borderWidth = Metrics.borderWidth
+        borderColorSource = layer.borderColor.map(UIColor.init(cgColor:))
+        configureBorder()
     }
 
     override func layoutSubviews() {
@@ -37,11 +40,24 @@ final class HUDRoundedButtonView: UIButton {
     override func setTitleColor(_ color: UIColor?, for state: UIControl.State) {
         super.setTitleColor(color, for: state)
         updateHighlight()
-        layer.borderColor = color?.cgColor
+        borderColorSource = color
+        updateBorderColor()
     }
 
     override var isHighlighted: Bool {
         didSet { updateHighlight() }
+    }
+
+    private func configureBorder() {
+        layer.borderWidth = Metrics.borderWidth
+        registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
+            (button: HUDRoundedButtonView, _) in
+            button.updateBorderColor()
+        }
+    }
+
+    private func updateBorderColor() {
+        layer.borderColor = borderColorSource?.resolvedColor(with: traitCollection).cgColor
     }
 
     private func updateHighlight() {

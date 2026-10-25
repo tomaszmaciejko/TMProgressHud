@@ -70,15 +70,22 @@ open class TMBarProgressView: UIView {
     /// Creates a transparent progress bar.
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
-        isOpaque = false
+        configureDrawing()
     }
 
     /// Decodes a progress bar with initialized Swift color defaults.
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
+        configureDrawing()
+    }
+
+    private func configureDrawing() {
         backgroundColor = .clear
         isOpaque = false
+        registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
+            (view: TMBarProgressView, _) in
+            view.setNeedsDisplay()
+        }
     }
 
     /// The reference 120-by-10-point intrinsic content size.

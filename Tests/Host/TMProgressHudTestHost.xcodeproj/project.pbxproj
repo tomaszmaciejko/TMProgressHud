@@ -36,6 +36,7 @@
 				<string>D00000000000000000000004</string>
 				<string>B0000000000000000000000C</string>
 				<string>D10000000000000000000002</string>
+				<string>9BEF1782E4B7468D8B4943E3</string>
 			</array>
 			<key>runOnlyForDeploymentPostprocessing</key>
 			<string>0</string>
@@ -484,6 +485,7 @@
 				<string>E00000000000000000000003</string>
 				<string>E00000000000000000000004</string>
 				<string>D10000000000000000000001</string>
+				<string>BB200F9728CD45E280ED0612</string>
 			</array>
 		</dict>
 		<key>E00000000000000000000003</key>
@@ -1178,6 +1180,24 @@
 			<string>PBXBuildFile</string>
 			<key>fileRef</key>
 			<string>B0000000000000000000000B</string>
+		</dict>
+		<key>BB200F9728CD45E280ED0612</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>../TMProgressHudUIKitTests/TraitAppearanceTests.swift</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.swift</string>
+		</dict>
+		<key>9BEF1782E4B7468D8B4943E3</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+			<key>fileRef</key>
+			<string>BB200F9728CD45E280ED0612</string>
 		</dict>
 	</dict>
 	<key>rootObject</key>

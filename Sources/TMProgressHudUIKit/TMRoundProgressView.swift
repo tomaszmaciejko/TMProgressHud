@@ -73,15 +73,22 @@ open class TMRoundProgressView: UIView {
     /// Creates a transparent indicator with the supplied frame.
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
-        isOpaque = false
+        configureDrawing()
     }
 
     /// Decodes an indicator using initialized Swift color defaults.
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
+        configureDrawing()
+    }
+
+    private func configureDrawing() {
         backgroundColor = .clear
         isOpaque = false
+        registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
+            (view: TMRoundProgressView, _) in
+            view.setNeedsDisplay()
+        }
     }
 
     /// The reference 37-by-37-point intrinsic size.
