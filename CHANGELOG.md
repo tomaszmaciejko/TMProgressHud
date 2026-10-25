@@ -2,7 +2,7 @@
 
 ## 2.0.0 (Unreleased)
 
-- Raise the minimum iOS version to 17.0; tvOS remains at 15.0.
+- Raise the minimum iOS and tvOS versions to 17.0.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

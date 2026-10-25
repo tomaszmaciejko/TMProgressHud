@@ -9,7 +9,7 @@ Use the Xcode version in `.xcode-version`. Start with:
 
 ## Hosted tests
 
-Hosted tests require iOS 17+ or tvOS 17+; the development library targets iOS 17 and tvOS 15. Replace the UUIDs below with dedicated test devices from `xcrun simctl list devices available`:
+Hosted tests require iOS 17+ or tvOS 17+; the development library targets iOS 17 and tvOS 17. Replace the UUIDs below with dedicated test devices from `xcrun simctl list devices available`:
 
 ```sh
 TMHUD_TEST_DESTINATION='platform=iOS Simulator,id=<UUID>' ./Scripts/test.sh

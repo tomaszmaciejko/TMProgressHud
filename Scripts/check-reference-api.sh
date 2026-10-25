@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 case "${TMHUD_REFERENCE_PLATFORM:-ios}" in
     ios) reference_platform=iphoneos; reference_target=arm64-apple-ios17.0 ;;
-    tvos) reference_platform=appletvos; reference_target=arm64-apple-tvos15.0 ;;
+    tvos) reference_platform=appletvos; reference_target=arm64-apple-tvos17.0 ;;
     *) printf '%s\n' 'Choose ios or tvos for TMHUD_REFERENCE_PLATFORM.' >&2; exit 1 ;;
 esac
 reference_sdk="$(xcrun --sdk "$reference_platform" --show-sdk-path)"

@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "TMProgressHud",
-    platforms: [.iOS(.v17), .tvOS(.v15)],
+    platforms: [.iOS(.v17), .tvOS(.v17)],
     products: [.library(name: "TMProgressHudUIKit", targets: ["TMProgressHudUIKit"])],
     targets: [
         .target(name: "TMProgressHudUIKit", resources: [.copy("PrivacyInfo.xcprivacy"), .copy("Resources")]),

@@ -173,7 +173,7 @@
 				<key>SUPPORTS_MACCATALYST</key>
 				<string>NO</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TARGETED_DEVICE_FAMILY[sdk=appletv*]</key>
 				<string>3</string>
 			</dict>
@@ -230,7 +230,7 @@
 				<key>SUPPORTS_MACCATALYST</key>
 				<string>NO</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TARGETED_DEVICE_FAMILY[sdk=appletv*]</key>
 				<string>3</string>
 			</dict>
@@ -260,7 +260,7 @@
 				<key>SUPPORTS_MACCATALYST</key>
 				<string>NO</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TARGETED_DEVICE_FAMILY[sdk=appletv*]</key>
 				<string>3</string>
 				<key>INFOPLIST_FILE[sdk=appletv*]</key>
@@ -322,7 +322,7 @@
 				<key>SUPPORTS_MACCATALYST</key>
 				<string>NO</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TARGETED_DEVICE_FAMILY[sdk=appletv*]</key>
 				<string>3</string>
 				<key>INFOPLIST_FILE[sdk=appletv*]</key>
