@@ -1,0 +1,20 @@
+[
+  {
+    "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
+    "sha256": "eac4d81a3a7b46f8594196ef7a2925915fdf04bb6bffe9ac0f623cb7a4ef7894",
+    "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
+    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+  },
+  {
+    "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
+    "sha256": "fd671229ccac9a7b3b0c234b53c61beb2ab5567b35c84bf4c575982437e39a7e",
+    "reason": "Swift/LLVM emits no source coverage regions for these enum/typealias/global constant declarations; raw values and offset are asserted in enumCasesPreserveRawValues.",
+    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+  },
+  {
+    "file": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
+    "sha256": "8259b993e56a6227e983ea8ea00518d873c0bd3f03901f59b84b17804c162e8d",
+    "reason": "Protocol method declaration has no executable body; concrete optional callback delivery is tested in repeatedHideRetainsCallbackOrdering.",
+    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+  }
+]

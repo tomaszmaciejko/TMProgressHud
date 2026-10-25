@@ -1,0 +1,169 @@
+name: Library checks
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: library-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  library:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Swift 6.0 compatibility build
+            runner: macos-15
+            developer: /Applications/Xcode_16.2.app/Contents/Developer
+            tests: false
+          - name: Current toolchain and coverage
+            runner: xcode-27
+            developer: /Applications/Xcode_27.1.app/Contents/Developer
+            tests: true
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: ${{ matrix.developer }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Install Swift 6.0 platform components
+        if: ${{ !matrix.tests }}
+        run: |
+          xcodebuild -downloadPlatform iOS -buildVersion 18.2
+          xcodebuild -downloadPlatform tvOS -buildVersion 18.2
+      - name: Public consumer Release build
+        run: ./Scripts/build-ios.sh
+      - name: Static checks and tooling tests
+        if: matrix.tests
+        run: ./Scripts/check.sh
+      - name: Original Swift import surface
+        run: ./Scripts/check-reference-api.sh
+      - name: Select CI simulator
+        if: matrix.tests
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          devices = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', 'available', '-j']))['devices']
+          candidates = [(runtime, device) for runtime, values in devices.items() if 'iOS' in runtime for device in values if 'iPhone' in device['name']]
+          if not candidates:
+              raise SystemExit('No iOS simulator available')
+          _, device = sorted(candidates, key=lambda item: item[0], reverse=True)[0]
+          with open(os.environ['GITHUB_ENV'], 'a') as file:
+              file.write('TMHUD_TEST_DESTINATION=platform=iOS Simulator,id=' + device['udid'] + '\n')
+          subprocess.run(['xcrun', 'simctl', 'boot', device['udid']], check=False)
+          subprocess.run(['xcrun', 'simctl', 'bootstatus', device['udid'], '-b'], check=True)
+          PY
+      - name: Hosted behavior and 100 percent production coverage
+        if: matrix.tests
+        run: ./Scripts/test.sh
+      - name: Select tvOS simulator
+        if: matrix.tests
+        run: |
+          python3 - <<'PYTV'
+          import json, os, subprocess
+          devices = json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', 'devices', 'available', '-j']))['devices']
+          candidates = [(runtime, device) for runtime, values in devices.items() if '.tvOS-' in runtime for device in values if device.get('isAvailable', True)]
+          if not candidates:
+              raise SystemExit('No tvOS simulator available: required platform coverage cannot be skipped')
+          _, device = sorted(candidates, key=lambda item: item[0], reverse=True)[0]
+          with open(os.environ['GITHUB_ENV'], 'a') as file:
+              file.write('TMHUD_TEST_DESTINATION=platform=tvOS Simulator,id=' + device['udid'] + '\n')
+          PYTV
+      - name: tvOS behavior and 100 percent production coverage
+        if: matrix.tests
+        run: ./Scripts/test.sh
+      - name: tvOS original import surface
+        run: TMHUD_REFERENCE_PLATFORM=tvos ./Scripts/check-reference-api.sh
+      - name: DocC
+        if: matrix.tests
+        run: xcodebuild docbuild -project TMProgressHud.xcodeproj -scheme TMProgressHudUIKit -destination 'generic/platform=iOS' -derivedDataPath .build/Docs CODE_SIGNING_ALLOWED=NO OTHER_DOCC_FLAGS=--warnings-as-errors
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always() && matrix.tests
+        with:
+          name: validation-evidence
+          include-hidden-files: true
+          path: |
+            .build/coverage
+          retention-days: 7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() && matrix.tests
+        with:
+          name: failing-test-results
+          include-hidden-files: true
+          path: .build/TestResults
+          retention-days: 3
+      - name: Build framework with oldest supported compiler
+        if: ${{ !matrix.tests }}
+        run: |
+          ./Scripts/build-xcframework.sh
+          python3 Scripts/check-distribution.py binary --platform ios --artifact Artifacts/TMProgressHudUIKit.xcframework
+          python3 Scripts/check-distribution.py binary --platform tvos --artifact Artifacts/TMProgressHudUIKit.xcframework
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !matrix.tests }}
+        with:
+          name: oldest-compiler-framework
+          path: |
+            Artifacts/TMProgressHudUIKit.xcframework.zip
+            Artifacts/SHA256SUMS
+            Artifacts/validation.json
+            Artifacts/LICENSE
+            Artifacts/THIRD_PARTY_NOTICES.md
+          retention-days: 3
+  distribution:
+    needs: library
+    name: Four distribution channels
+    runs-on: xcode-27
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.1.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Distribution tools
+        run: |
+          ruby --version
+          pod --version
+          carthage version
+          test "$(pod --version)" = '1.17.0'
+          test "$(carthage version)" = '0.40.0'
+      - name: Validate podspec
+        run: pod lib lint TMProgressHudUIKit.podspec --platforms=ios,tvos --swift-version=6.0 --skip-tests --fail-fast
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: oldest-compiler-framework
+          path: Artifacts
+      - name: Audit framework from oldest compiler
+        run: |
+          (cd Artifacts && shasum -a 256 -c SHA256SUMS)
+          ditto -x -k Artifacts/TMProgressHudUIKit.xcframework.zip Artifacts
+          python3 Scripts/audit-xcframework.py Artifacts/TMProgressHudUIKit.xcframework --report Artifacts/current-toolchain-validation.json
+      - name: Build and audit Carthage source distribution
+        run: |
+          carthage build --no-skip-current --use-xcframeworks --platform iOS,tvOS
+          python3 Scripts/audit-xcframework.py Carthage/Build/TMProgressHudUIKit.xcframework --report Carthage/Build/validation.json
+      - name: Independent Release consumers
+        run: |
+          for platform in ios tvos; do
+            python3 Scripts/check-distribution.py spm --platform "$platform"
+            python3 Scripts/check-distribution.py cocoapods --platform "$platform"
+            python3 Scripts/check-distribution.py binary --platform "$platform" --artifact Artifacts/TMProgressHudUIKit.xcframework
+            python3 Scripts/check-distribution.py carthage --platform "$platform" --artifact Carthage/Build/TMProgressHudUIKit.xcframework
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: distribution-evidence
+          path: |
+            Artifacts/SHA256SUMS
+            Artifacts/validation.json
+            Artifacts/current-toolchain-validation.json
+            Carthage/Build/validation.json
+            .build/Consumers/*/validation.json
+          include-hidden-files: true
+          retention-days: 7

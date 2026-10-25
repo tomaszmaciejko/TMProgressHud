@@ -1,0 +1,502 @@
+{
+  "revision": "4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781",
+  "verification": "Static source audit only; runtime behavior must be characterized before equivalence claims.",
+  "declarations": [
+    {
+      "id": "MBBackgroundView",
+      "kind": "class",
+      "header_line": 386,
+      "disposition": "preserve",
+      "contract": "Public UIView; zero intrinsic size; blur effect child rebuilt on style/effect changes.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBBackgroundView.blurEffectStyle",
+      "kind": "property",
+      "header_line": 398,
+      "disposition": "preserve",
+      "contract": "Actual iOS 17 default systemThickMaterial, not the Light value in header prose; change recreates effect child.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBBackgroundView.color",
+      "kind": "property",
+      "header_line": 407,
+      "disposition": "preserve",
+      "contract": "Default nil on iOS 17; header permits nil but setter asserts nonnil in debug. Record this inconsistency rather than silently fixing.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBBackgroundView.style",
+      "kind": "property",
+      "header_line": 392,
+      "disposition": "preserve",
+      "contract": "Default blur, including standalone view. Solid and blur retain color semantics.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBBarProgressView",
+      "kind": "class",
+      "header_line": 358,
+      "disposition": "preserve",
+      "contract": "Public standalone UIView; default frame 120x20, intrinsic size 120x10; preserve three progress drawing branches.",
+      "test_group": "bar"
+    },
+    {
+      "id": "MBBarProgressView.lineColor",
+      "kind": "property",
+      "header_line": 369,
+      "disposition": "preserve",
+      "contract": "Default white. Synthesized setter does not explicitly request redraw; distinguish from progress colors.",
+      "test_group": "bar"
+    },
+    {
+      "id": "MBBarProgressView.progress",
+      "kind": "property",
+      "header_line": 363,
+      "disposition": "preserve",
+      "contract": "Float default zero, raw storage without clamping; changed value requests redraw.",
+      "test_group": "bar"
+    },
+    {
+      "id": "MBBarProgressView.progressColor",
+      "kind": "property",
+      "header_line": 381,
+      "disposition": "preserve",
+      "contract": "Default white; changed nonnil color requests redraw.",
+      "test_group": "bar"
+    },
+    {
+      "id": "MBBarProgressView.progressRemainingColor",
+      "kind": "property",
+      "header_line": 375,
+      "disposition": "preserve",
+      "contract": "Default clear; changed nonnil color requests redraw.",
+      "test_group": "bar"
+    },
+    {
+      "id": "MBProgressHUD",
+      "kind": "class",
+      "header_line": 88,
+      "disposition": "preserve",
+      "contract": "UIView subclass; frame and coder initializers run common initialization; host convenience uses bounds.",
+      "test_group": "host"
+    },
+    {
+      "id": "MBProgressHUD.+HUDForView:",
+      "kind": "method",
+      "header_line": 128,
+      "disposition": "preserve",
+      "contract": "Reverse direct-subview lookup; include subclasses, skip finished presentations, do not recurse into descendants.",
+      "test_group": "host"
+    },
+    {
+      "id": "MBProgressHUD.+hideHUDForView:animated:",
+      "kind": "method",
+      "header_line": 120,
+      "disposition": "preserve",
+      "contract": "Find last unfinished direct HUD subview; set removal true, request hide, return whether found (not whether animation completed).",
+      "test_group": "host"
+    },
+    {
+      "id": "MBProgressHUD.+showHUDAddedTo:animated:",
+      "kind": "method",
+      "header_line": 103,
+      "disposition": "preserve",
+      "contract": "Create HUD, set removal-on-hide true, attach to supplied host, then show; return that instance.",
+      "test_group": "host"
+    },
+    {
+      "id": "MBProgressHUD.-hideAnimated:",
+      "kind": "method",
+      "header_line": 162,
+      "disposition": "preserve",
+      "contract": "Invalidate grace, set shared animation flag and finished; wait remaining minimum duration if necessary, otherwise hide.",
+      "test_group": "timing"
+    },
+    {
+      "id": "MBProgressHUD.-hideAnimated:afterDelay:",
+      "kind": "method",
+      "header_line": 174,
+      "disposition": "preserve",
+      "contract": "Replace existing delayed-hide timer; callback invokes ordinary hide and passes animation argument.",
+      "test_group": "timing"
+    },
+    {
+      "id": "MBProgressHUD.-initWithView:",
+      "kind": "method",
+      "header_line": 137,
+      "disposition": "preserve",
+      "contract": "Use supplied view bounds; does not attach the HUD automatically.",
+      "test_group": "initialization"
+    },
+    {
+      "id": "MBProgressHUD.-showAnimated:",
+      "kind": "method",
+      "header_line": 151,
+      "disposition": "preserve",
+      "contract": "Invalidate minimum timer, update shared animation flag, clear finished; schedule grace or show immediately.",
+      "test_group": "timing"
+    },
+    {
+      "id": "MBProgressHUD.animationType",
+      "kind": "property",
+      "header_line": 227,
+      "disposition": "preserve",
+      "contract": "Default fade; preserve all four variants and 0.3-second spring settings.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUD.backgroundView",
+      "kind": "property",
+      "header_line": 285,
+      "disposition": "preserve",
+      "contract": "Read-only reference; initial full-host solid clear view, alpha zero before presentation.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBProgressHUD.bezelView",
+      "kind": "property",
+      "header_line": 280,
+      "disposition": "preserve",
+      "contract": "Read-only reference to mutable background view; blur/systemThickMaterial on iOS 17; 5-point corner radius.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBProgressHUD.button",
+      "kind": "property",
+      "header_line": 307,
+      "disposition": "preserve",
+      "contract": "Read-only UIButton reference to private rounded subclass; bold 12-point title; intrinsic size zero unless title and events exist.",
+      "test_group": "content"
+    },
+    {
+      "id": "MBProgressHUD.completionBlock",
+      "kind": "property",
+      "header_line": 184,
+      "disposition": "preserve",
+      "contract": "Optional copied completion closure, invoked on every done call; no once-only guard in upstream.",
+      "test_group": "callbacks"
+    },
+    {
+      "id": "MBProgressHUD.contentColor",
+      "kind": "property",
+      "header_line": 222,
+      "disposition": "preserve",
+      "contract": "iOS 17 default label color at alpha 0.7. Nil stops propagation; it does not restore previous individual colors.",
+      "test_group": "colors"
+    },
+    {
+      "id": "MBProgressHUD.customView",
+      "kind": "property",
+      "header_line": 291,
+      "disposition": "preserve",
+      "contract": "Optional caller UIView; replacement updates indicator only in custom mode. Preserve progress/tint propagation and identity semantics.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUD.defaultMotionEffectsEnabled",
+      "kind": "property",
+      "header_line": 259,
+      "disposition": "preserve",
+      "contract": "Default false; horizontal and vertical center tilt effects use plus/minus 10 points; preserve repeated-call quirk.",
+      "test_group": "motion"
+    },
+    {
+      "id": "MBProgressHUD.delegate",
+      "kind": "property",
+      "header_line": 179,
+      "disposition": "preserve",
+      "contract": "Weak optional delegate; notify after completion closure in done; keep optional callback semantics.",
+      "test_group": "callbacks"
+    },
+    {
+      "id": "MBProgressHUD.detailsLabel",
+      "kind": "property",
+      "header_line": 302,
+      "disposition": "preserve",
+      "contract": "Read-only UILabel reference; centered, bold 12-point font, unlimited lines.",
+      "test_group": "content"
+    },
+    {
+      "id": "MBProgressHUD.graceTime",
+      "kind": "property",
+      "header_line": 195,
+      "disposition": "preserve",
+      "contract": "Zero by default; only values greater than zero select delayed-show branch. Configure before show.",
+      "test_group": "timing"
+    },
+    {
+      "id": "MBProgressHUD.label",
+      "kind": "property",
+      "header_line": 297,
+      "disposition": "preserve",
+      "contract": "Read-only UILabel reference; centered, bold 16-point font, default single line; caller may customize.",
+      "test_group": "content"
+    },
+    {
+      "id": "MBProgressHUD.margin",
+      "kind": "property",
+      "header_line": 241,
+      "disposition": "preserve",
+      "contract": "Default 20 points; both bezel inner padding and outer minimum margin.",
+      "test_group": "layout"
+    },
+    {
+      "id": "MBProgressHUD.minShowTime",
+      "kind": "property",
+      "header_line": 202,
+      "disposition": "preserve",
+      "contract": "Zero by default; remaining time calculated from showStarted using NSDate wall time upstream.",
+      "test_group": "timing"
+    },
+    {
+      "id": "MBProgressHUD.minSize",
+      "kind": "property",
+      "header_line": 246,
+      "disposition": "preserve",
+      "contract": "Default zero; minimum width/height constraints priority 997 when nonzero.",
+      "test_group": "layout"
+    },
+    {
+      "id": "MBProgressHUD.mode",
+      "kind": "property",
+      "header_line": 215,
+      "disposition": "preserve",
+      "contract": "Default indeterminate; change updates indicator; same value does not trigger replacement.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUD.offset",
+      "kind": "property",
+      "header_line": 234,
+      "disposition": "preserve",
+      "contract": "Default zero; center constraints at priority 998, bounded by higher-priority side margins.",
+      "test_group": "layout"
+    },
+    {
+      "id": "MBProgressHUD.progress",
+      "kind": "property",
+      "header_line": 266,
+      "disposition": "preserve",
+      "contract": "Float default zero; stores raw input without clamping; forwards to indicator supporting progress setter.",
+      "test_group": "progress"
+    },
+    {
+      "id": "MBProgressHUD.progressObject",
+      "kind": "property",
+      "header_line": 273,
+      "disposition": "preserve",
+      "contract": "Optional Foundation.Progress; changed object enables display-link polling immediately, even before show.",
+      "test_group": "progress"
+    },
+    {
+      "id": "MBProgressHUD.removeFromSuperViewOnHide",
+      "kind": "property",
+      "header_line": 208,
+      "disposition": "preserve",
+      "contract": "False for ordinary initialization; helpers set true. Removal occurs in done only if finished.",
+      "test_group": "host"
+    },
+    {
+      "id": "MBProgressHUD.square",
+      "kind": "property",
+      "header_line": 251,
+      "disposition": "preserve",
+      "contract": "Default false; optional equal-height/width constraint at priority 997.",
+      "test_group": "layout"
+    },
+    {
+      "id": "MBProgressHUDAnimation",
+      "kind": "enum",
+      "header_line": 54,
+      "disposition": "preserve",
+      "contract": "NSInteger-backed enum; preserve case ordering and raw values starting at zero.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUDAnimationFade",
+      "kind": "enum_case",
+      "header_line": 56,
+      "disposition": "preserve",
+      "contract": "Preserve Fade case with raw value 0.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUDAnimationZoom",
+      "kind": "enum_case",
+      "header_line": 58,
+      "disposition": "preserve",
+      "contract": "Preserve Zoom case with raw value 1.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUDAnimationZoomIn",
+      "kind": "enum_case",
+      "header_line": 62,
+      "disposition": "preserve",
+      "contract": "Preserve ZoomIn case with raw value 3.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUDAnimationZoomOut",
+      "kind": "enum_case",
+      "header_line": 60,
+      "disposition": "preserve",
+      "contract": "Preserve ZoomOut case with raw value 2.",
+      "test_group": "animations"
+    },
+    {
+      "id": "MBProgressHUDBackgroundStyle",
+      "kind": "enum",
+      "header_line": 65,
+      "disposition": "preserve",
+      "contract": "NSInteger-backed enum; preserve case ordering and raw values starting at zero.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBProgressHUDBackgroundStyleBlur",
+      "kind": "enum_case",
+      "header_line": 69,
+      "disposition": "preserve",
+      "contract": "Preserve Blur case with raw value 1.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBProgressHUDBackgroundStyleSolidColor",
+      "kind": "enum_case",
+      "header_line": 67,
+      "disposition": "preserve",
+      "contract": "Preserve SolidColor case with raw value 0.",
+      "test_group": "background"
+    },
+    {
+      "id": "MBProgressHUDCompletionBlock",
+      "kind": "closure_alias",
+      "header_line": 72,
+      "disposition": "preserve",
+      "contract": "Void-to-Void closure alias; optional property with copied lifetime.",
+      "test_group": "callbacks"
+    },
+    {
+      "id": "MBProgressHUDDelegate",
+      "kind": "protocol",
+      "header_line": 312,
+      "disposition": "preserve",
+      "contract": "NSObject-based delegate protocol with optional hudWasHidden callback; do not replace with closure-only API.",
+      "test_group": "callbacks"
+    },
+    {
+      "id": "MBProgressHUDDelegate.-hudWasHidden:",
+      "kind": "method",
+      "header_line": 319,
+      "disposition": "preserve",
+      "contract": "Optional callback receives the HUD after completionBlock invocation; do not assume exactly once upstream.",
+      "test_group": "callbacks"
+    },
+    {
+      "id": "MBProgressHUDMode",
+      "kind": "enum",
+      "header_line": 39,
+      "disposition": "preserve",
+      "contract": "NSInteger-backed enum; preserve case ordering and raw values starting at zero.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeAnnularDeterminate",
+      "kind": "enum_case",
+      "header_line": 47,
+      "disposition": "preserve",
+      "contract": "Preserve AnnularDeterminate case with raw value 3.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeCustomView",
+      "kind": "enum_case",
+      "header_line": 49,
+      "disposition": "preserve",
+      "contract": "Preserve CustomView case with raw value 4.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeDeterminate",
+      "kind": "enum_case",
+      "header_line": 43,
+      "disposition": "preserve",
+      "contract": "Preserve Determinate case with raw value 1.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeDeterminateHorizontalBar",
+      "kind": "enum_case",
+      "header_line": 45,
+      "disposition": "preserve",
+      "contract": "Preserve DeterminateHorizontalBar case with raw value 2.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeIndeterminate",
+      "kind": "enum_case",
+      "header_line": 41,
+      "disposition": "preserve",
+      "contract": "Preserve Indeterminate case with raw value 0.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressHUDModeText",
+      "kind": "enum_case",
+      "header_line": 51,
+      "disposition": "preserve",
+      "contract": "Preserve Text case with raw value 5.",
+      "test_group": "indicators"
+    },
+    {
+      "id": "MBProgressMaxOffset",
+      "kind": "constant",
+      "header_line": 37,
+      "disposition": "preserve",
+      "contract": "Public CGFloat sentinel equals 1,000,000; use with signed offset to push to host edge, constrained by margins.",
+      "test_group": "layout"
+    },
+    {
+      "id": "MBRoundProgressView",
+      "kind": "class",
+      "header_line": 327,
+      "disposition": "preserve",
+      "contract": "Public standalone UIView with 37x37 default frame and intrinsic size; preserve pie/ring drawing.",
+      "test_group": "round"
+    },
+    {
+      "id": "MBRoundProgressView.annular",
+      "kind": "property",
+      "header_line": 350,
+      "disposition": "preserve",
+      "contract": "Default false. Synthesized setter does not explicitly request redraw; getter imports as isAnnular.",
+      "test_group": "round"
+    },
+    {
+      "id": "MBRoundProgressView.backgroundTintColor",
+      "kind": "property",
+      "header_line": 345,
+      "disposition": "preserve",
+      "contract": "Standalone default white at alpha 0.1; used for ring and pie drawing on iOS 17 despite header wording.",
+      "test_group": "round"
+    },
+    {
+      "id": "MBRoundProgressView.progress",
+      "kind": "property",
+      "header_line": 332,
+      "disposition": "preserve",
+      "contract": "Float default zero, raw storage without clamping; changed value requests redraw.",
+      "test_group": "round"
+    },
+    {
+      "id": "MBRoundProgressView.progressTintColor",
+      "kind": "property",
+      "header_line": 338,
+      "disposition": "preserve",
+      "contract": "Standalone default opaque white; changed nonnil color redraws; HUD content propagation may override.",
+      "test_group": "round"
+    }
+  ]
+}

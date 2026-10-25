@@ -1,0 +1,4 @@
+module MBProgressHUDReference {
+    header "../../Reference/MBProgressHUD/MBProgressHUD.h"
+    export *
+}

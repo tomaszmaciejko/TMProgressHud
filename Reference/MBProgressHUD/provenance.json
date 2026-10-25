@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/jdg/MBProgressHUD",
+  "revision": "4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781",
+  "commit_date": "2024-05-10",
+  "observed_at": "2026-10-24",
+  "header_version": "1.2.0",
+  "baseline": "Pinned default-branch revision; implementation identical to release tag 1.2.0, with later packaging/privacy updates.",
+  "files": {
+    "MBProgressHUD.h": "0a61d206ca8e5a92141cbb0fd14dff0d27e6d78bd41e1cfb97297ecf5c0b8b5c",
+    "MBProgressHUD.m": "a2bae10f1358ac0c038f9ca0d5c6b91445e3240abadc40a108d16b1371e546a3",
+    "LICENSE": "3e4d494d81649c6ed26b1701f8c49ecf3710a47fd6220b3b0a21b422ba5b46f3",
+    "Package.swift": "352e8ca91c7fcbb7286a32a6b5f0ec64e7705967d8c5190fa7276c08645e5222",
+    "PrivacyInfo.xcprivacy": "17784da62e51f74c5859df32fe402e01e25cdf6f797a4add06e2a3ce15c911f4"
+  }
+}

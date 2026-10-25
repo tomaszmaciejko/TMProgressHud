@@ -1,0 +1,84 @@
+name: Minimum iOS runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      ios-version:
+        description: Simulator version
+        type: choice
+        options: ['15.0', '15.5']
+        default: '15.5'
+
+permissions:
+  contents: read
+
+jobs:
+  consumer:
+    name: iOS ${{ inputs.ios-version }} consumer
+    runs-on: macos-15
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      TMHUD_IOS_VERSION: ${{ inputs.ios-version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify environment
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcodebuild -showsdks
+          xcodes version
+          mkdir -p .build/minimum-ios
+      - name: Install iOS runtime
+        timeout-minutes: 10
+        run: sudo "$(command -v xcodes)" runtimes install "iOS $TMHUD_IOS_VERSION"
+      - name: Create dedicated simulator
+        timeout-minutes: 2
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+
+          output = subprocess.check_output(['xcrun', 'simctl', 'list', 'runtimes', '-j'], text=True, timeout=30)
+          Path('.build/minimum-ios/runtimes.json').write_text(output)
+          runtimes = [runtime for runtime in json.loads(output)['runtimes']
+                      if '.iOS-' in runtime['identifier']
+                      and runtime['version'] == os.environ['TMHUD_IOS_VERSION']
+                      and runtime.get('isAvailable', False)]
+          if len(runtimes) != 1:
+              raise SystemExit('Requested iOS runtime is not uniquely available; no runtime test performed')
+          runtime = runtimes[0]
+          device = subprocess.check_output([
+              'xcrun', 'simctl', 'create', 'TMProgressHud minimum iOS',
+              'com.apple.CoreSimulator.SimDeviceType.iPhone-13', runtime['identifier'],
+          ], text=True, timeout=30).strip()
+          Path('.build/minimum-ios/destination.json').write_text(json.dumps({
+              'runtime': runtime, 'device': device, 'revision': os.environ['GITHUB_SHA'],
+          }, indent=2) + '\n')
+          with open(os.environ['GITHUB_ENV'], 'a') as file:
+              file.write('TMHUD_SIMULATOR_ID=' + device + '\n')
+          PY
+      - name: Boot iOS simulator
+        timeout-minutes: 4
+        run: |
+          xcrun simctl boot "$TMHUD_SIMULATOR_ID"
+          xcrun simctl bootstatus "$TMHUD_SIMULATOR_ID" -b
+      - name: Run six-mode consumer verification
+        timeout-minutes: 5
+        run: python3 Scripts/check-distribution.py spm --platform ios --simulator-id "$TMHUD_SIMULATOR_ID"
+      - name: Collect runtime diagnostics
+        if: always()
+        timeout-minutes: 1
+        run: |
+          mkdir -p .build/minimum-ios
+          xcrun simctl list runtimes -j > .build/minimum-ios/final-runtimes.json
+          xcrun simctl list devices -j > .build/minimum-ios/final-devices.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: minimum-ios-${{ inputs.ios-version }}
+          include-hidden-files: true
+          path: |
+            .build/minimum-ios
+            .build/Consumers/spm-ios/validation.json
+          retention-days: 3

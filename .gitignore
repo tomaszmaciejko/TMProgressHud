@@ -1,0 +1,20 @@
+# Local build output
+.build/
+.swiftpm/
+DerivedData/
+*.xcresult
+.DS_Store
+xcuserdata/
+
+# Python tooling caches
+__pycache__/
+*.pyc
+
+# Generated distribution products
+Carthage/Build/
+Carthage/Checkouts/
+*.xcarchive
+*.xcframework
+*.xcframework.zip
+
+Artifacts/
