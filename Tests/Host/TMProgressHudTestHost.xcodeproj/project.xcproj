@@ -1,0 +1,320 @@
+{
+  "default-configuration": "Release",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "en",
+      "Base"
+    ]
+  },
+  "packages": [],
+  "files": [
+    {
+      "path": "HostApp.swift",
+      "target-membership": [
+        "TMProgressHudTestHost/compile-sources"
+      ]
+    },
+    {
+      "kind": "group",
+      "children": [
+        {
+          "path": "<PRODUCTS>/TMProgressHudTestHost.app",
+          "type": "wrapper.application"
+        },
+        {
+          "path": "<PRODUCTS>/TMProgressHudUIKitTests.xctest",
+          "type": "wrapper.cfbundle"
+        },
+        {
+          "path": "<PRODUCTS>/TMProgressHudUIKit.framework",
+          "type": "wrapper.framework",
+          "target-membership": [
+            "TMProgressHudUIKitTests/frameworks",
+            {
+              "build-phase": "TMProgressHudUIKitTests/copy/Embed framework",
+              "header-preservation": "remove-on-copy"
+            }
+          ]
+        }
+      ],
+      "name": "Products"
+    },
+    {
+      "kind": "group",
+      "children": [
+        {
+          "path": "../../Sources/TMProgressHudUIKit/HUDMetrics.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMBackgroundView.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMBarProgressView.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHud+Content.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/HUDLayout.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHud+Lifecycle.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHud.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMRoundProgressView.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/PrivacyInfo.xcprivacy",
+          "target-membership": [
+            "TMProgressHudUIKit/resources"
+          ]
+        }
+      ],
+      "name": "Library sources"
+    },
+    {
+      "kind": "group",
+      "children": [
+        {
+          "path": "../TMProgressHudUIKitTests/ArchiveAndButtonTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/ReferenceContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/LifecycleTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/IndicatorTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Reference/MBProgressHUD/MBProgressHUD.m",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/HUDBehaviorTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "Info.plist"
+        },
+        {
+          "path": "Reference.modulemap"
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/AdditionalFidelityAuditTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/TraitAppearanceTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/HostLayoutTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/LayoutContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        }
+      ],
+      "name": "Tests and reference"
+    }
+  ],
+  "targets": [
+    {
+      "name": "TMProgressHudTestHost",
+      "id": "A00000000000000000000005",
+      "product": "Products/TMProgressHudTestHost.app",
+      "dependencies": [],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources"
+      ],
+      "package-product-members": [],
+      "build-settings": {
+        "CODE_SIGNING_ALLOWED": "NO",
+        "INFOPLIST_FILE": "Info.plist",
+        "INFOPLIST_FILE[sdk=appletv*]": "Info-tvOS.plist",
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.tmprogresshud.testhost",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+        "SUPPORTS_MACCATALYST": "NO",
+        "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+        "TVOS_DEPLOYMENT_TARGET": "17.0"
+      },
+      "product-type": "application"
+    },
+    {
+      "name": "TMProgressHudUIKitTests",
+      "id": "B00000000000000000000001",
+      "product": "Products/TMProgressHudUIKitTests.xctest",
+      "dependencies": [
+        "TMProgressHudTestHost",
+        "TMProgressHudUIKit"
+      ],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        {
+          "kind": "copy",
+          "name": "Embed framework",
+          "bundle-base-path": "frameworks-directory",
+          "relative-path": ""
+        }
+      ],
+      "package-product-members": [],
+      "build-settings": {
+        "BUNDLE_LOADER": "$(TEST_HOST)",
+        "CODE_SIGNING_ALLOWED": "NO",
+        "ENABLE_TESTING_SEARCH_PATHS": "YES",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@loader_path/Frameworks",
+          "@executable_path/Frameworks"
+        ],
+        "OTHER_SWIFT_FLAGS": [
+          "$(inherited)",
+          "-Xcc",
+          "-fmodule-map-file=$(SRCROOT)/Reference.modulemap"
+        ],
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.tmprogresshud.tests",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+        "SUPPORTS_MACCATALYST": "NO",
+        "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+        "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/TMProgressHudTestHost.app/TMProgressHudTestHost",
+        "TVOS_DEPLOYMENT_TARGET": "17.0"
+      },
+      "product-type": "bundle.unit-test"
+    },
+    {
+      "name": "TMProgressHudUIKit",
+      "id": "F00000000000000000000001",
+      "product": "Products/TMProgressHudUIKit.framework",
+      "dependencies": [],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources"
+      ],
+      "package-product-members": [],
+      "build-settings": {
+        "CODE_SIGNING_ALLOWED": "NO",
+        "DEFINES_MODULE": "YES",
+        "ENABLE_TESTABILITY": "YES",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.tmprogresshud.testframework",
+        "PRODUCT_NAME": "TMProgressHudUIKit",
+        "SKIP_INSTALL": "YES",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+        "SUPPORTS_MACCATALYST": "NO",
+        "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+        "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+        "TVOS_DEPLOYMENT_TARGET": "17.0"
+      },
+      "product-type": "framework"
+    }
+  ],
+  "build-settings": {
+    "ALWAYS_SEARCH_USER_PATHS": "NO",
+    "CLANG_ENABLE_MODULES": "YES",
+    "CLANG_ENABLE_OBJC_ARC": "YES",
+    "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+    "SDKROOT": "iphoneos",
+    "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+    "SUPPORTS_MACCATALYST": "NO",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Release]": "-O",
+    "SWIFT_VERSION": "6.0",
+    "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+    "TVOS_DEPLOYMENT_TARGET": "17.0"
+  }
+}

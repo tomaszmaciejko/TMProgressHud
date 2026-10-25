@@ -9,6 +9,11 @@ if [ -e "$artifact_root/TMProgressHudUIKit.xcframework" ]; then
     printf '%s\n' 'Choose a fresh TMHUD_ARTIFACT_DIR; existing XCFramework is never silently replaced.' >&2
     exit 1
 fi
+framework_project="TMProgressHud.xcodeproj"
+if [ "${TMHUD_PROJECT_FORMAT:-json}" = "plist" ]; then
+    framework_project=".build/LegacyFramework/TMProgressHud.xcodeproj"
+    python3 Scripts/project-factory.py framework "$framework_project" --format plist
+fi
 for variant in ios ios-simulator tvos tvos-simulator; do
     case "$variant" in
         ios) sdk=iphoneos; destination='generic/platform=iOS' ;;
@@ -16,7 +21,7 @@ for variant in ios ios-simulator tvos tvos-simulator; do
         tvos) sdk=appletvos; destination='generic/platform=tvOS' ;;
         tvos-simulator) sdk=appletvsimulator; destination='generic/platform=tvOS Simulator' ;;
     esac
-    xcodebuild archive -project TMProgressHud.xcodeproj -scheme TMProgressHudUIKit \
+    xcodebuild archive -project "$framework_project" -scheme TMProgressHudUIKit \
         -configuration Release -sdk "$sdk" -destination "$destination" \
         -archivePath "$artifact_root/$variant.xcarchive" -derivedDataPath .build/DistributionBuild \
         CODE_SIGNING_ALLOWED=NO SKIP_INSTALL=NO BUILD_LIBRARY_FOR_DISTRIBUTION=YES

@@ -36,8 +36,14 @@ jobs:
         run: |
           xcodebuild -downloadPlatform iOS -buildVersion 18.2
           xcodebuild -downloadPlatform tvOS -buildVersion 18.2
-      - name: Public consumer Release build
+      - name: Demo Release build
+        if: matrix.tests
         run: ./Scripts/build-ios.sh
+      - name: Swift 6.0 SPM consumers
+        if: ${{ !matrix.tests }}
+        run: |
+          python3 Scripts/check-distribution.py spm --platform ios
+          python3 Scripts/check-distribution.py spm --platform tvos
       - name: Static checks and tooling tests
         if: matrix.tests
         run: ./Scripts/check.sh
@@ -100,7 +106,7 @@ jobs:
       - name: Build framework with oldest supported compiler
         if: ${{ !matrix.tests }}
         run: |
-          ./Scripts/build-xcframework.sh
+          TMHUD_PROJECT_FORMAT=plist ./Scripts/build-xcframework.sh
           python3 Scripts/check-distribution.py binary --platform ios --artifact Artifacts/TMProgressHudUIKit.xcframework
           python3 Scripts/check-distribution.py binary --platform tvos --artifact Artifacts/TMProgressHudUIKit.xcframework
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

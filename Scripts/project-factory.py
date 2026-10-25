@@ -3,9 +3,12 @@
 import argparse
 import json
 import os
-import plistlib
 from pathlib import Path
+import sys
 import xml.etree.ElementTree as ET
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from project_format import write_project
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text().strip()
@@ -30,7 +33,8 @@ class Project:
         return self.add("XCConfigurationList", buildConfigurations=refs, defaultConfigurationIsVisible="0", defaultConfigurationName="Release")
 
 
-def generate(output, kind, platform="ios", artifact=None, remote_source=None):
+def generate(output, kind, platform="ios", artifact=None, remote_source=None, project_format=None):
+    output = output.resolve()
     framework = kind == "framework"
     product_name = "TMProgressHudUIKit" if framework else "TMProgressHudConsumer"
     extension = "framework" if framework else "app"
@@ -73,7 +77,9 @@ def generate(output, kind, platform="ios", artifact=None, remote_source=None):
     target = p.add("PBXNativeTarget", name=product_name, productName=product_name, productReference=product, productType="com.apple.product-type.framework" if framework else "com.apple.product-type.application", buildConfigurationList=p.configurations(settings), buildPhases=phases, dependencies=[], buildRules=[], packageProductDependencies=dependencies)
     root = p.add("PBXProject", attributes={"LastUpgradeCheck": "1600"}, buildConfigurationList=p.configurations({"SDKROOT": "appletvos" if platform == "tvos" else "iphoneos"}), compatibilityVersion="Xcode 14.0", developmentRegion="en", knownRegions=["en", "Base"], mainGroup=group, productRefGroup=products, projectDirPath="", projectRoot="", targets=[target], packageReferences=packages)
     output.mkdir(parents=True, exist_ok=True)
-    (output / "project.pbxproj").write_bytes(plistlib.dumps({"archiveVersion": "1", "classes": {}, "objectVersion": "56", "objects": p.objects, "rootObject": root}, sort_keys=False))
+    # Disposable consumers retain compatibility with CocoaPods and older Xcode.
+    project_format = project_format or ("json" if framework else "plist")
+    write_project(output, {"archiveVersion": "1", "classes": {}, "objectVersion": "56", "objects": p.objects, "rootObject": root}, project_format)
     scheme = ET.Element("Scheme", LastUpgradeVersion="1600", version="1.3")
     build = ET.SubElement(scheme, "BuildAction", parallelizeBuildables="YES", buildImplicitDependencies="YES")
     entries = ET.SubElement(build, "BuildActionEntries")
@@ -92,7 +98,8 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--platform", choices=["ios", "tvos"], default="ios")
     parser.add_argument("--artifact", type=Path)
+    parser.add_argument("--format", choices=["json", "plist"], help="Defaults to JSON for the framework; plist for disposable compatibility consumers")
     args = parser.parse_args()
     if args.kind in ["binary", "carthage"] and args.artifact is None:
         parser.error("Binary consumers require --artifact")
-    generate(args.output.resolve(), args.kind, args.platform, args.artifact)
+    generate(args.output.resolve(), args.kind, args.platform, args.artifact, project_format=args.format)

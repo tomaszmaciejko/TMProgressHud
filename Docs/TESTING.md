@@ -1,6 +1,6 @@
 # Testing
 
-Use the Xcode version in `.xcode-version`. Start with:
+Use the Xcode version in `.xcode-version`. Maintained projects use JSON and require Xcode 27+. Disposable distribution consumers use the legacy format for CocoaPods and older-compiler checks; this does not change the library’s Swift 6.0 requirement. Start with:
 
 ```sh
 ./Scripts/check.sh
@@ -28,7 +28,7 @@ pod lib lint TMProgressHudUIKit.podspec --platforms=ios,tvos --swift-version=6.0
 carthage build --no-skip-current --use-xcframeworks --platform iOS,tvOS
 ```
 
-The framework builder requires a fresh output folder; set `TMHUD_ARTIFACT_DIR` to choose one. The shared `TMProgressHudUIKit` scheme builds the shipping framework; the framework under `Tests/Host` is test-only.
+The framework builder requires a fresh output folder; set `TMHUD_ARTIFACT_DIR` to choose one. For an older compiler, set `TMHUD_PROJECT_FORMAT=plist` to generate a temporary compatible framework project under `.build/`. The shared `TMProgressHudUIKit` scheme builds the shipping framework; the framework under `Tests/Host` is test-only.
 
 Build an independent consumer for either platform:
 

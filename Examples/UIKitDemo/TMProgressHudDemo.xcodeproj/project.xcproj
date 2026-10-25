@@ -1,0 +1,92 @@
+{
+  "default-configuration": "Release",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "en",
+      "Base"
+    ]
+  },
+  "packages": [
+    {
+      "kind": "local",
+      "path": "../.."
+    }
+  ],
+  "files": [
+    {
+      "path": "DemoApp.swift",
+      "target-membership": [
+        "TMProgressHudDemo/compile-sources"
+      ]
+    },
+    {
+      "kind": "group",
+      "children": [
+        {
+          "path": "<PRODUCTS>/TMProgressHudDemo.app",
+          "type": "wrapper.application"
+        }
+      ],
+      "name": "Products"
+    }
+  ],
+  "targets": [
+    {
+      "name": "TMProgressHudDemo",
+      "id": "A00000000000000000000005",
+      "product": "Products/TMProgressHudDemo.app",
+      "dependencies": [
+        {
+          "kind": "package",
+          "product-name": "TMProgressHudUIKit"
+        }
+      ],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources"
+      ],
+      "package-product-members": [
+        {
+          "product-name": "TMProgressHudUIKit",
+          "build-phase": {
+            "build-phase": "frameworks"
+          }
+        }
+      ],
+      "build-settings": {
+        "CODE_SIGNING_ALLOWED": "NO",
+        "INFOPLIST_FILE": "Info.plist",
+        "INFOPLIST_FILE[sdk=appletv*]": "Info-tvOS.plist",
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.tmprogresshud.demo",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+        "SUPPORTS_MACCATALYST": "NO",
+        "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+        "TVOS_DEPLOYMENT_TARGET": "17.0"
+      },
+      "product-type": "application"
+    }
+  ],
+  "build-settings": {
+    "ALWAYS_SEARCH_USER_PATHS": "NO",
+    "CLANG_ENABLE_MODULES": "YES",
+    "CLANG_ENABLE_OBJC_ARC": "YES",
+    "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+    "SDKROOT": "iphoneos",
+    "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+    "SUPPORTS_MACCATALYST": "NO",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Release]": "-O",
+    "SWIFT_VERSION": "6.0",
+    "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+    "TVOS_DEPLOYMENT_TARGET": "17.0"
+  }
+}

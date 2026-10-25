@@ -1,0 +1,168 @@
+{
+  "default-configuration": "Release",
+  "configurations": [
+    "Debug",
+    "Release"
+  ],
+  "localizations": {
+    "development": "en",
+    "supported": [
+      "en",
+      "Base"
+    ]
+  },
+  "packages": [],
+  "files": [
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDLayout.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMBackgroundView.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMBarProgressView.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHud+Content.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHud+Lifecycle.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHud.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMRoundProgressView.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/PrivacyInfo.xcprivacy",
+      "target-membership": [
+        "TMProgressHudUIKit/resources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/Resources/TMProgressHud-LICENSE.txt",
+      "target-membership": [
+        "TMProgressHudUIKit/resources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/Resources/TMProgressHud-NOTICES.txt",
+      "target-membership": [
+        "TMProgressHudUIKit/resources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudUIKit.docc",
+      "target-membership": [
+        "TMProgressHudUIKit/resources"
+      ]
+    },
+    {
+      "kind": "group",
+      "children": [
+        {
+          "path": "<PRODUCTS>/TMProgressHudUIKit.framework",
+          "type": "wrapper.framework"
+        }
+      ],
+      "name": "Products"
+    }
+  ],
+  "targets": [
+    {
+      "name": "TMProgressHudUIKit",
+      "id": "00000000000000000000002A",
+      "product": "Products/TMProgressHudUIKit.framework",
+      "product-type": "framework",
+      "dependencies": [],
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources"
+      ],
+      "package-product-members": [],
+      "build-settings": {
+        "APPLICATION_EXTENSION_API_ONLY": "YES",
+        "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES",
+        "CLANG_ENABLE_MODULES": "YES",
+        "CODE_SIGNING_ALLOWED": "NO",
+        "CURRENT_PROJECT_VERSION": "1",
+        "DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym",
+        "DEFINES_MODULE": "YES",
+        "DYLIB_INSTALL_NAME_BASE": "@rpath",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "IPHONEOS_DEPLOYMENT_TARGET": "17.0",
+        "MARKETING_VERSION": "2.0.0",
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.github.tomaszmaciejko.TMProgressHudUIKit",
+        "PRODUCT_NAME": "TMProgressHudUIKit",
+        "SKIP_INSTALL": "NO",
+        "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator",
+        "SUPPORTS_MACCATALYST": "NO",
+        "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+        "SWIFT_OPTIMIZATION_LEVEL[config=Release]": "-O",
+        "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES",
+        "SWIFT_VERSION": "6.0",
+        "TARGETED_DEVICE_FAMILY": "1,2",
+        "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3",
+        "TVOS_DEPLOYMENT_TARGET": "17.0"
+      }
+    }
+  ],
+  "build-settings": {
+    "SDKROOT": "iphoneos",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
+    "SWIFT_OPTIMIZATION_LEVEL[config=Release]": "-O"
+  }
+}
