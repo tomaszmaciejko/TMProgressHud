@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate the production framework or isolated distribution-consumer project."""
 import argparse
+import json
 import os
 import plistlib
 from pathlib import Path
@@ -8,6 +9,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text().strip()
+DEPLOYMENT_TARGETS = json.loads((ROOT / "Scripts/deployment-targets.json").read_text())
 
 
 class Project:
@@ -63,7 +65,7 @@ def generate(output, kind, platform="ios", artifact=None, remote_source=None):
     product = p.add("PBXFileReference", path=f"{product_name}.{extension}", sourceTree="BUILT_PRODUCTS_DIR", explicitFileType="wrapper.framework" if framework else "wrapper.application")
     products = p.add("PBXGroup", name="Products", sourceTree="<group>", children=[product])
     group = p.add("PBXGroup", sourceTree="<group>", children=[*file_refs, products])
-    settings = {"PRODUCT_NAME": product_name, "PRODUCT_BUNDLE_IDENTIFIER": f"com.github.tomaszmaciejko.{product_name}", "CODE_SIGNING_ALLOWED": "NO", "SWIFT_VERSION": "6.0", "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES", "CLANG_ENABLE_MODULES": "YES", "GENERATE_INFOPLIST_FILE": "YES", "IPHONEOS_DEPLOYMENT_TARGET": "15.0", "TVOS_DEPLOYMENT_TARGET": "15.0", "MARKETING_VERSION": VERSION, "CURRENT_PROJECT_VERSION": "1", "SUPPORTS_MACCATALYST": "NO"}
+    settings = {"PRODUCT_NAME": product_name, "PRODUCT_BUNDLE_IDENTIFIER": f"com.github.tomaszmaciejko.{product_name}", "CODE_SIGNING_ALLOWED": "NO", "SWIFT_VERSION": "6.0", "SWIFT_TREAT_WARNINGS_AS_ERRORS": "YES", "CLANG_ENABLE_MODULES": "YES", "GENERATE_INFOPLIST_FILE": "YES", "IPHONEOS_DEPLOYMENT_TARGET": DEPLOYMENT_TARGETS["ios"], "TVOS_DEPLOYMENT_TARGET": DEPLOYMENT_TARGETS["tvos"], "MARKETING_VERSION": VERSION, "CURRENT_PROJECT_VERSION": "1", "SUPPORTS_MACCATALYST": "NO"}
     if framework:
         settings.update({"SUPPORTED_PLATFORMS": "iphoneos iphonesimulator appletvos appletvsimulator", "TARGETED_DEVICE_FAMILY": "1,2", "TARGETED_DEVICE_FAMILY[sdk=appletv*]": "3", "DEFINES_MODULE": "YES", "DYLIB_INSTALL_NAME_BASE": "@rpath", "SKIP_INSTALL": "NO", "BUILD_LIBRARY_FOR_DISTRIBUTION": "YES", "APPLICATION_EXTENSION_API_ONLY": "YES", "DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym"})
     else:

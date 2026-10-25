@@ -9,7 +9,7 @@ Use the Xcode version in `.xcode-version`. Start with:
 
 ## Hosted tests
 
-Hosted tests require iOS 17+ or tvOS 17+; the shipping library still targets iOS/tvOS 15. Replace the UUIDs below with dedicated test devices from `xcrun simctl list devices available`:
+Hosted tests require iOS 17+ or tvOS 17+; the development library targets iOS 17 and tvOS 15. Replace the UUIDs below with dedicated test devices from `xcrun simctl list devices available`:
 
 ```sh
 TMHUD_TEST_DESTINATION='platform=iOS Simulator,id=<UUID>' ./Scripts/test.sh
@@ -51,4 +51,4 @@ Run the local checks above during development. GitHub Actions workflows run only
 
 The manual **Library checks** workflow checks the oldest supported compiler, current iOS/tvOS behavior and coverage, DocC and all four distributions. It builds the binary with Swift 6.0 before consuming it with the current compiler. Automated tests do not replace visual, VoiceOver or physical-device checks.
 
-The manual **Minimum iOS runtime** workflow runs the six-mode/action consumer on iOS 15.5 using macOS 15 and Xcode 16.4. iOS 15.0 can be selected for diagnostics, but its runtime is rejected by this host before application launch.
+The manual **Minimum iOS runtime** workflow runs the six-mode/action consumer on the selected iOS 17 runtime using macOS 15 and Xcode 16.4. It defaults to iOS 17.0; this updated configuration has not yet been executed. The `release/1.x` branch retains the iOS 15 workflow.

@@ -159,7 +159,7 @@
 				<key>CLANG_ENABLE_MODULES</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>SWIFT_OPTIMIZATION_LEVEL</key>
 				<string>-Onone</string>
 				<key>SWIFT_VERSION</key>
@@ -216,7 +216,7 @@
 				<key>CLANG_ENABLE_MODULES</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>SWIFT_OPTIMIZATION_LEVEL</key>
 				<string>-O</string>
 				<key>SWIFT_VERSION</key>

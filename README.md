@@ -4,9 +4,13 @@ A Swift progress and status HUD for UIKit on iOS and tvOS, ported from [MBProgre
 
 Display an activity indicator, pie, ring, horizontal bar, custom view or message, with an optional action button. You choose the host view and control the underlying operation.
 
-**Requirements:** iOS 15+ or tvOS 15+, Swift 6.0+. Mac Catalyst is not supported.
+**Development requirements:** iOS 17+ or tvOS 15+, Swift 6.0+. Mac Catalyst is not supported. This branch is preparing **2.0.0**, which has not been released.
+
+The published [1.0.0](https://github.com/tomaszmaciejko/TMProgressHud/tree/v1.0.0) supports iOS 15+ and tvOS 15+.
 
 ## Installation
+
+The instructions below install the published **1.0.0**. To try development version 2.0, add this checkout as a local Swift package in Xcode; it requires iOS 17+.
 
 All methods provide the **TMProgressHudUIKit** module. Choose one per app target.
 

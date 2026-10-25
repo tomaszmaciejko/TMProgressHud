@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DEPLOYMENT_TARGETS = json.loads((ROOT / "Scripts/deployment-targets.json").read_text())
 EXPECTED_VARIANTS = {("ios", "device"), ("ios", "simulator"), ("tvos", "device"), ("tvos", "simulator")}
 
 
@@ -30,7 +31,8 @@ def audit_slice(artifact, entry, version):
     require(info.get("CFBundleShortVersionString") == version, f"Wrong version: {framework}")
     build = subprocess.check_output(["xcrun", "vtool", "-show-build", str(binary)], text=True)
     minimums = re.findall(r"\bminos\s+(\S+)", build)
-    require(minimums and set(minimums) == {"15.0"}, f"Wrong minimum OS: {binary}")
+    minimum_os = DEPLOYMENT_TARGETS[entry["SupportedPlatform"]]
+    require(minimums and set(minimums) == {minimum_os}, f"Wrong minimum OS: {binary}")
     install_names = subprocess.check_output(["otool", "-D", str(binary)], text=True)
     names = [line.strip() for line in install_names.splitlines() if line.strip() and not line.rstrip().endswith(":")]
     require(names and set(names) == {"@rpath/TMProgressHudUIKit.framework/TMProgressHudUIKit"}, f"Nonportable runtime install name: {names}")
@@ -48,7 +50,7 @@ def audit_slice(artifact, entry, version):
     require(len(compilers) == 1, f"Mixed compilers within a framework slice: {framework}")
     for architecture in entry["SupportedArchitectures"]:
         require(any(path.name.startswith(architecture + "-") and not path.name.endswith(".private.swiftinterface") for path in interfaces), f"Missing public interface for {architecture}: {framework}")
-    return {"identifier": entry["LibraryIdentifier"], "platform": entry["SupportedPlatform"], "variant": entry.get("SupportedPlatformVariant", "device"), "architectures": entry["SupportedArchitectures"], "minimumOS": "15.0", "version": version, "swiftCompiler": next(iter(compilers)), "installName": names[0], "interfaces": sorted(path.name for path in interfaces), "binarySHA256": sha256(binary)}
+    return {"identifier": entry["LibraryIdentifier"], "platform": entry["SupportedPlatform"], "variant": entry.get("SupportedPlatformVariant", "device"), "architectures": entry["SupportedArchitectures"], "minimumOS": minimum_os, "version": version, "swiftCompiler": next(iter(compilers)), "installName": names[0], "interfaces": sorted(path.name for path in interfaces), "binarySHA256": sha256(binary)}
 
 
 def audit_signature(artifact, required, expected_certificate=None):

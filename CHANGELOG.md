@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0 (Unreleased)
+
+- Raise the minimum iOS version to 17.0; tvOS remains at 15.0.
+- Run GitHub Actions only when manually requested.
+
 ## 1.0.0
 
 - Initial Swift 6 port of MBProgressHUD for iOS 15+ and tvOS 15+.

@@ -32,6 +32,7 @@ project = work / "Consumer.xcodeproj"
 module_spec = importlib.util.spec_from_file_location("project_factory", root / "Scripts/project-factory.py")
 factory = importlib.util.module_from_spec(module_spec)
 module_spec.loader.exec_module(factory)
+minimum_os = factory.DEPLOYMENT_TARGETS[args.platform]
 factory.generate(project, args.kind, args.platform, args.artifact, remote_source)
 container = ["-project", str(project)]
 if args.kind == "cocoapods":
@@ -42,7 +43,7 @@ if args.kind == "cocoapods":
     if remote_source:
         source = f":git => {ruby_string(args.source_url)}, :commit => {ruby_string(args.revision)}"
     (work / "Podfile").write_text(
-        f"platform :{args.platform}, '15.0'\nuse_frameworks!\nproject 'Consumer.xcodeproj'\n"
+        f"platform :{args.platform}, '{minimum_os}'\nuse_frameworks!\nproject 'Consumer.xcodeproj'\n"
         f"target 'TMProgressHudConsumer' do\n  pod '{POD_NAME}', {source}\nend\n"
     )
     subprocess.run(["pod", "install", "--project-directory=" + str(work)], check=True)
@@ -63,8 +64,8 @@ for filename, canonical in [("PrivacyInfo.xcprivacy", root / "Sources/TMProgress
         raise SystemExit(f"Missing or stale resource in {args.kind}/{args.platform}: {filename}")
 metadata = subprocess.check_output(["xcrun", "vtool", "-show-build", str(app / "TMProgressHudConsumer")], text=True)
 minimum = re.search(r"\bminos\s+(\S+)", metadata)
-if minimum is None or minimum.group(1) != "15.0":
-    raise SystemExit("Consumer binary does not carry the expected minimum OS 15.0")
+if minimum is None or minimum.group(1) != minimum_os:
+    raise SystemExit(f"Consumer binary does not carry the expected minimum OS {minimum_os}")
 report = {"channel": args.kind, "platform": args.platform, "result": "built and resources verified", "minimumOS": minimum.group(1), "remoteInstallation": "not performed; release repository/tag not published"}
 if remote_source:
     if args.kind == "spm":

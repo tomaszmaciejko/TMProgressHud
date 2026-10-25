@@ -938,7 +938,7 @@
 				<key>CODE_SIGNING_ALLOWED</key>
 				<string>NO</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
 				<string>com.tmprogresshud.testframework</string>
 				<key>SKIP_INSTALL</key>
@@ -1099,7 +1099,7 @@
 				<key>CODE_SIGNING_ALLOWED</key>
 				<string>NO</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
 				<string>com.tmprogresshud.testframework</string>
 				<key>SKIP_INSTALL</key>

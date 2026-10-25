@@ -6,8 +6,8 @@ on:
       ios-version:
         description: Simulator version
         type: choice
-        options: ['15.0', '15.5']
-        default: '15.5'
+        options: ['17.0', '17.5']
+        default: '17.0'
 
 permissions:
   contents: read

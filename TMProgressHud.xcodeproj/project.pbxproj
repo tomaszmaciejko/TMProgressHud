@@ -423,11 +423,11 @@
 				<key>GENERATE_INFOPLIST_FILE</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
 				<string>15.0</string>
 				<key>MARKETING_VERSION</key>
-				<string>1.0.0</string>
+				<string>2.0.0</string>
 				<key>CURRENT_PROJECT_VERSION</key>
 				<string>1</string>
 				<key>SUPPORTS_MACCATALYST</key>
@@ -477,11 +477,11 @@
 				<key>GENERATE_INFOPLIST_FILE</key>
 				<string>YES</string>
 				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>15.0</string>
+				<string>17.0</string>
 				<key>TVOS_DEPLOYMENT_TARGET</key>
 				<string>15.0</string>
 				<key>MARKETING_VERSION</key>
-				<string>1.0.0</string>
+				<string>2.0.0</string>
 				<key>CURRENT_PROJECT_VERSION</key>
 				<string>1</string>
 				<key>SUPPORTS_MACCATALYST</key>

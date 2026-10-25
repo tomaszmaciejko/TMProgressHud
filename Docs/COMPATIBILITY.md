@@ -1,6 +1,8 @@
 # Compatibility and limitations
 
-TMProgressHud 1.0 ports MBProgressHUD at revision `4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781`. It supports UIKit on iOS/iPadOS 15+ and tvOS 15+, with Swift 6.0+. Mac Catalyst, native macOS, watchOS and visionOS are not supported.
+The unreleased TMProgressHud 2.0 development line builds on the Swift port of MBProgressHUD at revision `4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781`. It targets UIKit on iOS/iPadOS 17+ and tvOS 15+, with Swift 6.0+. Mac Catalyst, native macOS, watchOS and visionOS are not supported.
+
+The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15+ support.
 
 ## Preserved behavior
 
@@ -25,4 +27,6 @@ Objective-C selectors and dynamic progress setters are preserved. Swift does not
 
 ## Verification limits
 
-Deployment targets are iOS/tvOS 15. Builds are checked with Swift 6.0.3 and the current CI toolchain. Consumer checks pass on iOS 15.5: all six HUD modes and primary actions. The full test suite runs on newer simulators. Execution on iOS 15.0 or tvOS 15, physical Apple TV remote input and an actual VoiceOver session remain unverified.
+The 1.0 release was checked with Swift 6.0.3 and the current CI toolchain, with a six-mode/action consumer check on iOS 15.5 and full hosted tests on newer simulators. Those results describe 1.0, not qualification of the unreleased 2.0 line.
+
+Execution on the new minimum iOS 17.0, tvOS 15, physical Apple TV remote input and an actual VoiceOver session remain unverified. The full supported-toolchain matrix is checked separately before release.
