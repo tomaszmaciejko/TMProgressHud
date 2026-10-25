@@ -11,6 +11,15 @@ Start with:
 
 ## Hosted tests
 
+After adding or removing Swift sources, update the explicit project registries:
+
+```sh
+python3 Scripts/project-factory.py test-sources Tests/Host/TMProgressHudTestHost.xcodeproj
+python3 Scripts/project-factory.py framework TMProgressHud.xcodeproj
+```
+
+The source verifier rejects missing, stale or duplicate registrations.
+
 Hosted tests require iOS 17+ or tvOS 17+; the development library targets iOS 17 and tvOS 17. Replace the UUIDs below with dedicated test devices from `xcrun simctl list devices available`:
 
 ```sh

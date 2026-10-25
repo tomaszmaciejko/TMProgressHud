@@ -8,7 +8,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from project_format import write_project
+from project_format import read_project, write_project
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = (ROOT / "VERSION").read_text().strip()
@@ -33,8 +33,48 @@ class Project:
         return self.add("XCConfigurationList", buildConfigurations=refs, defaultConfigurationIsVisible="0", defaultConfigurationName="Release")
 
 
+def synchronize_test_sources(bundle):
+    """Replace only managed Swift memberships; preserve targets, resources and reference fixtures."""
+    project = read_project(bundle)
+    phases = {"TMProgressHudUIKit/compile-sources", "TMProgressHudUIKitTests/compile-sources"}
+
+    def preserved(entries):
+        result = []
+        for entry in entries:
+            if entry.get("kind") == "group":
+                children = preserved(entry.get("children", []))
+                if children or not entry.get("children"):
+                    result.append({**entry, "children": children})
+            else:
+                memberships = entry.get("target-membership", [])
+                owned = [member for member in memberships if (member if isinstance(member, str) else member["build-phase"]) in phases]
+                if owned and Path(entry.get("path", "")).suffix == ".swift":
+                    if memberships != owned or len(owned) != 1 or not isinstance(owned[0], str):
+                        raise ValueError("Cannot replace mixed Swift source membership")
+                else:
+                    result.append(entry)
+        return result
+
+    project["files"] = preserved(project["files"])
+    for name, directory, target in (
+        ("Swift library sources", "Sources/TMProgressHudUIKit", "TMProgressHudUIKit"),
+        ("Swift tests", "Tests/TMProgressHudUIKitTests", "TMProgressHudUIKitTests"),
+    ):
+        if not (ROOT / directory).is_dir():
+            raise ValueError(f"Missing source directory: {directory}")
+        children = [
+            {"path": os.path.relpath(path, bundle.parent), "target-membership": [target + "/compile-sources"]}
+            for path in sorted((ROOT / directory).glob("*.swift"))
+        ]
+        project["files"].append({"kind": "group", "name": name, "children": children})
+    (bundle / "project.xcproj").write_text(json.dumps(project, indent=2, ensure_ascii=False) + "\n")
+
+
 def generate(output, kind, platform="ios", artifact=None, remote_source=None, project_format=None):
     output = output.resolve()
+    if kind == "test-sources":
+        synchronize_test_sources(output)
+        return
     framework = kind == "framework"
     product_name = "TMProgressHudUIKit" if framework else "TMProgressHudConsumer"
     extension = "framework" if framework else "app"
@@ -94,7 +134,7 @@ def generate(output, kind, platform="ios", artifact=None, remote_source=None, pr
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("kind", choices=["framework", "spm", "cocoapods", "binary", "carthage"])
+    parser.add_argument("kind", choices=["framework", "spm", "cocoapods", "binary", "carthage", "test-sources"])
     parser.add_argument("output", type=Path)
     parser.add_argument("--platform", choices=["ios", "tvos"], default="ios")
     parser.add_argument("--artifact", type=Path)

@@ -1,4 +1,6 @@
 import importlib.util
+import json
+from unittest import mock
 from pathlib import Path
 import sys
 import tempfile
@@ -14,6 +16,63 @@ spec.loader.exec_module(factory)
 
 
 class ProjectFormatTests(unittest.TestCase):
+    def test_host_registry_tracks_additions_and_removals(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sources = root / "Sources/TMProgressHudUIKit"
+            tests = root / "Tests/TMProgressHudUIKitTests"
+            sources.mkdir(parents=True)
+            tests.mkdir(parents=True)
+            (sources / "First.swift").write_text("struct First {}")
+            (tests / "ExampleTests.swift").write_text("struct ExampleTests {}")
+            bundle = root / "Host.xcodeproj"
+            bundle.mkdir()
+            original = read_project(SCRIPTS.parent / "Tests/Host/TMProgressHudTestHost.xcodeproj")
+            (bundle / "project.xcproj").write_text(json.dumps(original))
+            with mock.patch.object(factory, "ROOT", root):
+                factory.generate(bundle, "test-sources")
+                (sources / "First.swift").unlink()
+                (sources / "Second.swift").write_text("struct Second {}")
+                factory.generate(bundle, "test-sources")
+            result = read_project(bundle)
+            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKit"), {(sources / "Second.swift").resolve()})
+            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKitTests"), {(tests / "ExampleTests.swift").resolve()})
+            self.assertEqual({key: value for key, value in result.items() if key != "files"}, {key: value for key, value in original.items() if key != "files"})
+
+    def test_host_registry_is_idempotent_and_preserves_reference_resources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory) / "Host.xcodeproj"
+            bundle.mkdir()
+            original = read_project(SCRIPTS.parent / "Tests/Host/TMProgressHudTestHost.xcodeproj")
+            def unmanaged(entries):
+                result = []
+                for entry in entries:
+                    if entry.get("kind") == "group":
+                        result.extend(unmanaged(entry.get("children", [])))
+                    elif not entry.get("path", "").endswith(".swift"):
+                        result.append(entry)
+                return result
+            (bundle / "project.xcproj").write_text(json.dumps(original))
+            factory.generate(bundle, "test-sources")
+            first = (bundle / "project.xcproj").read_bytes()
+            factory.generate(bundle, "test-sources")
+            self.assertEqual((bundle / "project.xcproj").read_bytes(), first)
+            self.assertEqual(unmanaged(read_project(bundle)["files"]), unmanaged(original["files"]))
+
+    def test_host_registry_rejects_mixed_source_membership_without_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory) / "Host.xcodeproj"
+            bundle.mkdir()
+            project = read_project(SCRIPTS.parent / "Tests/Host/TMProgressHudTestHost.xcodeproj")
+            project["files"].append({"path": "Shared.swift", "target-membership": ["TMProgressHudUIKit/compile-sources", "Other/compile-sources"]})
+            path = bundle / "project.xcproj"
+            path.write_text(json.dumps(project))
+            before = path.read_bytes()
+            with self.assertRaisesRegex(ValueError, "mixed Swift source"):
+                factory.generate(bundle, "test-sources")
+            self.assertEqual(path.read_bytes(), before)
+
+
     def test_framework_defaults_to_json_and_keeps_scheme_target_identity(self):
         with tempfile.TemporaryDirectory() as directory:
             bundle = Path(directory) / "Library.xcodeproj"
