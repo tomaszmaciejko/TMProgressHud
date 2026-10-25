@@ -15,7 +15,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 
 On tvOS the background uses `.regular` blur; iOS uses `.systemThickMaterial`. The caller manages focus; see the tvOS example.
 
-On both platforms the HUD follows its host size through UIKit autoresizing and synchronizes its frame when attached or reparented. Version 2.0 no longer observes global status-bar orientation notifications.
+On both platforms the HUD follows its host size through UIKit autoresizing and synchronizes its frame when attached or reparented. Version 2.0 no longer observes global status-bar orientation notifications. Layout updates preserve constraints added by the caller.
 
 ## Swift API
 

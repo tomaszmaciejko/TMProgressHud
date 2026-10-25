@@ -15,7 +15,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/HUDMetrics.swift</string>
+			<string>Sources/TMProgressHudUIKit/HUDLayout.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -33,7 +33,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift</string>
+			<string>Sources/TMProgressHudUIKit/HUDMetrics.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -51,7 +51,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift</string>
+			<string>Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -69,7 +69,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/TMBackgroundView.swift</string>
+			<string>Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -87,7 +87,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/TMBarProgressView.swift</string>
+			<string>Sources/TMProgressHudUIKit/TMBackgroundView.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -105,7 +105,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/TMProgressHud+Content.swift</string>
+			<string>Sources/TMProgressHudUIKit/TMBarProgressView.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>
@@ -123,7 +123,7 @@
 			<key>isa</key>
 			<string>PBXFileReference</string>
 			<key>path</key>
-			<string>Sources/TMProgressHudUIKit/TMProgressHud+Layout.swift</string>
+			<string>Sources/TMProgressHudUIKit/TMProgressHud+Content.swift</string>
 			<key>sourceTree</key>
 			<string>&lt;group&gt;</string>
 			<key>lastKnownFileType</key>

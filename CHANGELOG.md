@@ -6,6 +6,7 @@
 - Use UIKit’s duration/bounce spring animations, with a perceived duration of 0.3 seconds and no bounce.
 - Refresh custom indicator drawing and action-button border colors when color appearance traits change.
 - Follow host resizing through UIKit layout instead of global status-bar orientation notifications.
+- Preserve app-added constraints during layout updates and reuse layout constraints when only parameters change.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

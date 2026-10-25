@@ -23,11 +23,6 @@ extension TMProgressHud {
             view.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
             bezelView.addSubview(view)
         }
-        for spacer in [topSpacer, bottomSpacer] {
-            spacer.translatesAutoresizingMaskIntoConstraints = false
-            spacer.isHidden = true
-            bezelView.addSubview(spacer)
-        }
     }
 
     private func configureLabels() {

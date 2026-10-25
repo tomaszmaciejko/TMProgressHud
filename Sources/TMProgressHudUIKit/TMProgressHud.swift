@@ -102,16 +102,13 @@ open class TMProgressHud: UIView {
     private let storedLabel = UILabel()
     private let storedDetailsLabel = UILabel()
     private let storedButton: UIButton = HUDRoundedButtonView(type: .custom)
+    private let hudLayout = HUDLayout()
 
     var timing = HUDTimingEnvironment()
     var useAnimation = false
     var hasFinished = false
     var showStarted: Date?
     var indicator: UIView?
-    var paddingConstraints: [NSLayoutConstraint] = []
-    var bezelConstraints: [NSLayoutConstraint] = []
-    let topSpacer = UIView()
-    let bottomSpacer = UIView()
     var bezelMotionEffects: UIMotionEffectGroup?
     weak var graceTimer: Timer?
     weak var minShowTimer: Timer?
@@ -173,15 +170,19 @@ open class TMProgressHud: UIView {
         if let superview { frame = superview.bounds }
     }
 
-    /// Rebuilds the reference bezel/content constraints.
+    /// Updates owned constraints for the current content and layout configuration.
     open override func updateConstraints() {
-        rebuildConstraints()
+        var content = [label, detailsLabel, button]
+        if let indicator { content.insert(indicator, at: 0) }
+        hudLayout.update(
+            container: self, bezel: bezelView, content: content,
+            configuration: .init(offset: offset, margin: margin, minimumSize: minSize, isSquare: isSquare))
         super.updateConstraints()
     }
 
     /// Updates content padding when constraints do not require rebuilding.
     open override func layoutSubviews() {
-        if !needsUpdateConstraints() { updatePaddingConstraints() }
+        if !needsUpdateConstraints() { hudLayout.updatePadding() }
         super.layoutSubviews()
     }
 
