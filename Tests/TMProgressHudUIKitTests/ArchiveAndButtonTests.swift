@@ -60,6 +60,49 @@ struct ArchiveAndButtonTests {
         #expect(button.layer.borderColor == nil)
     }
 
+    @Test(arguments: [CGFloat(17), 31])
+    func actionButtonRespectsDirectFontAndTitleChanges(fontSize: CGFloat) {
+        let button = HUDRoundedButtonView(type: .custom)
+        let baseline = UIButton(type: .custom)
+        let receiver = ActionReceiver()
+        button.addTarget(receiver, action: #selector(ActionReceiver.press), for: .primaryActionTriggered)
+        for title in ["Cancel", "Cancel this download"] {
+            let font = UIFont.monospacedSystemFont(ofSize: fontSize, weight: .medium)
+            button.titleLabel?.font = font
+            baseline.titleLabel?.font = font
+            button.setTitle(title, for: .normal)
+            baseline.setTitle(title, for: .normal)
+            let horizontalPadding: CGFloat = 20
+            #expect(button.intrinsicContentSize.width == baseline.intrinsicContentSize.width + horizontalPadding)
+            #expect(button.intrinsicContentSize.height == baseline.intrinsicContentSize.height)
+            #expect(button.titleLabel?.font == font)
+            #expect(button.configuration == nil)
+        }
+    }
+
+    @Test func actionButtonSupportsSwiftActionsAndStateTitles() {
+        let button = HUDRoundedButtonView(type: .custom)
+        let normalTitle = "Cancel"
+        let selectedTitle = "Retry"
+        button.setTitle(normalTitle, for: .normal)
+        button.setTitle(selectedTitle, for: .selected)
+        #expect(button.intrinsicContentSize == .zero)
+        var count = 0
+        let action = UIAction { _ in count += 1 }
+        button.addAction(action, for: .primaryActionTriggered)
+        #expect(button.intrinsicContentSize.width > 0)
+        button.sendActions(for: .primaryActionTriggered)
+        #expect(count == 1)
+        button.isSelected = true
+        #expect(button.currentTitle == selectedTitle)
+        button.isSelected = false
+        #expect(button.currentTitle == normalTitle)
+        button.removeAction(action, for: .primaryActionTriggered)
+        #expect(button.intrinsicContentSize == .zero)
+        button.sendActions(for: .primaryActionTriggered)
+        #expect(count == 1)
+    }
+
     private func roundTrip<T: UIView>(_ view: T) throws -> T {
         let data = try NSKeyedArchiver.archivedData(withRootObject: view, requiringSecureCoding: false)
         let decoder = try NSKeyedUnarchiver(forReadingFrom: data)
