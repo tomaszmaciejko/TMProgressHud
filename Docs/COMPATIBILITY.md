@@ -9,7 +9,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 - Progress values are stored and forwarded without clamping.
 - Completion and delegate callbacks occur once per completed presentation, in that order. Repeated hide calls after completion do nothing; a new show cancels unfinished hiding and its callback. Re-showing visible content skips the grace delay.
 - Reusing a ring indicator as a pie retains its annular state.
-- Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress still uses the original display-link ownership; hide the HUD when work finishes.
+- Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress uses KVO while the HUD is presented in a window, with buffered delivery to the main actor. Hiding, detaching or replacing the source ends the previous observation; showing reads the latest value.
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.
 - The action button has zero intrinsic size until it has both a title and a registered event.
 

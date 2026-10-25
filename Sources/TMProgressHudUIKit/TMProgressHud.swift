@@ -77,9 +77,12 @@ open class TMProgressHud: UIView {
     @objc open dynamic var progress: Float = 0 {
         didSet { if oldValue != progress { forwardProgress() } }
     }
-    /// A progress object polled by display link, following the reference ownership and timing.
+    /// Progress observed while the HUD is presented in a window.
+    ///
+    /// Updates arrive on the main actor. Hiding or detaching stops observation; showing reads the latest value.
     @objc open dynamic var progressObject: Progress? {
-        didSet { if oldValue !== progressObject { setProgressDisplayLinkEnabled(true) } }
+        get { progressBinding.source }
+        set { progressBinding.replace(with: newValue) }
     }
     /// The caller's custom content, used in customView mode.
     @objc open dynamic var customView: UIView? {
@@ -111,12 +114,13 @@ open class TMProgressHud: UIView {
     var hasFinished: Bool { presentation.hasFinished }
     var indicator: UIView?
     var bezelMotionEffects: UIMotionEffectGroup?
-    weak var progressDisplayLink: CADisplayLink? {
-        didSet {
-            if oldValue !== progressDisplayLink {
-                oldValue?.invalidate()
-                progressDisplayLink?.add(to: .main, forMode: .default)
-            }
+    private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
+
+    func updateProgressObservation() {
+        if window != nil && presentation.isShowingContent {
+            progressBinding.start()
+        } else {
+            progressBinding.stop()
         }
     }
 
@@ -166,6 +170,13 @@ open class TMProgressHud: UIView {
     open override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if let superview { frame = superview.bounds }
+        updateProgressObservation()
+    }
+
+    /// Starts or stops progress observation when the presentation gains or loses a window.
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
+        updateProgressObservation()
     }
 
     /// Updates owned constraints for the current content and layout configuration.

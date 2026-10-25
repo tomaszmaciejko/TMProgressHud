@@ -9,7 +9,7 @@ extension TMProgressHud: HUDPresentationHost {
         bezelView.layer.removeAllAnimations()
         backgroundView.layer.removeAllAnimations()
         alpha = 1
-        setProgressDisplayLinkEnabled(true)
+        updateProgressObservation()
         updateBezelMotionEffects()
         if animated {
             animate(in: true, type: animationType, completion: nil)
@@ -20,6 +20,7 @@ extension TMProgressHud: HUDPresentationHost {
     }
 
     func hidePresentation(animated: Bool, completion: @escaping @MainActor () -> Void) {
+        updateProgressObservation()
         if animated {
             animate(in: false, type: animationType) { _ in completion() }
         } else {
@@ -66,25 +67,11 @@ extension TMProgressHud: HUDPresentationHost {
     }
 
     func finishPresentation() {
-        setProgressDisplayLinkEnabled(false)
+        updateProgressObservation()
         alpha = 0
         if removeFromSuperViewOnHide { removeFromSuperview() }
         completionBlock?()
         delegate?.hudWasHidden?(self)
     }
 
-    func setProgressDisplayLinkEnabled(_ enabled: Bool) {
-        if enabled && progressObject != nil {
-            if progressDisplayLink == nil {
-                let link = CADisplayLink(target: self, selector: #selector(updateProgressFromProgressObject))
-                progressDisplayLink = link
-            }
-        } else {
-            progressDisplayLink = nil
-        }
-    }
-
-    @objc func updateProgressFromProgressObject() {
-        if let progressObject { progress = Float(progressObject.fractionCompleted) }
-    }
 }

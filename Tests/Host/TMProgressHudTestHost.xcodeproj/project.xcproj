@@ -229,6 +229,18 @@
       "target-membership": [
         "TMProgressHudUIKitTests/compile-sources"
       ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/ProgressBindingTests.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
+    },
+    {
+      "path": "../../Sources/TMProgressHudUIKit/HUDProgressBinding.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
     }
   ],
   "targets": [

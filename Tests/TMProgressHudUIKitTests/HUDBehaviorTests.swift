@@ -171,20 +171,23 @@ struct HUDBehaviorTests {
         hud.hide(animated: false)
     }
 
-    @Test func foundationProgressCanBeReplacedAndDetached() {
-        let hud = TMProgressHud(frame: .zero)
+    @Test func foundationProgressCanBeReplacedAndDetached() throws {
+        let window = try makeProgressTestWindow()
+        defer { window.isHidden = true }
+        let host = try #require(window.rootViewController?.view)
+        let hud = TMProgressHud(view: host)
+        host.addSubview(hud)
         let progress = Progress(totalUnitCount: 100)
         progress.completedUnitCount = 25
         hud.progressObject = progress
-        #expect(hud.progressDisplayLink != nil)
-        hud.updateProgressFromProgressObject()
-        #expect(hud.progress == 0.25)
-        hud.progressObject = progress
+        #expect(hud.progress == 0)
         hud.show(animated: false)
+        #expect(hud.progress == 0.25)
+        #expect(hud.progressObject === progress)
+        hud.progressObject = progress
         hud.hide(animated: false)
-        #expect(hud.progressDisplayLink == nil)
         hud.progressObject = nil
-        hud.updateProgressFromProgressObject()
+        #expect(hud.progressObject == nil)
         let unchangedProgress = hud.progress
         hud.progress = unchangedProgress
     }

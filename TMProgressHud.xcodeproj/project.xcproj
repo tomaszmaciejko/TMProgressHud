@@ -32,6 +32,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDProgressBinding.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -135,7 +141,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "00000000000000000000002E",
+      "id": "000000000000000000000030",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

@@ -30,6 +30,8 @@ final class HUDPresentation {
     private var minimumAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
     private var delayedHideAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
 
+    var isShowingContent: Bool { phase == .visible || phase == .waitingForMinimum }
+
     var hasFinished: Bool {
         switch phase {
         case .waitingForMinimum, .hiding, .hidden: true
