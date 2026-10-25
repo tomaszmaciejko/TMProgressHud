@@ -1,10 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
-mkdir -p .build/Tools
-lint_host="$(xcrun --find swiftc)"
-lint_host="$(dirname "$lint_host")/../lib/swift/host"
-xcrun swiftc -swift-version 6 -warnings-as-errors -I "$lint_host" -L "$lint_host" \
-    -lSwiftParser -lSwiftSyntax -Xlinker -rpath -Xlinker "$lint_host" \
-    Tools/SourceLint.swift -o .build/Tools/source-lint
-find Sources -name '*.swift' -print0 | xargs -0 .build/Tools/source-lint
+linter="${SWIFTLINT_BIN:-swiftlint}"
+if [ -z "${SWIFTLINT_BIN:-}" ] && [ -x .build/Tools/swiftlint ]; then
+    linter="$PWD/.build/Tools/swiftlint"
+fi
+if ! command -v "$linter" >/dev/null 2>&1; then
+    printf '%s\n' 'Install SwiftLint using the instructions in Docs/TESTING.md.' >&2
+    exit 1
+fi
+required_version="$(cat .swiftlint-version)"
+if [ "$("$linter" version)" != "$required_version" ]; then
+    printf 'SwiftLint %s is required; see .swiftlint-version.\n' "$required_version" >&2
+    exit 1
+fi
+"$linter" lint --config .swiftlint.yml --strict --no-cache "$@"

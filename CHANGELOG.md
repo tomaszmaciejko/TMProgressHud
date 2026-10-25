@@ -8,6 +8,7 @@
 - Follow host resizing through UIKit layout instead of global status-bar orientation notifications.
 - Preserve app-added constraints during layout updates and reuse layout constraints when only parameters change.
 - Store maintained Xcode projects in the readable JSON format (Xcode 27+).
+- Replace the project-specific source linter with pinned SwiftLint; retain Apple’s swift-format.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

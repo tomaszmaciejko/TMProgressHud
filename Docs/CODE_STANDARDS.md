@@ -20,8 +20,8 @@ No force unwraps, forced casts, force try or hidden concurrency escapes. Handle 
 
 ## Formatting and review
 
-`swift format` owns formatting: four spaces and a 120-column target. `Scripts/check.sh` runs formatting, API documentation and structural checks.
+`swift-format` from Xcode owns formatting and documentation checks: four spaces and a 120-column target. SwiftLint checks production safety and structural metrics. Its version is pinned in `.swiftlint-version`; `.swiftlint.yml` explicitly selects rules without overlapping cosmetic formatting rules. `Scripts/check.sh` runs both tools.
 
-Production review limits are 350 nonblank lines per file, 200 per type, 40 per function and complexity 8. Tests allow 500 lines per file and 80 per function. Type size is reviewed manually; the other limits are checked automatically. Explain necessary deviations rather than splitting cohesive code to satisfy a number.
+SwiftLint enforces production limits of 350 file lines, 40 function-body lines and complexity 8, using its standard metric definitions. Function-body counts exclude blank and comment lines. Type size (200 nonblank lines), test-file size (500 lines) and test-function size (80 lines) remain manual review triggers. Explain necessary deviations rather than splitting cohesive code to satisfy a number. The two regex rules in `.swiftlint.yml` reject runtime traps and concurrency escapes while ignoring comments and strings; there is no separate custom linter.
 
 Tests should assert observable outcomes, including boundary values and repeated operations. Require 100% executable production line coverage with no blanket exclusions. Any proposed exception must identify the exact line, reason and source hash in `Scripts/coverage-exceptions.json`; there are currently none. Compiler-unmapped declarations are separately recorded in `Scripts/coverage-unmapped.json`.

@@ -1,0 +1,42 @@
+# Formatting and documentation rules belong to swift-format.
+included:
+  - Sources
+only_rules:
+  - force_cast
+  - force_try
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - file_length
+  - function_body_length
+  - cyclomatic_complexity
+  - custom_rules
+force_cast: error
+force_try: error
+force_unwrapping: error
+implicitly_unwrapped_optional: error
+file_length:
+  warning: 350
+  error: 350
+function_body_length:
+  warning: 40
+  error: 40
+cyclomatic_complexity:
+  warning: 8
+  error: 8
+custom_rules:
+  forbidden_runtime_traps:
+    name: Explicit failure handling
+    regex: '\b(?:fatalError|preconditionFailure)\s*\('
+    match_kinds: identifier
+    message: Define an explicit supported outcome instead of trapping.
+    severity: error
+  unsafe_concurrency:
+    name: Explicit concurrency safety
+    regex: '@(?:preconcurrency|unchecked)\b|\bnonisolated\s*\(\s*unsafe\s*\)'
+    match_kinds:
+      - attribute.builtin
+      - attribute.id
+      - identifier
+      - keyword
+    message: Concurrency escapes require a specific reviewed safety decision.
+    severity: error

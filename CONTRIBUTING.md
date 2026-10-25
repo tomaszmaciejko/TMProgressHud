@@ -15,6 +15,8 @@ For local app integration, use Xcode's **Add Package Dependencies → Add Local*
 
 Run the hosted tests on both platforms before submitting a behavior change; commands and packaging checks are in [Testing](Docs/TESTING.md).
 
+Use Apple’s `swift-format` and the pinned SwiftLint version; setup is in [Testing](Docs/TESTING.md). Formatting rules live in `.swift-format`, safety/metric rules in `.swiftlint.yml`.
+
 Maintained Xcode projects use JSON (`project.xcproj`) and require Xcode 27+.
 
 If you add a Swift file, register it in `Tests/Host/TMProgressHudTestHost.xcodeproj`. Regenerate the production project with `python3 Scripts/project-factory.py framework TMProgressHud.xcodeproj`. The source-registry check catches missing files.

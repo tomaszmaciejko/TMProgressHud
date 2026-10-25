@@ -1,6 +1,8 @@
 # Testing
 
-Use the Xcode version in `.xcode-version`. Maintained projects use JSON and require Xcode 27+. Disposable distribution consumers use the legacy format for CocoaPods and older-compiler checks; this does not change the library’s Swift 6.0 requirement. Start with:
+Use the Xcode version in `.xcode-version`. Maintained projects use JSON and require Xcode 27+. Disposable distribution consumers use the legacy format for CocoaPods and older-compiler checks; this does not change the library’s Swift 6.0 requirement. Install SwiftLint matching `.swiftlint-version` before running the local checks (`brew install swiftlint` when Homebrew provides that version, or use the matching official portable release). The manual workflow contains the checksum-verified portable installation. `Scripts/lint.sh` accepts `SWIFTLINT_BIN` or finds `.build/Tools/swiftlint` and then your PATH. The formatter is included in Xcode.
+
+Start with:
 
 ```sh
 ./Scripts/check.sh
