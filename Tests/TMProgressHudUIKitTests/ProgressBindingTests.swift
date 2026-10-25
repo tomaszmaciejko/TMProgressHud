@@ -187,7 +187,7 @@ struct ProgressBindingTests {
     }
 
     @Test func detachingWholeHostReleasesActiveHUD() throws {
-        let window = try makeProgressTestWindow()
+        let window = try makeHostedTestWindow()
         defer { window.isHidden = true }
         let root = try #require(window.rootViewController?.view)
         let source = Progress(totalUnitCount: 100)
@@ -206,7 +206,7 @@ struct ProgressBindingTests {
     }
 
     @Test func hiddenAndDetachedHUDStopsAndRefreshesOnReturn() async throws {
-        let window = try makeProgressTestWindow()
+        let window = try makeHostedTestWindow()
         defer { window.isHidden = true }
         let host = try #require(window.rootViewController?.view)
         let hud = TMProgressHud.showAdded(to: host, animated: false)
@@ -236,7 +236,7 @@ struct ProgressBindingTests {
     }
 
     @Test func gracePeriodDoesNotStartObservation() throws {
-        let window = try makeProgressTestWindow()
+        let window = try makeHostedTestWindow()
         defer { window.isHidden = true }
         let host = try #require(window.rootViewController?.view)
         let time = ManualHUDTime()
@@ -254,13 +254,4 @@ struct ProgressBindingTests {
         #expect(hud.progress == 0.25)
         hud.hide(animated: false)
     }
-}
-
-@MainActor
-func makeProgressTestWindow() throws -> UIWindow {
-    let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
-    let window = UIWindow(windowScene: scene)
-    window.rootViewController = UIViewController()
-    window.isHidden = false
-    return window
 }

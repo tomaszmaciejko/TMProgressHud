@@ -17,6 +17,12 @@ On tvOS the background uses `.regular` blur; iOS uses `.systemThickMaterial`. Th
 
 On both platforms the HUD follows its host size through UIKit autoresizing and synchronizes its frame when attached or reparented. Version 2.0 no longer observes global status-bar orientation notifications. Layout updates preserve constraints added by the caller.
 
+## Configuration
+
+The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.
+
+`contentColor = nil` stops bulk coloring and preserves existing colors. `.clear` is an explicit transparent color. Indicator colors resolve from container UIAppearance first, then `contentColor`, then the view default. Unlike the original port, a configured appearance color is explicitly applied rather than merely suppressing the bulk color. Set per-instance properties on the exposed views when you need local customization. Background `color = nil` clears its tint and keeps the blur.
+
 ## Swift API
 
 The module is `TMProgressHudUIKit`. Original `MB` type prefixes become `TM`; the main class is spelled `TMProgressHud`. UIKit-facing APIs and delegate callbacks are main-actor isolated.

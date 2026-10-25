@@ -99,7 +99,7 @@ struct HUDBehaviorTests {
         #expect(hud.customView?.tintColor == .blue)
     }
 
-    @Test func containerAppearancePreservesReferencePrecedence() throws {
+    @Test func containerAppearanceSuppliesActualIndicatorColor() throws {
         let proxy = UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
         let referenceProxy = UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [MBProgressHUD.self])
         let previous = proxy.color
@@ -120,7 +120,8 @@ struct HUDBehaviorTests {
             original.bezelView.subviews.compactMap { $0 as? UIActivityIndicatorView }.first)
         #expect(proxy.color == .green)
         #expect(referenceProxy.color == .green)
-        #expect(spinner.color == referenceSpinner.color)
+        #expect(spinner.color == .green)
+        #expect(referenceSpinner.color != .red)
         #expect(spinner.color != .red)
         hud.hide(animated: false)
         original.hide(animated: false)
@@ -172,7 +173,7 @@ struct HUDBehaviorTests {
     }
 
     @Test func foundationProgressCanBeReplacedAndDetached() throws {
-        let window = try makeProgressTestWindow()
+        let window = try makeHostedTestWindow()
         defer { window.isHidden = true }
         let host = try #require(window.rootViewController?.view)
         let hud = TMProgressHud(view: host)

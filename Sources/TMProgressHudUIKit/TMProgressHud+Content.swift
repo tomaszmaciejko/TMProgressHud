@@ -42,6 +42,7 @@ extension TMProgressHud {
     }
 
     func updateIndicators() {
+        let previousIndicator = indicator
         switch mode {
         case .indeterminate: updateSpinner()
         case .determinateHorizontalBar: replaceIndicator(with: TMBarProgressView())
@@ -54,7 +55,7 @@ extension TMProgressHud {
         forwardProgress()
         indicator?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .horizontal)
         indicator?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
-        updateViewsForColor(contentColor)
+        if indicator !== previousIndicator { updateIndicatorColor(contentColor) }
         setNeedsUpdateConstraints()
     }
 
@@ -88,17 +89,19 @@ extension TMProgressHud {
         label.textColor = color
         detailsLabel.textColor = color
         button.setTitleColor(color, for: .normal)
+        updateIndicatorColor(color)
+    }
+
+    private func updateIndicatorColor(_ color: UIColor?) {
         if let spinner = indicator as? UIActivityIndicatorView {
-            if appearanceColor(#selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self)
-                == nil
-            {
-                spinner.color = color
-            }
+            spinner.color =
+                appearanceColor(#selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self)
+                ?? color ?? spinner.color
         } else if let round = indicator as? TMRoundProgressView {
             updateRoundColors(round, color: color)
         } else if let bar = indicator as? TMBarProgressView {
             updateBarColors(bar, color: color)
-        } else {
+        } else if let color {
             indicator?.tintColor = color
         }
     }
@@ -108,26 +111,24 @@ extension TMProgressHud {
         return proxy.perform(getter)?.takeUnretainedValue() as? UIColor
     }
 
-    private func updateRoundColors(_ view: TMRoundProgressView, color: UIColor) {
-        if appearanceColor(#selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self)
-            == nil
-        {
-            view.progressTintColor = color
-        }
-        if appearanceColor(#selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self)
-            == nil
-        {
-            view.backgroundTintColor = color.withAlphaComponent(HUDMetrics.remainingAlpha)
-        }
+    private func updateRoundColors(_ view: TMRoundProgressView, color: UIColor?) {
+        view.progressTintColor =
+            appearanceColor(
+                #selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self)
+            ?? color ?? view.progressTintColor
+        view.backgroundTintColor =
+            appearanceColor(
+                #selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self)
+            ?? color?.withAlphaComponent(HUDMetrics.remainingAlpha) ?? view.backgroundTintColor
     }
 
-    private func updateBarColors(_ view: TMBarProgressView, color: UIColor) {
-        if appearanceColor(#selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self) == nil {
-            view.progressColor = color
-        }
-        if appearanceColor(#selector(getter: TMBarProgressView.lineColor), of: TMBarProgressView.self) == nil {
-            view.lineColor = color
-        }
+    private func updateBarColors(_ view: TMBarProgressView, color: UIColor?) {
+        view.progressColor =
+            appearanceColor(#selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self)
+            ?? color ?? view.progressColor
+        view.lineColor =
+            appearanceColor(#selector(getter: TMBarProgressView.lineColor), of: TMBarProgressView.self)
+            ?? color ?? view.lineColor
     }
 
     func updateBezelMotionEffects() {

@@ -30,9 +30,12 @@ open class TMProgressHud: UIView {
     ///
     /// Ordinary initialization defaults to false.
     @objc open dynamic var removeFromSuperViewOnHide = false
-    /// The content tint.
+    /// A bulk color for current content and newly created indicators.
     ///
-    /// Nil leaves existing individual view colors unchanged.
+    /// Changing to a non-nil value updates labels, the button and the current indicator.
+    /// Direct view customizations survive mode changes. Assigning the same value does nothing.
+    /// Nil disables bulk coloring without clearing existing colors; use clear for transparency.
+    /// Container UIAppearance settings on indicators are not overwritten by bulk coloring.
     @objc open dynamic var contentColor: UIColor? {
         get { storedContentColor }
         set {

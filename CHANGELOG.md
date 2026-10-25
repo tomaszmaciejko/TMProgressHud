@@ -12,6 +12,8 @@
 - Use typed, cancellable scheduled actions and monotonic timing; obsolete minimum/grace requests no longer affect a new presentation.
 - Give presentation phases and completion delivery a dedicated owner; ignore stale animation completions and duplicate hides after completion.
 - Observe Progress while presented in a window instead of polling by display link; stop on hide/detach and release removed HUDs.
+- Apply configured container-appearance colors to indicators instead of leaving factory defaults.
+- Preserve direct content colors when modes change; apply bulk color defaults only to newly created indicators unless contentColor is explicitly changed.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

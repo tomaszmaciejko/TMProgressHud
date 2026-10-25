@@ -241,6 +241,18 @@
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
       ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/ConfigurationTests.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/HostedTestWindow.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
     }
   ],
   "targets": [
