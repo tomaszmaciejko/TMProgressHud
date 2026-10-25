@@ -54,3 +54,5 @@ Run the local checks above during development. GitHub Actions workflows run only
 The manual **Library checks** workflow checks the oldest supported compiler, current iOS/tvOS behavior and coverage, DocC and all four distributions. It builds the binary with Swift 6.0 before consuming it with the current compiler. Automated tests do not replace visual, VoiceOver or physical-device checks.
 
 The manual **Minimum iOS runtime** workflow runs the six-mode/action consumer on the selected iOS 17 runtime using macOS 15 and Xcode 16.4. It defaults to iOS 17.0; this updated configuration has not yet been executed. The `release/1.x` branch retains the iOS 15 workflow.
+
+Before packaging, run `python3 Scripts/verify-release-metadata.py` with SwiftPM and CocoaPods available. It compares versions and minimum systems across evaluated manifests, maintained projects and generated distribution projects, without building or resolving dependencies. The regular static checks run its fixture tests without requiring CocoaPods.
