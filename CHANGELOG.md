@@ -10,6 +10,7 @@
 - Store maintained Xcode projects in the readable JSON format (Xcode 27+).
 - Replace the project-specific source linter with pinned SwiftLint; retain Apple’s swift-format.
 - Use typed, cancellable scheduled actions and monotonic timing; obsolete minimum/grace requests no longer affect a new presentation.
+- Give presentation phases and completion delivery a dedicated owner; ignore stale animation completions and duplicate hides after completion.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

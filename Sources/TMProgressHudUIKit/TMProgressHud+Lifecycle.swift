@@ -4,16 +4,10 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-extension TMProgressHud {
-    func handleGraceAction() {
-        if !hasFinished { showUsingAnimation(useAnimation) }
-    }
-
-    func showUsingAnimation(_ animated: Bool) {
+extension TMProgressHud: HUDPresentationHost {
+    func showPresentation(animated: Bool) {
         bezelView.layer.removeAllAnimations()
         backgroundView.layer.removeAllAnimations()
-        delayedHideAction = nil
-        showStarted = timing.now()
         alpha = 1
         setProgressDisplayLinkEnabled(true)
         updateBezelMotionEffects()
@@ -25,16 +19,13 @@ extension TMProgressHud {
         }
     }
 
-    func hideUsingAnimation(_ animated: Bool) {
-        delayedHideAction = nil
-        if animated && showStarted != nil {
-            showStarted = nil
-            animate(in: false, type: animationType) { _ in self.done() }
+    func hidePresentation(animated: Bool, completion: @escaping @MainActor () -> Void) {
+        if animated {
+            animate(in: false, type: animationType) { _ in completion() }
         } else {
-            showStarted = nil
             bezelView.alpha = 0
             backgroundView.alpha = 1
-            done()
+            completion()
         }
     }
 
@@ -74,12 +65,10 @@ extension TMProgressHud {
         backgroundView.alpha = appearing ? 1 : 0
     }
 
-    func done() {
+    func finishPresentation() {
         setProgressDisplayLinkEnabled(false)
-        if hasFinished {
-            alpha = 0
-            if removeFromSuperViewOnHide { removeFromSuperview() }
-        }
+        alpha = 0
+        if removeFromSuperViewOnHide { removeFromSuperview() }
         completionBlock?()
         delegate?.hudWasHidden?(self)
     }

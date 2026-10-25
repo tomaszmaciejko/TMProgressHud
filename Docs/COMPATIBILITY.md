@@ -7,7 +7,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 ## Preserved behavior
 
 - Progress values are stored and forwarded without clamping.
-- Repeated hide calls can repeat completion and delegate callbacks.
+- Completion and delegate callbacks occur once per completed presentation, in that order. Repeated hide calls after completion do nothing; a new show cancels unfinished hiding and its callback. Re-showing visible content skips the grace delay.
 - Reusing a ring indicator as a pie retains its annular state.
 - Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress still uses the original display-link ownership; hide the HUD when work finishes.
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.

@@ -3,62 +3,40 @@ import Testing
 import UIKit
 @testable import TMProgressHudUIKit
 
-@MainActor
-private final class ManualTime {
-    var instant = ContinuousClock.now
-    var actions: [HUDScheduledAction] = []
-    var requestedIntervals: [TimeInterval] = []
-
-    var environment: HUDTimingEnvironment {
-        HUDTimingEnvironment(
-            now: { self.instant },
-            schedule: { interval, action in
-                let scheduled = HUDScheduledAction(action: action)
-                self.actions.append(scheduled)
-                self.requestedIntervals.append(interval)
-                return scheduled
-            }
-        )
-    }
-
-    func invalidate() { for action in actions { action.cancel() } }
-}
-
 @Suite(.serialized)
 @MainActor
 struct LifecycleTests {
     @Test func shortWorkNeverBecomesVisible() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.graceTime = 10
         var callbacks = 0
         hud.completionBlock = { callbacks += 1 }
         hud.show(animated: false)
         #expect(hud.alpha == 0)
-        let action = try #require(hud.graceAction)
+        let action = try #require(time.actions.last)
         hud.hide(animated: false)
         #expect(!action.isPending)
         action.fire()
-        hud.handleGraceAction()
         #expect(hud.alpha == 0)
         #expect(callbacks == 1)
     }
 
     @Test func graceAndMinimumDurationUseInjectedTime() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.graceTime = 10
         hud.minShowTime = 5
         hud.show(animated: false)
-        try #require(hud.graceAction).fire()
+        try #require(time.actions.last).fire()
         #expect(hud.alpha == 1)
         time.instant = time.instant.advanced(by: .seconds(2))
         hud.hide(animated: false)
-        let minimumAction = try #require(hud.minimumShowAction)
+        let minimumAction = try #require(time.actions.last)
         #expect(time.requestedIntervals.last == 3)
         #expect(hud.alpha == 1)
         minimumAction.fire()
@@ -66,71 +44,70 @@ struct LifecycleTests {
     }
 
     @Test func showInvalidatesTrackedMinimumAndActualShowCancelsDelay() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.minShowTime = 10
         hud.show(animated: false)
         hud.hide(animated: false)
-        let minimum = try #require(hud.minimumShowAction)
+        let minimum = try #require(time.actions.last)
         hud.hide(animated: true, afterDelay: 20)
-        let delay = try #require(hud.delayedHideAction)
+        let delay = try #require(time.actions.last)
         hud.show(animated: false)
         #expect(!minimum.isPending)
         #expect(!delay.isPending)
         hud.minShowTime = 0
         hud.hide(animated: false, afterDelay: 5)
-        let replaced = try #require(hud.delayedHideAction)
+        let replaced = try #require(time.actions.last)
         hud.hide(animated: true, afterDelay: 10)
         #expect(!replaced.isPending)
-        hud.delayedHideAction?.fire()
+        time.actions.last?.fire()
         #expect(hud.hasFinished)
-        #expect(hud.useAnimation)
     }
 
     @Test func repeatedGraceCallsReplaceOutstandingAction() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.graceTime = 10
         hud.show(animated: false)
-        let first = try #require(hud.graceAction)
+        let first = try #require(time.actions.last)
         hud.show(animated: false)
         #expect(!first.isPending)
         first.fire()
         #expect(hud.alpha == 0)
-        hud.graceAction?.fire()
+        time.actions.last?.fire()
         #expect(hud.alpha == 1)
         hud.hide(animated: false)
     }
 
     @Test func elapsedMinimumAndNegativeDelayRemainReferenceInputs() {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.minShowTime = 1
         hud.graceTime = -1
         hud.show(animated: false)
         time.instant = time.instant.advanced(by: .seconds(2))
         hud.hide(animated: false)
-        #expect(hud.minimumShowAction == nil)
+        #expect(time.requestedIntervals.isEmpty)
         #expect(hud.alpha == 0)
         hud.hide(animated: false, afterDelay: -1)
-        hud.delayedHideAction?.fire()
+        time.actions.last?.fire()
         #expect(hud.hasFinished)
     }
 
     @Test func immediateShowCancelsPreviousGrace() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.graceTime = 10
         hud.show(animated: false)
-        let oldGrace = try #require(hud.graceAction)
+        let oldGrace = try #require(time.actions.last)
         hud.graceTime = 0
         hud.minShowTime = 10
         hud.show(animated: false)
@@ -141,16 +118,16 @@ struct LifecycleTests {
     }
 
     @Test func immediateHideCancelsPendingMinimum() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.minShowTime = 10
         var calls = 0
         hud.completionBlock = { calls += 1 }
         hud.show(animated: false)
         hud.hide(animated: false)
-        let oldMinimum = try #require(hud.minimumShowAction)
+        let oldMinimum = try #require(time.actions.last)
         hud.minShowTime = 0
         hud.hide(animated: false)
         oldMinimum.fire()
@@ -158,16 +135,16 @@ struct LifecycleTests {
     }
 
     @Test func repeatedMinimumRequestsCannotHideNextPresentation() throws {
-        let time = ManualTime()
+        let time = ManualHUDTime()
         defer { time.invalidate() }
         let hud = TMProgressHud(frame: .zero)
-        hud.timing = time.environment
+        hud.setTimingEnvironment(time.environment)
         hud.minShowTime = 10
         var callbacks = 0
         hud.completionBlock = { callbacks += 1 }
         hud.show(animated: false)
         hud.hide(animated: false)
-        let obsolete = try #require(hud.minimumShowAction)
+        let obsolete = try #require(time.actions.last)
         hud.hide(animated: false)
         hud.show(animated: false)
         obsolete.fire()
@@ -178,14 +155,15 @@ struct LifecycleTests {
         hud.hide(animated: false)
     }
 
-    @Test func productionSchedulerRegistersAndCanCancelGrace() throws {
+    @Test func productionDelayedHideDeliversCompletion() async {
         let hud = TMProgressHud(frame: .zero)
-        hud.graceTime = 60
         hud.show(animated: false)
-        let action = try #require(hud.graceAction)
-        #expect(action.isPending)
-        hud.hide(animated: false)
-        #expect(!action.isPending)
+        await withCheckedContinuation { continuation in
+            hud.completionBlock = { continuation.resume() }
+            hud.hide(animated: false, afterDelay: 0)
+        }
+        #expect(hud.alpha == 0)
+        hud.completionBlock = nil
     }
 
     @Test func animationVariantsCompleteAndHide() async {
@@ -222,12 +200,15 @@ struct LifecycleTests {
         hud.completionBlock = nil
     }
 
-    @Test func completionWithoutFinishedFlagPreservesReshownVisibility() {
-        let hud = TMProgressHud(frame: .zero)
-        hud.show(animated: false)
-        hud.done()
-        #expect(hud.alpha == 1)
-        hud.hide(animated: true)
-        #expect(hud.hasFinished)
+    @Test func pendingGraceDoesNotRetainReleasedHUD() async {
+        weak var reference: TMProgressHud?
+        autoreleasepool {
+            let hud = TMProgressHud(frame: .zero)
+            hud.graceTime = 60
+            hud.show(animated: false)
+            reference = hud
+        }
+        #expect(reference == nil)
+        await Task.yield()
     }
 }

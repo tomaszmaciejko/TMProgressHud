@@ -43,7 +43,10 @@ final class HUDScheduledAction {
 
     func fire() {
         let action = action
-        cancel()
+        let completedTask = task
+        self.action = nil
+        task = nil
         action?()
+        completedTask?.cancel()
     }
 }

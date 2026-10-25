@@ -126,7 +126,7 @@ struct HUDBehaviorTests {
         original.hide(animated: false)
     }
 
-    @Test func repeatedHideRetainsCallbackOrdering() {
+    @Test func repeatedHideCompletesPresentationOnceInOrder() {
         let hud = TMProgressHud(frame: .zero)
         let spy = CallbackSpy()
         hud.delegate = spy
@@ -134,7 +134,7 @@ struct HUDBehaviorTests {
         hud.show(animated: false)
         hud.hide(animated: false)
         hud.hide(animated: false)
-        #expect(spy.events == ["completion", "delegate", "completion", "delegate"])
+        #expect(spy.events == ["completion", "delegate"])
         hud.completionBlock = nil
         hud.delegate = nil
         hud.hide(animated: false)

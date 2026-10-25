@@ -16,11 +16,13 @@ open class TMProgressHud: UIView {
     }
     /// The weak optional lifecycle delegate.
     @objc open dynamic weak var delegate: (any TMProgressHudDelegate)?
-    /// The completion called before the optional delegate after each reference hide sequence.
+    /// Called once when hiding completes, before the optional delegate.
+    ///
+    /// Repeated hide calls after completion do not repeat callbacks. A new show supersedes unfinished hiding.
     @objc open dynamic var completionBlock: TMProgressHudCompletionBlock?
     /// Seconds to wait before showing.
     ///
-    /// Nonpositive values show immediately.
+    /// Nonpositive values show immediately. Re-showing an already visible HUD does not reapply the grace delay.
     @objc open dynamic var graceTime: TimeInterval = 0
     /// The minimum visible duration in monotonic seconds, initially zero.
     @objc open dynamic var minShowTime: TimeInterval = 0
@@ -104,15 +106,11 @@ open class TMProgressHud: UIView {
     private let storedButton: UIButton = HUDRoundedButtonView(type: .custom)
     private let hudLayout = HUDLayout()
 
-    var timing = HUDTimingEnvironment()
-    var useAnimation = false
-    var hasFinished = false
-    var showStarted: ContinuousClock.Instant?
+    private lazy var presentation = HUDPresentation(host: self)
+    func setTimingEnvironment(_ timing: HUDTimingEnvironment) { presentation.timing = timing }
+    var hasFinished: Bool { presentation.hasFinished }
     var indicator: UIView?
     var bezelMotionEffects: UIMotionEffectGroup?
-    var graceAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
-    var minimumShowAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
-    var delayedHideAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
     weak var progressDisplayLink: CADisplayLink? {
         didSet {
             if oldValue !== progressDisplayLink {
@@ -186,44 +184,17 @@ open class TMProgressHud: UIView {
         super.layoutSubviews()
     }
 
-    /// Shows the HUD immediately or after graceTime, replacing pending minimum/grace actions.
-    @objc(showAnimated:) open dynamic func show(animated: Bool) {
-        graceAction = nil
-        minimumShowAction = nil
-        useAnimation = animated
-        hasFinished = false
-        if graceTime > 0 {
-            graceAction = timing.schedule(graceTime) { [weak self] in self?.handleGraceAction() }
-        } else {
-            showUsingAnimation(useAnimation)
-        }
-    }
+    /// Starts a presentation, replacing pending work and any unfinished previous hide.
+    @objc(showAnimated:) open dynamic func show(animated: Bool) { presentation.show(animated: animated) }
 
     /// Hides the HUD after satisfying its minimum visible duration.
-    @objc(hideAnimated:) open dynamic func hide(animated: Bool) {
-        graceAction = nil
-        minimumShowAction = nil
-        useAnimation = animated
-        hasFinished = true
-        if minShowTime > 0, let showStarted {
-            let elapsed = timing.elapsed(since: showStarted)
-            if elapsed < minShowTime {
-                minimumShowAction = timing.schedule(minShowTime - elapsed) { [weak self] in
-                    guard let self else { return }
-                    self.hideUsingAnimation(self.useAnimation)
-                }
-                return
-            }
-        }
-        hideUsingAnimation(useAnimation)
-    }
+    @objc(hideAnimated:) open dynamic func hide(animated: Bool) { presentation.hide(animated: animated) }
 
     /// Replaces any pending delayed-hide request, in monotonic seconds.
     ///
     /// Nonpositive or NaN delays run on the next actor turn. Unrepresentable positive delays remain pending.
     @objc(hideAnimated:afterDelay:) open dynamic func hide(animated: Bool, afterDelay delay: TimeInterval) {
-        delayedHideAction = nil
-        delayedHideAction = timing.schedule(delay) { [weak self] in self?.hide(animated: animated) }
+        presentation.hide(animated: animated, afterDelay: delay)
     }
 
     func commonInit() {

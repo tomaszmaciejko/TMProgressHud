@@ -27,6 +27,7 @@ struct SchedulingTests {
         var calls = 0
         await withCheckedContinuation { continuation in
             scheduled = HUDScheduledAction.scheduled(after: interval) {
+                #expect(!Task.isCancelled)
                 calls += 1
                 continuation.resume()
             }
