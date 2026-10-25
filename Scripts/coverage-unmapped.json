@@ -7,9 +7,9 @@
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
-    "sha256": "fd671229ccac9a7b3b0c234b53c61beb2ab5567b35c84bf4c575982437e39a7e",
+    "sha256": "2ce6c6f390ae3c1609f4825616dc828894bdcc54dec43c948c7db081b332dd6c",
     "reason": "Swift/LLVM emits no source coverage regions for these enum/typealias/global constant declarations; raw values and offset are asserted in enumCasesPreserveRawValues.",
-    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+    "decision": "Reviewed additive checked Sendable conformance on three Int enums; declaration-only body, no new executable regions or exclusions. Raw values and cross-task transfer are tested."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",

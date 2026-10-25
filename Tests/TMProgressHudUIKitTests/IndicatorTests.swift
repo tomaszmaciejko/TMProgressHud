@@ -104,6 +104,22 @@ struct IndicatorTests {
         #expect(TMProgressMaxOffset == MBProgressMaxOffset)
     }
 
+    @Test func appearanceValuesCanCrossTaskBoundaries() async {
+        let values = await Task.detached {
+            (TMProgressHudMode.determinate, TMProgressHudAnimation.zoomIn, TMProgressHudBackgroundStyle.solidColor)
+        }.value
+        #expect(values.0 == .determinate)
+        #expect(values.1 == .zoomIn)
+        #expect(values.2 == .solidColor)
+        let hud = TMProgressHud(frame: .zero)
+        hud.mode = values.0
+        hud.animationType = values.1
+        hud.bezelView.style = values.2
+        #expect(hud.mode == .determinate)
+        #expect(hud.animationType == .zoomIn)
+        #expect(hud.bezelView.style == .solidColor)
+    }
+
     private func pixels(_ view: UIView) throws -> Data {
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1

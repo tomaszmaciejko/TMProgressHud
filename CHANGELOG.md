@@ -17,6 +17,7 @@
 - Respect overridden getters in indicator drawing, bulk color application and Progress observation; retain open classes and Objective-C/KVO integration.
 - Use typed indicator updates and add TMProgressHudProgressReporting for Swift custom views; retain legacy custom progress setters.
 - Restore pie drawing when reusing a ring indicator.
+- Make mode, animation and background-style values Sendable for checked transfer between Swift tasks.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

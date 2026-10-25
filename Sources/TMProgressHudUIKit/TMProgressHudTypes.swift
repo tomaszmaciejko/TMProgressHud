@@ -5,7 +5,7 @@
 import UIKit
 
 /// The indicator or content displayed by a HUD, matching the reference raw values.
-@objc public enum TMProgressHudMode: Int {
+@objc public enum TMProgressHudMode: Int, Sendable {
     /// An indeterminate activity indicator.
     case indeterminate
     /// A circular pie-style progress indicator.
@@ -21,7 +21,7 @@ import UIKit
 }
 
 /// The reference appearance and dismissal transition.
-@objc public enum TMProgressHudAnimation: Int {
+@objc public enum TMProgressHudAnimation: Int, Sendable {
     /// Changes opacity only.
     case fade
     /// Zooms in on appearance and out on dismissal.
@@ -33,7 +33,7 @@ import UIKit
 }
 
 /// A solid background or a visual-effect background.
-@objc public enum TMProgressHudBackgroundStyle: Int {
+@objc public enum TMProgressHudBackgroundStyle: Int, Sendable {
     /// A solid color.
     case solidColor
     /// A system blur effect.
