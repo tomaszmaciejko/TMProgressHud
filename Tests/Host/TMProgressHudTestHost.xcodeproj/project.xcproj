@@ -253,6 +253,12 @@
       "target-membership": [
         "TMProgressHudUIKitTests/compile-sources"
       ]
+    },
+    {
+      "path": "../TMProgressHudUIKitTests/InheritanceTests.swift",
+      "target-membership": [
+        "TMProgressHudUIKitTests/compile-sources"
+      ]
     }
   ],
   "targets": [

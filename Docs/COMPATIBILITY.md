@@ -33,6 +33,12 @@ Subclass frame initializers must be `required init(frame:)`. Native Swift enums 
 
 Objective-C selectors and dynamic progress setters are preserved. Swift does not export the offset constant or completion typealias as C globals/typedefs; Objective-C callers use an inline block type and their own offset value.
 
+## Subclassing
+
+Open indicator color/style getters are used by drawing. HUD color application and progress observation also read the public getters, so an override is reflected in the result. This deliberately differs from the original implementation's direct reads of private drawing fields.
+
+Return stable child-view and progress-source instances between configuration changes. Forward overridden setters to `super` to preserve updates, and request `setNeedsDisplay()` when a computed drawing value changes independently of a setter. Existing Objective-C selectors, KVC keys and progress KVO remain supported.
+
 ## Verification limits
 
 The 1.0 release was checked with Swift 6.0.3 and the current CI toolchain, with a six-mode/action consumer check on iOS 15.5 and full hosted tests on newer simulators. Those results describe 1.0, not qualification of the unreleased 2.0 line.

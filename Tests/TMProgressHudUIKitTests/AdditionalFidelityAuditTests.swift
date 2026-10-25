@@ -50,6 +50,10 @@ private final class PortRoundWithCustomGetters: TMRoundProgressView {
         get { .red }
         set { super.progressTintColor = newValue }
     }
+    override var backgroundTintColor: UIColor {
+        get { .blue }
+        set { super.backgroundTintColor = newValue }
+    }
 }
 
 @MainActor
@@ -65,6 +69,14 @@ private final class PortBarWithCustomGetter: TMBarProgressView {
     override var lineColor: UIColor {
         get { .red }
         set { super.lineColor = newValue }
+    }
+    override var progressColor: UIColor {
+        get { .green }
+        set { super.progressColor = newValue }
+    }
+    override var progressRemainingColor: UIColor {
+        get { .blue }
+        set { super.progressRemainingColor = newValue }
     }
 }
 
@@ -210,15 +222,27 @@ struct AdditionalFidelityAuditTests {
         }
     }
 
-    @Test func indicatorDrawingUsesStoredColorsLikeReferenceIvars() throws {
+    @Test func indicatorDrawingHonorsOverriddenGetters() throws {
         let portRound = PortRoundWithCustomGetters()
         let originalRound = ReferenceRoundWithCustomGetters()
-        portRound.progress = 0.5
+        let expectedRound = TMRoundProgressView()
+        for view in [portRound, expectedRound] { view.progress = 0.5 }
         originalRound.progress = 0.5
-        #expect(try pixels(portRound) == pixels(originalRound))
+        expectedRound.isAnnular = true
+        expectedRound.progressTintColor = .red
+        expectedRound.backgroundTintColor = .blue
+        #expect(try pixels(portRound) == pixels(expectedRound))
+        #expect(try pixels(portRound) != pixels(originalRound))
         let portBar = PortBarWithCustomGetter()
         let originalBar = ReferenceBarWithCustomGetter()
-        #expect(try pixels(portBar) == pixels(originalBar))
+        let expectedBar = TMBarProgressView()
+        for view in [portBar, expectedBar] { view.progress = 0.5 }
+        originalBar.progress = 0.5
+        expectedBar.lineColor = .red
+        expectedBar.progressColor = .green
+        expectedBar.progressRemainingColor = .blue
+        #expect(try pixels(portBar) == pixels(expectedBar))
+        #expect(try pixels(portBar) != pixels(originalBar))
     }
 
     @Test func circularDrawingPreservesContextFillColor() throws {

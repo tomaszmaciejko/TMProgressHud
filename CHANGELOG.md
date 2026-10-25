@@ -14,6 +14,7 @@
 - Observe Progress while presented in a window instead of polling by display link; stop on hide/detach and release removed HUDs.
 - Apply configured container-appearance colors to indicators instead of leaving factory defaults.
 - Preserve direct content colors when modes change; apply bulk color defaults only to newly created indicators unless contentColor is explicitly changed.
+- Respect overridden getters in indicator drawing, bulk color application and Progress observation; retain open classes and Objective-C/KVO integration.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

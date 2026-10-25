@@ -41,7 +41,7 @@ open class TMProgressHud: UIView {
         set {
             guard storedContentColor != newValue else { return }
             storedContentColor = newValue
-            updateViewsForColor(newValue)
+            updateViewsForColor(contentColor)
         }
     }
     /// The transition style, initially fade.
@@ -84,8 +84,7 @@ open class TMProgressHud: UIView {
     ///
     /// Updates arrive on the main actor. Hiding or detaching stops observation; showing reads the latest value.
     @objc open dynamic var progressObject: Progress? {
-        get { progressBinding.source }
-        set { progressBinding.replace(with: newValue) }
+        didSet { updateProgressObservation() }
     }
     /// The caller's custom content, used in customView mode.
     @objc open dynamic var customView: UIView? {
@@ -121,9 +120,11 @@ open class TMProgressHud: UIView {
 
     func updateProgressObservation() {
         if window != nil && presentation.isShowingContent {
+            progressBinding.replace(with: progressObject)
             progressBinding.start()
         } else {
             progressBinding.stop()
+            progressBinding.replace(with: nil)
         }
     }
 

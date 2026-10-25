@@ -97,7 +97,7 @@ open class TMRoundProgressView: UIView {
     /// Draws the current progress using the reference geometry.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
-        if storedAnnular { drawRing() } else { drawPie(in: context) }
+        if isAnnular { drawRing() } else { drawPie(in: context) }
     }
 
     private func drawRing() {
@@ -109,7 +109,7 @@ open class TMRoundProgressView: UIView {
         )
         background.lineWidth = Geometry.lineWidth
         background.lineCapStyle = .butt
-        storedBackgroundTintColor.set()
+        backgroundTintColor.set()
         background.stroke()
         let path = UIBezierPath(
             arcCenter: center, radius: radius, startAngle: Geometry.startAngle,
@@ -117,15 +117,15 @@ open class TMRoundProgressView: UIView {
         )
         path.lineWidth = Geometry.lineWidth
         path.lineCapStyle = .square
-        storedProgressTintColor.set()
+        progressTintColor.set()
         path.stroke()
     }
 
     private func drawPie(in context: CGContext) {
         let lineWidth = Geometry.lineWidth
         let circle = bounds.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
-        storedProgressTintColor.setStroke()
-        storedBackgroundTintColor.setFill()
+        progressTintColor.setStroke()
+        backgroundTintColor.setFill()
         context.setLineWidth(lineWidth)
         context.strokeEllipse(in: circle)
         let pathWidth = lineWidth * 2
@@ -139,7 +139,7 @@ open class TMRoundProgressView: UIView {
         path.lineWidth = pathWidth
         path.lineCapStyle = .butt
         context.setBlendMode(.copy)
-        storedProgressTintColor.set()
+        progressTintColor.set()
         path.stroke()
     }
 }

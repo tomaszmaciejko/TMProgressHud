@@ -98,11 +98,11 @@ open class TMBarProgressView: UIView {
         let inset = Geometry.inset
         let borderRadius = rect.height / 2 - border
         context.setLineWidth(border)
-        context.setStrokeColor(storedLineColor.cgColor)
-        context.setFillColor(storedProgressRemainingColor.cgColor)
+        context.setStrokeColor(lineColor.cgColor)
+        context.setFillColor(progressRemainingColor.cgColor)
         outline(in: rect, inset: border, radius: borderRadius, context: context)
         context.drawPath(using: .fillStroke)
-        context.setFillColor(storedProgressColor.cgColor)
+        context.setFillColor(progressColor.cgColor)
         let radius = borderRadius - border
         let amount = CGFloat(progress) * rect.width
         if amount >= radius + inset && amount <= rect.width - radius - inset {
