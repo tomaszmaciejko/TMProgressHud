@@ -105,7 +105,7 @@ open class TMProgressHud: UIView {
     private var storedSquare = false
     private var storedMotionEffectsEnabled = false
     private let storedBezelView = TMBackgroundView()
-    private let storedBackgroundView = TMBackgroundView()
+    private let storedBackgroundView = TMBackgroundView(frame: .zero, style: .solidColor)
     private let storedLabel = UILabel()
     private let storedDetailsLabel = UILabel()
     private let storedButton: UIButton = HUDRoundedButtonView(type: .custom)

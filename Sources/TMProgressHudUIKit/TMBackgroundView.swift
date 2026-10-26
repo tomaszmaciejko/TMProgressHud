@@ -61,6 +61,13 @@ open class TMBackgroundView: UIView {
         updateBackground()
     }
 
+    init(frame: CGRect, style: TMProgressHudBackgroundStyle) {
+        self.style = style
+        super.init(frame: frame)
+        clipsToBounds = true
+        updateBackground()
+    }
+
     /// Decodes a background and applies the supported Swift background defaults.
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -72,16 +79,26 @@ open class TMBackgroundView: UIView {
     open override var intrinsicContentSize: CGSize { .zero }
 
     private func updateBackground() {
-        effectView?.removeFromSuperview()
-        effectView = nil
         if style == .blur {
-            let view = UIVisualEffectView(effect: UIBlurEffect(style: blurEffectStyle))
-            view.frame = bounds
-            view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            insertSubview(view, at: 0)
-            layer.allowsGroupOpacity = false
-            effectView = view
+            updateBlur()
+        } else {
+            effectView?.removeFromSuperview()
+            effectView = nil
         }
         backgroundColor = color
+    }
+
+    private func updateBlur() {
+        let effect = UIBlurEffect(style: blurEffectStyle)
+        if let effectView {
+            effectView.effect = effect
+            return
+        }
+        let view = UIVisualEffectView(effect: effect)
+        view.frame = bounds
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        insertSubview(view, at: 0)
+        layer.allowsGroupOpacity = false
+        effectView = view
     }
 }

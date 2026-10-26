@@ -205,6 +205,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/BackgroundViewTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/ConfigurationTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
