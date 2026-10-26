@@ -11,7 +11,7 @@ protocol HUDPresentationHost: AnyObject {
     var minShowTime: TimeInterval { get }
     func showPresentation(animated: Bool)
     func hidePresentation(animated: Bool, completion: @escaping @MainActor () -> Void)
-    func finishPresentation()
+    func finishPresentation(completion: (@MainActor () -> Void)?)
 }
 
 /// Owns one presentation's phases, scheduled work and completion delivery.
@@ -30,6 +30,7 @@ final class HUDPresentation {
     var timing = HUDTimingEnvironment()
     private weak var host: (any HUDPresentationHost)?
     private var generation = UUID()
+    private var hideCompletion: (@MainActor () -> Void)?
     private var shownAt: ContinuousClock.Instant?
     private var graceAction: HUDScheduledAction? {
         didSet { oldValue?.cancel() }
@@ -58,6 +59,7 @@ final class HUDPresentation {
         let wasPresented = phase == .visible || phase == .waitingForMinimum || phase == .hiding
         generation = UUID()
         cancelScheduledActions()
+        hideCompletion = nil
         shownAt = nil
         phase = .waitingForGrace
         let current = generation
@@ -71,8 +73,11 @@ final class HUDPresentation {
         }
     }
 
-    func hide(animated: Bool) {
+    func hide(animated: Bool, completion: (@MainActor () -> Void)? = nil) {
         guard phase != .hidden && phase != .hiding else { return }
+        if phase != .waitingForMinimum {
+            hideCompletion = completion
+        }
         graceAction = nil
         minimumAction = nil
         delayedHideAction = nil
@@ -121,8 +126,10 @@ final class HUDPresentation {
 
     private func finish(generation current: UUID) {
         guard current == generation && phase == .hiding else { return }
+        let completion = hideCompletion
+        hideCompletion = nil
         phase = .hidden
-        host?.finishPresentation()
+        host?.finishPresentation(completion: completion)
     }
 
     private func cancelScheduledActions() {

@@ -143,9 +143,9 @@ open class TMProgressHud: UIView {
     /// The weak optional lifecycle delegate.
     @objc open dynamic weak var delegate: (any TMProgressHudDelegate)?
 
-    /// Called once when hiding completes, before the optional delegate.
+    /// A compatibility callback consumed by the next completed hide, before the optional delegate.
     ///
-    /// Repeated hides do not repeat callbacks. A new show supersedes unfinished hiding.
+    /// Cleared before invocation. Prefer the per-request hide completion; use the delegate for recurring events.
     @objc open dynamic var completionBlock: TMProgressHudCompletionBlock?
 
     // MARK: - Owned state
@@ -239,6 +239,20 @@ open class TMProgressHud: UIView {
     /// Hides the HUD after satisfying its minimum visible duration.
     @objc(hideAnimated:) open dynamic func hide(animated: Bool) {
         presentation.hide(animated: animated)
+    }
+
+    /// Hides the HUD and invokes a one-shot completion after it is hidden and optionally removed.
+    ///
+    /// A new show discards this request's completion. Repeated hides while waiting for the minimum duration
+    /// keep the first request's completion; hides during or after dismissal are ignored.
+    /// This completion runs before the compatibility completionBlock and delegate notification.
+    @objc(hideAnimated:completion:) open dynamic func hide(
+        animated: Bool, completion: @escaping @MainActor (TMProgressHud) -> Void
+    ) {
+        presentation.hide(animated: animated) { [weak self] in
+            guard let self else { return }
+            completion(self)
+        }
     }
 
     /// Replaces any pending delayed-hide request, in monotonic seconds.

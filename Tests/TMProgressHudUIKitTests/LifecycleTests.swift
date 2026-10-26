@@ -176,9 +176,7 @@ struct LifecycleTests {
             hud.show(animated: true)
             #expect(hud.alpha == 1)
             let completed = CallbackExpectation()
-            hud.completionBlock = { completed.signal() }
-            defer { hud.completionBlock = nil }
-            hud.hide(animated: true)
+            hud.hide(animated: true) { _ in completed.signal() }
             try await completed.wait()
             #expect(hud.alpha == 0)
             hud.completionBlock = nil
@@ -205,13 +203,11 @@ struct LifecycleTests {
         let hud = TMProgressHud.showAdded(to: host, animated: false)
         #expect(hud.superview === host)
         let completed = CallbackExpectation()
-        hud.completionBlock = { [weak hud] in
-            #expect(hud?.superview == nil)
-            #expect(hud?.alpha == 0)
+        hud.hide(animated: true) { finished in
+            #expect(finished.superview == nil)
+            #expect(finished.alpha == 0)
             completed.signal()
         }
-        defer { hud.completionBlock = nil }
-        hud.hide(animated: true)
         try await completed.wait()
         #expect(!host.subviews.contains { $0 === hud })
         hud.completionBlock = nil

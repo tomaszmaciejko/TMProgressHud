@@ -71,12 +71,16 @@ extension TMProgressHud: HUDPresentationHost {
         backgroundView.alpha = isAppearing ? 1 : 0
     }
 
-    func finishPresentation() {
+    func finishPresentation(completion: (@MainActor () -> Void)?) {
+        let compatibilityCompletion = completionBlock
+        let notificationDelegate = delegate
+        completionBlock = nil
         updateProgressObservation()
         alpha = 0
         if removeFromSuperViewOnHide { removeFromSuperview() }
-        completionBlock?()
-        delegate?.hudWasHidden?(self)
+        completion?()
+        compatibilityCompletion?()
+        notificationDelegate?.hudWasHidden?(self)
     }
 
     // MARK: - Motion effects

@@ -17,8 +17,9 @@ private final class PresentationSpy: HUDPresentationHost {
         hideAnimations.append(animated)
         hideCompletions.append(completion)
     }
-    func finishPresentation() {
+    func finishPresentation(completion: (@MainActor () -> Void)?) {
         finishCount += 1
+        completion?()
         onFinish?()
     }
 }
