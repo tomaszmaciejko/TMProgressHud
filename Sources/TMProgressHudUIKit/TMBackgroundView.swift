@@ -15,8 +15,10 @@ open class TMBackgroundView: UIView {
     private enum Defaults {
         #if os(tvOS)
             static let blurEffectStyle: UIBlurEffect.Style = .regular
+            static let opaqueColor = UIColor { $0.userInterfaceStyle == .dark ? .black : .white }
         #else
             static let blurEffectStyle: UIBlurEffect.Style = .systemThickMaterial
+            static let opaqueColor = UIColor.systemBackground
         #endif
     }
 
@@ -38,6 +40,20 @@ open class TMBackgroundView: UIView {
         }
     }
 
+    /// Controls the fallback for blur backgrounds, following Reduce Transparency by default.
+    public var blurPolicy: TMProgressHudBlurPolicy = .system {
+        didSet {
+            if oldValue != blurPolicy { updateBackground() }
+        }
+    }
+
+    /// The adaptive fallback color, rendered at full alpha when blur is replaced.
+    public var opaqueBackgroundColor: UIColor = Defaults.opaqueColor {
+        didSet {
+            if oldValue != opaqueBackgroundColor { updateBackgroundColor() }
+        }
+    }
+
     /// The container tint, initially nil.
     ///
     /// Nil clears the tint without removing the blur.
@@ -46,13 +62,21 @@ open class TMBackgroundView: UIView {
         set {
             guard storedColor != newValue else { return }
             storedColor = newValue
-            backgroundColor = color
+            updateBackgroundColor()
         }
     }
 
     private var storedColor: UIColor?
 
     private var effectView: UIVisualEffectView?
+    lazy var transparencyPreference = HUDSystemPreference(
+        name: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+        read: { UIAccessibility.isReduceTransparencyEnabled }
+    ) { [weak self] in self?.updateBackground() }
+
+    private var usesOpaqueBackground: Bool {
+        style == .blur && blurPolicy.usesOpaqueBackground(systemValue: transparencyPreference.value)
+    }
 
     /// Creates a background using the default blur material.
     public override init(frame: CGRect) {
@@ -60,8 +84,9 @@ open class TMBackgroundView: UIView {
         configureBackground()
     }
 
-    init(frame: CGRect, style: TMProgressHudBackgroundStyle) {
+    init(frame: CGRect, style: TMProgressHudBackgroundStyle, blurPolicy: TMProgressHudBlurPolicy = .system) {
         self.style = style
+        self.blurPolicy = blurPolicy
         super.init(frame: frame)
         configureBackground()
     }
@@ -89,14 +114,23 @@ open class TMBackgroundView: UIView {
         updateBackground()
     }
 
-    private func updateBackground() {
-        if style == .blur {
-            updateBlur()
-        } else {
+    func updateBackground() {
+        switch style {
+        case .blur:
+            if usesOpaqueBackground {
+                effectView?.effect = nil
+            } else {
+                updateBlur()
+            }
+        case .solidColor:
             effectView?.removeFromSuperview()
             effectView = nil
         }
-        backgroundColor = color
+        updateBackgroundColor()
+    }
+
+    private func updateBackgroundColor() {
+        backgroundColor = usesOpaqueBackground ? opaqueBackgroundColor.withAlphaComponent(1) : color
     }
 
     private func updateBlur() {

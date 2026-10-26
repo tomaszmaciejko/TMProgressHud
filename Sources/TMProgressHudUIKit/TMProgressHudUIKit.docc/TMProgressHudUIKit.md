@@ -50,4 +50,5 @@ hud.setProgressSource(.manual(0.5))
 - ``TMBarProgressView``
 - ``TMBackgroundView``
 - ``TMProgressHudBackgroundStyle``
+- ``TMProgressHudBlurPolicy``
 - ``TMProgressHudProgressReporting``

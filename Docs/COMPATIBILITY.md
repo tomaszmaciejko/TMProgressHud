@@ -42,6 +42,12 @@ Built-in pie, ring and bar views expose a localized percentage as their accessib
 
 Set accessibilityLanguage, accessibilityLabel or an application-specific accessibilityValue when needed. Setting accessibilityValue back to nil restores the automatic percentage. Custom content keeps its own accessibility semantics; adopting the progress protocol does not replace its label, value or traits. Actual VoiceOver interaction remains a separate manual check.
 
+## Background accessibility in 2.0
+
+Blur backgrounds follow Reduce Transparency through `blurPolicy = .system`. Use `.opaque` to always replace blur with `opaqueBackgroundColor`, rendered at full alpha, or `.configured` to keep the requested material and tint under UIKit’s own behavior. Solid backgrounds are unaffected. Changing the policy preserves the requested color, material and caller-added content.
+
+The default opaque surface adapts to light/dark appearance. Customize it together with text colors when branding; the default-palette contrast check does not qualify arbitrary custom colors or blurred content.
+
 ## Configuration
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.

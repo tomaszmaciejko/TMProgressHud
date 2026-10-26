@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Follow Reduce Transparency with an adaptive opaque background and explicit per-background policy.
+
 - Expose localized accessible progress values while preserving application overrides and raw input values.
 
 - Follow Reduce Motion for zoom and HUD-owned tilt effects, with an explicit per-HUD policy.

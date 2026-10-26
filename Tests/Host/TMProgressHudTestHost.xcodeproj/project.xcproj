@@ -139,6 +139,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDSystemPreference.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDTimingEnvironment.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -170,6 +176,12 @@
         },
         {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHud.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudBlurPolicy.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
           ]
@@ -230,6 +242,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/ArchiveAndButtonTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/BackgroundAccessibilityTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]
