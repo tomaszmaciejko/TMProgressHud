@@ -77,6 +77,7 @@ struct IndicatorTests {
         bar.progressRemainingColor = .blue
         bar.progressRemainingColor = .blue
         let background = TMBackgroundView(frame: CGRect(x: 0, y: 0, width: 100, height: 80))
+        background.blurPolicy = .configured
         #expect(background.subviews.count == 1)
         #expect(background.intrinsicContentSize == .zero)
         background.style = .solidColor

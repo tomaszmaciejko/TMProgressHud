@@ -57,6 +57,7 @@ struct ArchiveAndButtonTests {
     @Test(arguments: [TMProgressHudBackgroundStyle.blur, .solidColor])
     func decodingBackgroundKeepsOneEffectView(style: TMProgressHudBackgroundStyle) throws {
         let initial = TMBackgroundView(frame: CGRect(x: 0, y: 0, width: 100, height: 80))
+        initial.blurPolicy = .configured
         initial.style = style
         initial.blurEffectStyle = .dark
         initial.color = .red
@@ -65,6 +66,8 @@ struct ArchiveAndButtonTests {
         client.tag = clientTag
         initial.addSubview(client)
         let decoded = try archiveRoundTrip(initial)
+        #expect(decoded.blurPolicy == .system)
+        decoded.blurPolicy = .configured
         #expect(decoded.subviews.compactMap { $0 as? UIVisualEffectView }.count == 1)
         #expect(decoded.viewWithTag(clientTag) != nil)
         #expect(decoded.frame == initial.frame)
@@ -73,11 +76,13 @@ struct ArchiveAndButtonTests {
         #expect(decoded.color == nil)
     }
 
-    @Test func unmarkedViewArchivesDecodeWithCurrentDefaults() throws {
+    @Test func unmarkedViewArchivesUseDefaultsAndAllowConfiguredBlur() throws {
         let hud = try decodeUnmarkedView(as: TMProgressHud.self)
         #expect(hud.mode == .indeterminate)
         #expect(hud.subviews.filter { $0 is TMBackgroundView }.count == 2)
         let background = try decodeUnmarkedView(as: TMBackgroundView.self)
+        #expect(background.blurPolicy == .system)
+        background.blurPolicy = .configured
         #expect(background.style == .blur)
         #expect(background.subviews.compactMap { $0 as? UIVisualEffectView }.count == 1)
     }

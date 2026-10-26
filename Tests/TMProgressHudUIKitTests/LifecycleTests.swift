@@ -172,6 +172,7 @@ struct LifecycleTests {
         for type in [TMProgressHudAnimation.fade, .zoom, .zoomIn, .zoomOut] {
             let hud = TMProgressHud(view: host)
             host.addSubview(hud)
+            hud.motionPolicy = .full
             hud.animationType = type
             hud.show(animated: true)
             #expect(hud.alpha == 1)
@@ -187,6 +188,7 @@ struct LifecycleTests {
     @Test(arguments: [TMProgressHudAnimation.zoom, .zoomIn, .zoomOut])
     func nonanimatedReshowRestoresVisibleGeometry(type: TMProgressHudAnimation) {
         let hud = TMProgressHud(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        hud.motionPolicy = .full
         hud.animationType = type
         hud.show(animated: false)
         hud.hide(animated: true)

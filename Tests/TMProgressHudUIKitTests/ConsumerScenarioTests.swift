@@ -134,7 +134,10 @@ struct ConsumerScenarioTests {
         let host = try #require(window.rootViewController?.view)
         let hud = TMProgressHud(view: host)
         host.addSubview(hud)
-        defer { hud.hide(animated: false); hud.removeFromSuperview() }
+        defer {
+            hud.hide(animated: false)
+            hud.removeFromSuperview()
+        }
         hud.setContent(.ring)
         hud.setProgressSource(.manual(0.625))
         hud.setLayout(.init(position: .init(vertical: .bottom)))

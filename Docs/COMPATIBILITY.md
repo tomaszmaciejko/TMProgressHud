@@ -29,7 +29,7 @@ Use `setProgressSource(.manual(value))` to stop observation before assigning a v
 
 ## Explicit layout in 2.0
 
-Use `setLayout(_:)` with `TMProgressHudLayout` to select position, contentInsets and hostInsets together. Position axes use left/center/right and top/center/bottom; offsets move right and down. Insets use physical edges and do not mirror with language. Positions refer to host bounds, with outer insets taking priority over an offset; safe areas are not applied implicitly. Minimum size and square preference remain separate properties.
+Use `setLayout(_:)` with `TMProgressHudLayout` to select position, contentInsets and hostInsets together. Position axes use left/center/right and top/center/bottom; offsets move right and down. Insets use physical edges and do not mirror with language. Positions refer to host bounds, with outer insets taking priority over an offset; safe areas are not applied implicitly. Minimum size and square preference remain separate properties. Supply finite layout values, as required by UIKit constraints.
 
 The compatibility offset getter projects edge positions to `TMProgressMaxOffset` extremes; its setter changes only position. The margin getter reads the top content inset; assigning margin restores uniform inner and outer spacing. Use layoutConfiguration to read the full selection. Existing getter overrides remain effective, and compatibility KVO observers receive the completed selection.
 
@@ -59,7 +59,7 @@ The default opaque surface adapts to light/dark appearance. Customize it togethe
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.
 
-`contentColor = nil` stops bulk coloring and preserves existing colors. `.clear` is an explicit transparent color. Indicator colors resolve from container UIAppearance first, then `contentColor`, then the view default. Unlike the original port, a configured appearance color is explicitly applied rather than merely suppressing the bulk color. Set per-instance properties on the exposed views when you need local customization. Background `color = nil` clears its tint and keeps the blur.
+`contentColor = nil` stops bulk coloring and preserves existing colors. `.clear` is an explicit transparent color. Indicator colors resolve from container UIAppearance first, then `contentColor`, then the view default. Unlike the original port, a configured appearance color is explicitly applied rather than merely suppressing the bulk color. Set per-instance properties on the exposed views when you need local customization. Background `color = nil` clears the requested tint; blurPolicy still determines the displayed background.
 
 ## Swift API
 

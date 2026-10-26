@@ -25,6 +25,8 @@ struct HUDBehaviorTests {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud(view: host)
         let original = MBProgressHUD(view: host)
+        hud.traitOverrides.preferredContentSizeCategory = .large
+        for label in [hud.label, hud.detailsLabel] { label.updateTraitsIfNeeded() }
         #expect(hud.frame == original.frame)
         #expect(hud.margin == original.margin)
         #expect(hud.contentColor == UIColor.label.withAlphaComponent(0.7))

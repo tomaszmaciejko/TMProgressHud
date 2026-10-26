@@ -88,7 +88,7 @@ final class HUDDemoViewController: UIViewController {
         let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
         let custom = UIImageView(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: configuration))
         let scenarios: [(String, TMProgressHudContent)] = [
-            ("Activity indicator", .activity), ("Pie progress", .pie),
+            ("Activity indicator", .activity), ("Circular progress", .pie),
             ("Ring progress", .ring), ("Horizontal progress", .bar),
             ("Custom content", .custom(custom)), ("Text only", .text),
         ]

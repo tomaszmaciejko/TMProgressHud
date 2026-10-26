@@ -16,7 +16,7 @@ private final class CountingBackgroundView: TMBackgroundView {
 @MainActor
 struct BackgroundViewTests {
     @Test func solidBackgroundDoesNotCreateATransientEffect() {
-        let background = CountingBackgroundView(frame: .zero, style: .solidColor)
+        let background = CountingBackgroundView(frame: .zero, style: .solidColor, blurPolicy: .configured)
         #expect(background.insertedEffectCount == 0)
         #expect(background.subviews.isEmpty)
         background.blurEffectStyle = .dark
@@ -27,6 +27,7 @@ struct BackgroundViewTests {
 
     @Test func changingMaterialReusesTheEffectView() throws {
         let background = CountingBackgroundView(frame: CGRect(x: 0, y: 0, width: 100, height: 80))
+        background.blurPolicy = .configured
         let initial = try #require(background.subviews.compactMap { $0 as? UIVisualEffectView }.first)
         #expect(background.insertedEffectCount == 1)
         for material in [UIBlurEffect.Style.dark, .regular] {
@@ -41,6 +42,7 @@ struct BackgroundViewTests {
 
     @Test func changingBackgroundStylePreservesCallerSubviews() throws {
         let background = CountingBackgroundView(frame: .zero)
+        background.blurPolicy = .configured
         let initial = try #require(background.subviews.first)
         let custom = UIView()
         background.addSubview(custom)

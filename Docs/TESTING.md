@@ -41,7 +41,7 @@ pod lib lint TMProgressHudUIKit.podspec --platforms=ios,tvos --swift-version=6.0
 carthage build --no-skip-current --use-xcframeworks --platform iOS,tvOS
 ```
 
-The framework builder requires a fresh output folder; set `TMHUD_ARTIFACT_DIR` to choose one. For an older compiler, set `TMHUD_PROJECT_FORMAT=plist` to generate a temporary compatible framework project under `.build/`. The shared `TMProgressHudUIKit` scheme builds the shipping framework; the framework under `Tests/Host` is test-only.
+The framework builder requires a fresh output folder; set `TMHUD_ARTIFACT_DIR` to choose one. For an older compiler, set `TMHUD_PROJECT_FORMAT=plist` to generate a temporary compatible framework project under `.build/`. Direct Carthage source builds use the bundled projects and require Xcode 27+. The shared `TMProgressHudUIKit` scheme builds the shipping framework; the framework under `Tests/Host` is test-only.
 
 Build an independent consumer for either platform:
 

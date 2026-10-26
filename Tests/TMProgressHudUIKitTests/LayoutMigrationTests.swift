@@ -160,7 +160,10 @@ struct LayoutMigrationTests {
             #expect(observed.layoutConfiguration == layout)
             #expect(observed.offset == CGPoint(x: -TMProgressMaxOffset, y: -TMProgressMaxOffset))
         }
-        defer { offset.invalidate(); margin.invalidate() }
+        defer {
+            offset.invalidate()
+            margin.invalidate()
+        }
         hud.setLayout(layout)
         #expect(recorder.count == 2)
         hud.setLayout(layout)
@@ -214,10 +217,10 @@ struct LayoutMigrationTests {
         expectLayoutValue(hud.bezelView.frame.midY, equals: 285)
         #expect(hud.bezelView.bounds.size == CGSize(width: 60, height: 60))
     }
+
     private func expectLayoutValue(_ actual: CGFloat, equals expected: CGFloat) {
         // Auto Layout's floating-point solver may leave subpixel arithmetic residue.
         let solverPrecisionInPoints: CGFloat = 0.001
         #expect(abs(actual - expected) <= solverPrecisionInPoints)
     }
-
 }

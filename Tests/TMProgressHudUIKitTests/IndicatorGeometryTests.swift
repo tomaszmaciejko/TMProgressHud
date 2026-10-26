@@ -14,6 +14,7 @@ struct IndicatorGeometryTests {
             for (input, expected) in cases {
                 view.progress = input
                 let actual = try pixels(view)
+                if input.isNaN { #expect(view.progress.isNaN) } else { #expect(view.progress == input) }
                 view.progress = expected
                 #expect(actual == (try pixels(view)))
             }

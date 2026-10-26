@@ -85,8 +85,9 @@ struct ConfigurationTests {
         #expect(hud.label.frame.width > 0)
     }
 
-    @Test func backgroundNilClearsTintAndKeepsBlur() throws {
+    @Test func backgroundNilClearsRequestedTintWithConfiguredBlur() throws {
         let background = TMBackgroundView()
+        background.blurPolicy = .configured
         let effect = try #require(background.subviews.compactMap { $0 as? UIVisualEffectView }.first)
         background.color = .red
         background.color = nil

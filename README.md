@@ -2,9 +2,9 @@
 
 A Swift progress and status HUD for UIKit on iOS and tvOS, originally ported from [MBProgressHUD](https://github.com/jdg/MBProgressHUD/tree/4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781).
 
-Display an activity indicator, pie, ring, horizontal bar, custom view or message, with an optional action button. You choose the host view and control the underlying operation.
+Display an activity indicator, circular progress, ring, horizontal bar, custom view or message, with an optional action button. You choose the host view and control the underlying operation.
 
-**Development requirements:** iOS 17+ or tvOS 17+, Swift 6.0+. Mac Catalyst is not supported. This branch is preparing **2.0.0**, which has not been released. Editing the bundled JSON Xcode projects requires Xcode 27+; package installation retains Swift 6.0+ support.
+**Development requirements:** iOS 17+ or tvOS 17+, Swift 6.0+. Mac Catalyst is not supported. This branch is preparing **2.0.0**, which has not been released. The bundled JSON Xcode projects, including Carthage source builds, require Xcode 27+. SwiftPM and CocoaPods source installation retain Swift 6.0+ support.
 
 The published [1.0.0](https://github.com/tomaszmaciejko/TMProgressHud/tree/v1.0.0) supports iOS 15+ and tvOS 15+.
 
@@ -61,7 +61,7 @@ hud.detailsLabel.text = "Please wait."
 hud.hide(animated: true)
 ```
 
-Development version 2.0 offers complete selections with `setContent(.ring)` and `setProgressSource(.manual(0.5))`; custom content uses `setContent(.custom(view))`. Use `hide(animated:completion:)` for a one-shot callback receiving the finished HUD; a superseding show cancels that request. Use the delegate for recurring dismissal notifications. For colors, `defaultIndicatorColor` affects future indicators and `applyContentColor(_:)` changes current content.
+For development version 2.0, prefer `setContent(.ring)` and `setProgressSource(.manual(0.5))`. See the [2.0 API and migration notes](Docs/COMPATIBILITY.md) for explicit layout, colors, completions, accessibility and custom progress.
 
 The helper attaches the HUD and removes it when hidden. Use `TMProgressHud(view:)` to configure it before attaching and showing it yourself.
 
@@ -82,7 +82,7 @@ On tvOS, direct focus to the HUD's action button in your own view controller. Th
 
 ## Compatibility
 
-Version 1.0 preserves the original behavior, including unclamped progress, fixed font sizes and repeated callbacks on repeated hides. See [compatibility notes](Docs/COMPATIBILITY.md) for these details and Swift API differences.
+Version 1.0 preserves the original behavior, including unclamped progress, fixed font sizes and repeated callbacks on repeated hides. See the [1.0 compatibility notes](https://github.com/tomaszmaciejko/TMProgressHud/blob/v1.0.0/Docs/COMPATIBILITY.md) for these details and Swift API differences.
 
 ## Contributing
 
