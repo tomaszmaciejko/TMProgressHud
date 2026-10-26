@@ -30,9 +30,7 @@ open class TMBackgroundView: UIView {
     }
 
     /// The system blur material.
-
     ///
-
     /// The default is regular on tvOS and systemThickMaterial on iOS.
     @objc open dynamic var blurEffectStyle: UIBlurEffect.Style = Defaults.blurEffectStyle {
         didSet {
@@ -41,9 +39,7 @@ open class TMBackgroundView: UIView {
     }
 
     /// The container tint, initially nil.
-
     ///
-
     /// Nil clears the tint without removing the blur.
     @objc open dynamic var color: UIColor? {
         get { storedColor }
@@ -54,22 +50,20 @@ open class TMBackgroundView: UIView {
         }
     }
 
-    private var storedColor: UIColor? = nil
+    private var storedColor: UIColor?
 
     private var effectView: UIVisualEffectView?
 
-    /// Creates a background using the reference blur defaults.
+    /// Creates a background using the default blur material.
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        clipsToBounds = true
-        updateBackground()
+        configureBackground()
     }
 
     init(frame: CGRect, style: TMProgressHudBackgroundStyle) {
         self.style = style
         super.init(frame: frame)
-        clipsToBounds = true
-        updateBackground()
+        configureBackground()
     }
 
     /// Decodes a background and applies the supported Swift background defaults.
@@ -78,8 +72,7 @@ open class TMBackgroundView: UIView {
         if coder.containsValue(forKey: ArchiveKeys.effectView) {
             effectView = coder.decodeObject(forKey: ArchiveKeys.effectView) as? UIVisualEffectView
         }
-        clipsToBounds = true
-        updateBackground()
+        configureBackground()
     }
 
     /// Encodes UIKit view state and identifies the owned effect view without persisting HUD configuration.
@@ -90,6 +83,11 @@ open class TMBackgroundView: UIView {
 
     /// The smallest intrinsic size; surrounding content determines the final size.
     open override var intrinsicContentSize: CGSize { .zero }
+
+    private func configureBackground() {
+        clipsToBounds = true
+        updateBackground()
+    }
 
     private func updateBackground() {
         if style == .blur {

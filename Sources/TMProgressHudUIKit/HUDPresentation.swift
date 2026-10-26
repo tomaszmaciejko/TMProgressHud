@@ -18,7 +18,12 @@ protocol HUDPresentationHost: AnyObject {
 @MainActor
 final class HUDPresentation {
     enum Phase {
-        case idle, waitingForGrace, visible, waitingForMinimum, hiding, hidden
+        case idle
+        case waitingForGrace
+        case visible
+        case waitingForMinimum
+        case hiding
+        case hidden
     }
 
     private(set) var phase: Phase = .idle
@@ -26,20 +31,28 @@ final class HUDPresentation {
     private weak var host: (any HUDPresentationHost)?
     private var generation = UUID()
     private var shownAt: ContinuousClock.Instant?
-    private var graceAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
-    private var minimumAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
-    private var delayedHideAction: HUDScheduledAction? { didSet { oldValue?.cancel() } }
+    private var graceAction: HUDScheduledAction? {
+        didSet { oldValue?.cancel() }
+    }
+    private var minimumAction: HUDScheduledAction? {
+        didSet { oldValue?.cancel() }
+    }
+    private var delayedHideAction: HUDScheduledAction? {
+        didSet { oldValue?.cancel() }
+    }
 
     var isShowingContent: Bool { phase == .visible || phase == .waitingForMinimum }
 
-    var hasFinished: Bool {
+    var hasHideRequest: Bool {
         switch phase {
         case .waitingForMinimum, .hiding, .hidden: true
         case .idle, .waitingForGrace, .visible: false
         }
     }
 
-    init(host: any HUDPresentationHost) { self.host = host }
+    init(host: any HUDPresentationHost) {
+        self.host = host
+    }
 
     func show(animated: Bool) {
         let wasPresented = phase == .visible || phase == .waitingForMinimum || phase == .hiding

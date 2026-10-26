@@ -14,8 +14,12 @@ final class HUDProgressBinding {
     private var generation = UUID()
     private let onProgress: @MainActor (Float) -> Void
 
-    init(onProgress: @escaping @MainActor (Float) -> Void) { self.onProgress = onProgress }
-    deinit { updatesTask?.cancel() }
+    init(onProgress: @escaping @MainActor (Float) -> Void) {
+        self.onProgress = onProgress
+    }
+    deinit {
+        updatesTask?.cancel()
+    }
 
     func replace(with source: Progress?) {
         guard self.source !== source else { return }

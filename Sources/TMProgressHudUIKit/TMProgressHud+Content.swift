@@ -5,7 +5,7 @@
 import UIKit
 
 extension TMProgressHud {
-    func setupViews() {
+    func installContentViews() {
         backgroundView.frame = bounds
         backgroundView.style = .solidColor
         backgroundView.backgroundColor = .clear
@@ -41,7 +41,7 @@ extension TMProgressHud {
         button.setTitleColor(contentColor, for: .normal)
     }
 
-    func updateIndicators() {
+    func updateIndicator() {
         let previousIndicator = indicator
         managedIndicator = HUDIndicator.make(mode: mode, customView: customView, reusing: previousIndicator)
         if indicator !== previousIndicator {
@@ -56,36 +56,15 @@ extension TMProgressHud {
         setNeedsUpdateConstraints()
     }
 
-    func forwardProgress() { managedIndicator?.updateProgress(progress) }
+    func forwardProgress() {
+        managedIndicator?.updateProgress(progress)
+    }
 
-    func updateViewsForColor(_ color: UIColor?) {
+    func updateContentColor(_ color: UIColor?) {
         guard let color else { return }
         label.textColor = color
         detailsLabel.textColor = color
         button.setTitleColor(color, for: .normal)
         managedIndicator?.updateColor(color)
-    }
-
-    func updateBezelMotionEffects() {
-        if areDefaultMotionEffectsEnabled {
-            guard bezelMotionEffects == nil else { return }
-            let horizontal = motionEffect(key: "center.x", type: .tiltAlongHorizontalAxis)
-            let vertical = motionEffect(key: "center.y", type: .tiltAlongVerticalAxis)
-            let group = UIMotionEffectGroup()
-            group.motionEffects = [horizontal, vertical]
-            bezelMotionEffects = group
-            bezelView.addMotionEffect(group)
-        } else if let effects = bezelMotionEffects {
-            bezelMotionEffects = nil
-            bezelView.removeMotionEffect(effects)
-        }
-    }
-
-    private func motionEffect(key: String, type: UIInterpolatingMotionEffect.EffectType) -> UIInterpolatingMotionEffect
-    {
-        let effect = UIInterpolatingMotionEffect(keyPath: key, type: type)
-        effect.maximumRelativeValue = HUDMetrics.motionOffset
-        effect.minimumRelativeValue = -HUDMetrics.motionOffset
-        return effect
     }
 }

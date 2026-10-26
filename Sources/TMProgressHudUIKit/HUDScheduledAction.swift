@@ -12,9 +12,13 @@ final class HUDScheduledAction {
 
     var isPending: Bool { action != nil }
 
-    init(action: @escaping @MainActor () -> Void) { self.action = action }
+    init(action: @escaping @MainActor () -> Void) {
+        self.action = action
+    }
 
-    deinit { task?.cancel() }
+    deinit {
+        task?.cancel()
+    }
 
     static func scheduled(after interval: TimeInterval, action: @escaping @MainActor () -> Void) -> HUDScheduledAction {
         let scheduled = HUDScheduledAction(action: action)

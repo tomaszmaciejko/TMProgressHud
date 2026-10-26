@@ -55,11 +55,11 @@ final class HUDLayout {
     func updatePadding() {
         var hasEarlierVisibleContent = false
         for gap in gaps {
-            let precedingVisible = !gap.preceding.isHidden && gap.preceding.intrinsicContentSize != .zero
-            let followingVisible = !gap.following.isHidden && gap.following.intrinsicContentSize != .zero
-            gap.constraint.constant =
-                followingVisible && (precedingVisible || hasEarlierVisibleContent) ? HUDMetrics.padding : 0
-            hasEarlierVisibleContent = hasEarlierVisibleContent || precedingVisible
+            let isPrecedingVisible = !gap.preceding.isHidden && gap.preceding.intrinsicContentSize != .zero
+            let isFollowingVisible = !gap.following.isHidden && gap.following.intrinsicContentSize != .zero
+            let needsPadding = isFollowingVisible && (isPrecedingVisible || hasEarlierVisibleContent)
+            gap.constraint.constant = needsPadding ? HUDMetrics.padding : 0
+            hasEarlierVisibleContent = hasEarlierVisibleContent || isPrecedingVisible
         }
     }
 
@@ -88,7 +88,9 @@ final class HUDLayout {
             bezel.heightAnchor.constraint(greaterThanOrEqualToConstant: 0),
         ]
         squareConstraints = [bezel.heightAnchor.constraint(equalTo: bezel.widthAnchor)]
-        for constraint in minimumSizeConstraints + squareConstraints { constraint.priority = HUDMetrics.sizePriority }
+        for constraint in minimumSizeConstraints + squareConstraints {
+            constraint.priority = HUDMetrics.sizePriority
+        }
         NSLayoutConstraint.activate(fixedConstraints)
     }
 
@@ -97,7 +99,9 @@ final class HUDLayout {
             bezel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             bezel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
         ]
-        for constraint in centeringConstraints { constraint.priority = HUDMetrics.contentPriority }
+        for constraint in centeringConstraints {
+            constraint.priority = HUDMetrics.contentPriority
+        }
         minimumMarginConstraints = [
             bezel.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor),
             bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor),
@@ -135,14 +139,20 @@ final class HUDLayout {
         for (constraint, value) in zip(centeringConstraints, [configuration.offset.x, configuration.offset.y]) {
             constraint.constant = value
         }
-        for constraint in minimumMarginConstraints { constraint.constant = configuration.margin }
-        for constraint in maximumMarginConstraints { constraint.constant = -configuration.margin }
+        for constraint in minimumMarginConstraints {
+            constraint.constant = configuration.margin
+        }
+        for constraint in maximumMarginConstraints {
+            constraint.constant = -configuration.margin
+        }
         for (constraint, value) in zip(
             minimumSizeConstraints, [configuration.minimumSize.width, configuration.minimumSize.height]
         ) {
             constraint.constant = value
             constraint.isActive = configuration.minimumSize != .zero
         }
-        for constraint in squareConstraints { constraint.isActive = configuration.isSquare }
+        for constraint in squareConstraints {
+            constraint.isActive = configuration.isSquare
+        }
     }
 }

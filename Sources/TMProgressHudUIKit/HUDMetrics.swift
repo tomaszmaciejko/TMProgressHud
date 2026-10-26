@@ -4,7 +4,7 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-// Layout values are in points; opacity and scale factors are dimensionless.
+// Shared layout, appearance and presentation defaults.
 enum HUDMetrics {
     static let margin: CGFloat = 20
     static let padding: CGFloat = 4
@@ -13,6 +13,7 @@ enum HUDMetrics {
     static let contentAlpha: CGFloat = 0.7
     static let remainingAlpha: CGFloat = 0.1
     static let bezelRadius: CGFloat = 5
+    // Outer margins win over centering; optional size preferences yield first in a small host.
     static let contentPriority = UILayoutPriority(998)
     static let sidePriority = UILayoutPriority(999)
     static let sizePriority = UILayoutPriority(997)

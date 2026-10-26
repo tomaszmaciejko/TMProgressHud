@@ -1,15 +1,15 @@
 [
   {
     "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
-    "sha256": "928d8d6abd486406c4555a61c212d89dd6387a91dba4a12c4561fdd5c2d118ed",
+    "sha256": "eb745e4ab06b20a6d62d6a323693b8c18dfbfc8a3373443e5ebe20001c55cf93",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Reviewed native CGFloat alpha literal replacing C Float promotion; declarations have no executable regions. Exact documented alphas are tested separately."
+    "decision": "Reviewed declaration-only cleanup: current-product docs and priority rationale; enum raw values, Sendable conformance and numeric defaults unchanged. No executable-line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
-    "sha256": "2ce6c6f390ae3c1609f4825616dc828894bdcc54dec43c948c7db081b332dd6c",
+    "sha256": "2f68f339894f5a01f1498101683ee2aca0da870bff491227b7eb04a39bc320e8",
     "reason": "Swift/LLVM emits no source coverage regions for these enum/typealias/global constant declarations; raw values and offset are asserted in enumCasesPreserveRawValues.",
-    "decision": "Reviewed additive checked Sendable conformance on three Int enums; declaration-only body, no new executable regions or exclusions. Raw values and cross-task transfer are tested."
+    "decision": "Reviewed declaration-only cleanup: current-product docs and priority rationale; enum raw values, Sendable conformance and numeric defaults unchanged. No executable-line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",

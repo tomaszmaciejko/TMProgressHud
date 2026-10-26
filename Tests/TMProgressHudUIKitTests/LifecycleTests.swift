@@ -63,7 +63,7 @@ struct LifecycleTests {
         hud.hide(animated: true, afterDelay: 10)
         #expect(!replaced.isPending)
         time.actions.last?.fire()
-        #expect(hud.hasFinished)
+        #expect(hud.hasHideRequest)
     }
 
     @Test func repeatedGraceCallsReplaceOutstandingAction() throws {
@@ -97,7 +97,7 @@ struct LifecycleTests {
         #expect(hud.alpha == 0)
         hud.hide(animated: false, afterDelay: -1)
         time.actions.last?.fire()
-        #expect(hud.hasFinished)
+        #expect(hud.hasHideRequest)
     }
 
     @Test func immediateShowCancelsPreviousGrace() throws {

@@ -9,8 +9,12 @@ struct HUDIndicator {
     private let receiveProgress: ((Float) -> Void)?
     private let receiveColor: (UIColor?) -> Void
 
-    func updateProgress(_ progress: Float) { receiveProgress?(progress) }
-    func updateColor(_ color: UIColor?) { receiveColor(color) }
+    func updateProgress(_ progress: Float) {
+        receiveProgress?(progress)
+    }
+    func updateColor(_ color: UIColor?) {
+        receiveColor(color)
+    }
 
     static func make(mode: TMProgressHudMode, customView: UIView?, reusing previous: UIView?) -> HUDIndicator? {
         switch mode {
@@ -73,10 +77,10 @@ struct HUDIndicator {
         let receiveProgress: ((Float) -> Void)?
         if let reporting = view as? any TMProgressHudProgressReporting {
             receiveProgress = { reporting.progress = $0 }
+        } else if let adapter = HUDLegacyProgressAdapter(view: view) {
+            receiveProgress = { adapter.updateProgress($0) }
         } else {
-            receiveProgress = HUDLegacyProgressAdapter(view: view).map { adapter in
-                { adapter.updateProgress($0) }
-            }
+            receiveProgress = nil
         }
         return HUDIndicator(view: view, receiveProgress: receiveProgress) { color in
             if let color { view.tintColor = color }

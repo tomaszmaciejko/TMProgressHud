@@ -12,7 +12,7 @@ extension TMProgressHud: HUDPresentationHost {
         updateProgressObservation()
         updateBezelMotionEffects()
         if animated {
-            animate(in: true, type: animationType, completion: nil)
+            animate(isAppearing: true, type: animationType, completion: nil)
         } else {
             bezelView.alpha = 1
             backgroundView.alpha = 1
@@ -22,7 +22,7 @@ extension TMProgressHud: HUDPresentationHost {
     func hidePresentation(animated: Bool, completion: @escaping @MainActor () -> Void) {
         updateProgressObservation()
         if animated {
-            animate(in: false, type: animationType) { _ in completion() }
+            animate(isAppearing: false, type: animationType) { _ in completion() }
         } else {
             bezelView.alpha = 0
             backgroundView.alpha = 1
@@ -30,11 +30,16 @@ extension TMProgressHud: HUDPresentationHost {
         }
     }
 
-    func animate(in appearing: Bool, type: TMProgressHudAnimation, completion: ((Bool) -> Void)?) {
-        let resolvedType: TMProgressHudAnimation = type == .zoom ? (appearing ? .zoomIn : .zoomOut) : type
+    func animate(isAppearing: Bool, type: TMProgressHudAnimation, completion: ((Bool) -> Void)?) {
+        let resolvedType: TMProgressHudAnimation
+        if type == .zoom {
+            resolvedType = isAppearing ? .zoomIn : .zoomOut
+        } else {
+            resolvedType = type
+        }
         let small = CGAffineTransform(scaleX: HUDMetrics.reducedScale, y: HUDMetrics.reducedScale)
         let large = CGAffineTransform(scaleX: HUDMetrics.enlargedScale, y: HUDMetrics.enlargedScale)
-        if appearing && bezelView.alpha == 0 {
+        if isAppearing && bezelView.alpha == 0 {
             if resolvedType == .zoomIn {
                 bezelView.transform = small
             } else if resolvedType == .zoomOut {
@@ -45,25 +50,25 @@ extension TMProgressHud: HUDPresentationHost {
             springDuration: HUDMetrics.animationPerceivedDuration, bounce: 0,
             initialSpringVelocity: 0, delay: 0, options: .beginFromCurrentState,
             animations: {
-                self.applyAnimationState(appearing: appearing, type: resolvedType, small: small, large: large)
+                self.applyAnimationState(isAppearing: isAppearing, type: resolvedType, small: small, large: large)
             },
             completion: completion
         )
     }
 
     private func applyAnimationState(
-        appearing: Bool, type: TMProgressHudAnimation,
+        isAppearing: Bool, type: TMProgressHudAnimation,
         small: CGAffineTransform, large: CGAffineTransform
     ) {
-        if appearing {
+        if isAppearing {
             bezelView.transform = .identity
         } else if type == .zoomIn {
             bezelView.transform = large
         } else if type == .zoomOut {
             bezelView.transform = small
         }
-        bezelView.alpha = appearing ? 1 : 0
-        backgroundView.alpha = appearing ? 1 : 0
+        bezelView.alpha = isAppearing ? 1 : 0
+        backgroundView.alpha = isAppearing ? 1 : 0
     }
 
     func finishPresentation() {
@@ -74,4 +79,28 @@ extension TMProgressHud: HUDPresentationHost {
         delegate?.hudWasHidden?(self)
     }
 
+    // MARK: - Motion effects
+
+    func updateBezelMotionEffects() {
+        if areDefaultMotionEffectsEnabled {
+            guard bezelMotionEffects == nil else { return }
+            let horizontal = motionEffect(key: "center.x", type: .tiltAlongHorizontalAxis)
+            let vertical = motionEffect(key: "center.y", type: .tiltAlongVerticalAxis)
+            let group = UIMotionEffectGroup()
+            group.motionEffects = [horizontal, vertical]
+            bezelMotionEffects = group
+            bezelView.addMotionEffect(group)
+        } else if let effects = bezelMotionEffects {
+            bezelMotionEffects = nil
+            bezelView.removeMotionEffect(effects)
+        }
+    }
+
+    private func motionEffect(key: String, type: UIInterpolatingMotionEffect.EffectType) -> UIInterpolatingMotionEffect
+    {
+        let effect = UIInterpolatingMotionEffect(keyPath: key, type: type)
+        effect.maximumRelativeValue = HUDMetrics.motionOffset
+        effect.minimumRelativeValue = -HUDMetrics.motionOffset
+        return effect
+    }
 }
