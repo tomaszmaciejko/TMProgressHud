@@ -43,20 +43,26 @@ struct IndicatorTests {
         port.draw(port.bounds)  // Drawing without a graphics context is a defined no-op.
     }
 
-    @Test(arguments: [Float(0), 0.01, 0.5, 0.99, 1, 2])
-    func barDrawingMatchesOriginal(progress: Float) throws {
-        let reference = MBBarProgressView()
-        let port = TMBarProgressView()
-        reference.progress = progress
-        port.progress = progress
-        reference.progressColor = .red
-        port.progressColor = .red
-        reference.progressRemainingColor = .blue
-        port.progressRemainingColor = .blue
-        reference.lineColor = .green
-        port.lineColor = .green
-        #expect(try pixels(reference) == pixels(port))
-        port.draw(port.bounds)
+    @Test func barColorsRemainIndependent() throws {
+        let bar = TMBarProgressView()
+        bar.lineColor = .green
+        bar.progressRemainingColor = .blue
+        bar.progressColor = .red
+        let empty = try pixels(bar)
+        bar.progressColor = .yellow
+        #expect(try pixels(bar) == empty)
+        bar.lineColor = .red
+        #expect(try pixels(bar) != empty)
+        bar.lineColor = .green
+        bar.progressRemainingColor = .black
+        #expect(try pixels(bar) != empty)
+        bar.progressRemainingColor = .blue
+        bar.progress = 1
+        let full = try pixels(bar)
+        #expect(full != empty)
+        bar.progressColor = .red
+        #expect(try pixels(bar) != full)
+        bar.draw(bar.bounds)  // Drawing without a graphics context is a defined no-op.
     }
 
     @Test func colorSettersAndBackgroundChangesAreReversible() {

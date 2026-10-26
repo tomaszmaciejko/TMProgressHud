@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Simplify bar rendering to rounded paths and a proportional interior fill, including safe small-size and nonfinite-input behavior.
+
 - Fit circular indicators within rectangular bounds and safely bound their displayed progress.
 
 - Redraw built-in indicators after resizing instead of stretching a cached drawing.

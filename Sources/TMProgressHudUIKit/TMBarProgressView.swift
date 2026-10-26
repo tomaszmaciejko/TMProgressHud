@@ -114,78 +114,28 @@ open class TMBarProgressView: UIView {
     }
 
     private func drawBar(in rect: CGRect, context: CGContext) {
-        let border = Geometry.border
-        let inset = Geometry.inset
-        let borderRadius = rect.height / 2 - border
-        context.setLineWidth(border)
+        let outline = rect.insetBy(dx: Geometry.border, dy: Geometry.border)
+        guard outline.width > 0, outline.height > 0 else { return }
+        let borderPath = capsule(in: outline)
+        context.addPath(borderPath.cgPath)
+        context.setLineWidth(Geometry.border)
         context.setStrokeColor(lineColor.cgColor)
         context.setFillColor(progressRemainingColor.cgColor)
-        outline(in: rect, inset: border, radius: borderRadius, context: context)
         context.drawPath(using: .fillStroke)
+
+        let interior = rect.insetBy(dx: Geometry.inset, dy: Geometry.inset)
+        guard interior.width > 0, interior.height > 0 else { return }
+        let fraction = CGFloat(HUDProgressValue.boundedFraction(progress))
+        context.addPath(capsule(in: interior).cgPath)
+        context.clip()
         context.setFillColor(progressColor.cgColor)
-        let radius = borderRadius - border
-        let amount = CGFloat(progress) * rect.width
-        if amount >= radius + inset && amount <= rect.width - radius - inset {
-            drawMiddle(amount: amount, radius: radius, rect: rect, context: context)
-        } else if amount > radius + inset {
-            drawRight(amount: amount, radius: radius, rect: rect, context: context)
-        } else if amount < radius + inset && amount > 0 {
-            drawLeft(radius: radius, rect: rect, context: context)
-        }
+        context.fill(
+            CGRect(
+                x: interior.minX, y: interior.minY,
+                width: interior.width * fraction, height: interior.height))
     }
 
-    private func outline(in rect: CGRect, inset: CGFloat, radius: CGFloat, context: CGContext) {
-        context.move(to: CGPoint(x: inset, y: rect.height / 2))
-        context.addArc(
-            tangent1End: CGPoint(x: inset, y: inset), tangent2End: CGPoint(x: radius + inset, y: inset), radius: radius)
-        context.addArc(
-            tangent1End: CGPoint(x: rect.width - inset, y: inset),
-            tangent2End: CGPoint(x: rect.width - inset, y: rect.height / 2), radius: radius)
-        context.addArc(
-            tangent1End: CGPoint(x: rect.width - inset, y: rect.height - inset),
-            tangent2End: CGPoint(x: rect.width - radius - inset, y: rect.height - inset), radius: radius)
-        context.addArc(
-            tangent1End: CGPoint(x: inset, y: rect.height - inset), tangent2End: CGPoint(x: inset, y: rect.height / 2),
-            radius: radius)
-    }
-
-    private func startHalf(top: Bool, radius: CGFloat, rect: CGRect, context: CGContext) {
-        let inset = Geometry.inset
-        let y = top ? inset : rect.height - inset
-        context.move(to: CGPoint(x: inset, y: rect.height / 2))
-        context.addArc(
-            tangent1End: CGPoint(x: inset, y: y), tangent2End: CGPoint(x: radius + inset, y: y), radius: radius)
-    }
-
-    private func drawMiddle(amount: CGFloat, radius: CGFloat, rect: CGRect, context: CGContext) {
-        for top in [true, false] {
-            startHalf(top: top, radius: radius, rect: rect, context: context)
-            context.addLine(to: CGPoint(x: amount, y: top ? Geometry.inset : rect.height - Geometry.inset))
-            context.addLine(to: CGPoint(x: amount, y: radius + Geometry.inset))
-        }
-        context.fillPath()
-    }
-
-    private func drawRight(amount: CGFloat, radius: CGFloat, rect: CGRect, context: CGContext) {
-        let centerX = rect.width - radius - Geometry.inset
-        let rawAngle = acos((amount - centerX) / radius)
-        let angle = rawAngle.isNaN ? 0 : rawAngle
-        for top in [true, false] {
-            startHalf(top: top, radius: radius, rect: rect, context: context)
-            context.addLine(to: CGPoint(x: centerX, y: top ? Geometry.inset : rect.height - Geometry.inset))
-            context.addArc(
-                center: CGPoint(x: centerX, y: rect.height / 2), radius: radius,
-                startAngle: top ? .pi : -.pi, endAngle: top ? -angle : angle, clockwise: !top)
-            context.addLine(to: CGPoint(x: amount, y: rect.height / 2))
-        }
-        context.fillPath()
-    }
-
-    private func drawLeft(radius: CGFloat, rect: CGRect, context: CGContext) {
-        for top in [true, false] {
-            startHalf(top: top, radius: radius, rect: rect, context: context)
-            context.addLine(to: CGPoint(x: radius + Geometry.inset, y: rect.height / 2))
-        }
-        context.fillPath()
+    private func capsule(in rect: CGRect) -> UIBezierPath {
+        UIBezierPath(roundedRect: rect, cornerRadius: min(rect.width, rect.height) / 2)
     }
 }

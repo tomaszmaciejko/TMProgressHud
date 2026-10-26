@@ -44,6 +44,52 @@ struct IndicatorGeometryTests {
         #expect(try pixels(view).allSatisfy { $0 == 0 })
     }
 
+    @Test func barFillAdvancesInsideTheLeadingCap() throws {
+        let view = TMBarProgressView()
+        view.progress = 0.01
+        let first = try pixels(view)
+        view.progress = 0.04
+        #expect(first != (try pixels(view)))
+    }
+
+    @Test func barFillIncreasesFromEmptyToFull() throws {
+        let view = TMBarProgressView()
+        view.lineColor = .clear
+        view.progressRemainingColor = .clear
+        var previous = 0
+        for progress: Float in [0, 0.01, 0.04, 0.25, 0.5, 0.75, 0.99, 1] {
+            view.progress = progress
+            let coloredBytes = try pixels(view).filter { $0 != 0 }.count
+            if progress == 0 { #expect(coloredBytes == 0) } else { #expect(coloredBytes > previous) }
+            previous = coloredBytes
+        }
+    }
+
+    @Test func barDrawingBoundsProgressWithoutChangingItsStoredValue() throws {
+        let view = TMBarProgressView()
+        let cases: [(Float, Float)] = [(-1, 0), (2, 1), (.nan, 0), (.infinity, 0), (-.infinity, 0)]
+        for (input, expected) in cases {
+            view.progress = input
+            let actual = try pixels(view)
+            if input.isNaN { #expect(view.progress.isNaN) } else { #expect(view.progress == input) }
+            view.progress = expected
+            #expect(actual == (try pixels(view)))
+        }
+    }
+
+    @Test func smallBarsDoNotDrawAnInvalidFill() throws {
+        let view = TMBarProgressView()
+        view.lineColor = .clear
+        view.progressRemainingColor = .clear
+        view.progress = 1
+        for size in [
+            CGSize.zero, CGSize(width: 3, height: 20), CGSize(width: 20, height: 3), CGSize(width: 6, height: 6),
+        ] {
+            view.bounds.size = size
+            #expect(try pixels(view, canvas: CGSize(width: 20, height: 20)).allSatisfy { $0 == 0 })
+        }
+    }
+
     private func pixels(_ view: UIView, canvas: CGSize? = nil, offset: CGPoint = .zero) throws -> Data {
         let format = UIGraphicsImageRendererFormat()
         format.scale = 3
