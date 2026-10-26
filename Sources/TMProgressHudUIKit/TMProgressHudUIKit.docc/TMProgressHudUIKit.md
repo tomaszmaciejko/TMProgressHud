@@ -19,6 +19,17 @@ The convenience helper removes the HUD on hide. To configure grace time, create 
 
 Progress values are forwarded without clamping. A new show supersedes unfinished hiding; completion and delegate callbacks run once per completed presentation. A Progress source is observed only while the HUD is presented in a window. The caller can customize the exposed labels and custom UIView content.
 
+## Position and spacing
+
+Select physical edges without numeric offsets. Insets refer to the host bounds; minimum size and square preference remain separate.
+
+```swift
+hud.setLayout(.init(
+    position: .init(vertical: .bottom),
+    contentInsets: .init(top: 12, left: 16, bottom: 12, right: 16),
+    hostInsets: .init(top: 24, left: 24, bottom: 40, right: 24)))
+```
+
 ## System progress bar
 
 Use UIKit's system appearance through custom content. The HUD forwards progress to the view; an explicit width lets Auto Layout size the bar.
@@ -43,6 +54,11 @@ hud.setProgressSource(.manual(0.5))
 - ``TMProgressHudDelegate``
 - ``TMProgressHudCompletionBlock``
 - ``TMProgressMaxOffset``
+
+### Layout
+
+- ``TMProgressHudLayout``
+- ``TMProgressHudPosition``
 
 ### Content views
 

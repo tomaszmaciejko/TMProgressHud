@@ -96,21 +96,25 @@ open class TMProgressHud: UIView {
 
     // MARK: - Layout
 
-    /// Offset relative to the host center, constrained by the minimum outer margin.
-    @objc open dynamic var offset: CGPoint = .zero {
-        didSet {
-            if oldValue != offset {
-                setNeedsUpdateConstraints()
-            }
+    /// Compatibility offset: projects edge anchors to legacy extremes and assigns only position.
+    @objc open dynamic var offset: CGPoint {
+        get { layoutPreferences.compatibilityOffset }
+        set {
+            guard layoutPreferences.compatibilityOffset != newValue else { return }
+            layoutPreferences.position = .legacy(newValue)
+            setNeedsUpdateConstraints()
         }
     }
 
-    /// Inner and minimum outer margin in points, initially 20.
-    @objc open dynamic var margin: CGFloat = HUDMetrics.margin {
-        didSet {
-            if oldValue != margin {
-                setNeedsUpdateConstraints()
-            }
+    /// Compatibility spacing: reads the top content inset and assigns uniform inner and outer spacing.
+    @objc open dynamic var margin: CGFloat {
+        get { layoutPreferences.compatibilityMargin }
+        set {
+            let insets = HUDLayoutPreferences.uniformInsets(newValue)
+            guard layoutPreferences.contentInsets != insets || layoutPreferences.hostInsets != insets else { return }
+            layoutPreferences.contentInsets = insets
+            layoutPreferences.hostInsets = insets
+            setNeedsUpdateConstraints()
         }
     }
 
@@ -181,6 +185,7 @@ open class TMProgressHud: UIView {
     private lazy var presentation = HUDPresentation(host: self)
     private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
 
+    var layoutPreferences = HUDLayoutPreferences()
     var contentSelection: (mode: TMProgressHudMode, customView: UIView?) = (.indeterminate, nil)
     lazy var motionSettings = HUDMotionSettings { [weak self] in self?.updateBezelMotionEffects() }
     var managedIndicator: HUDIndicator?
@@ -303,7 +308,7 @@ open class TMProgressHud: UIView {
         }
         hudLayout.update(
             container: self, bezel: bezelView, content: content,
-            configuration: .init(offset: offset, margin: margin, minimumSize: minSize, isSquare: isSquare))
+            configuration: .init(layout: layoutConfiguration, minimumSize: minSize, isSquare: isSquare))
         super.updateConstraints()
     }
 

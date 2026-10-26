@@ -26,6 +26,12 @@ Use `setContent(.custom(view))` to select custom content in one call, or `.activ
 
 Use `setProgressSource(.manual(value))` to stop observation before assigning a value, or `.observed(progress)` to select Foundation Progress. The compatibility progress/progressObject setters remain available; their independent use can still combine manual updates with observation.
 
+## Explicit layout in 2.0
+
+Use `setLayout(_:)` with `TMProgressHudLayout` to select position, contentInsets and hostInsets together. Position axes use left/center/right and top/center/bottom; offsets move right and down. Insets use physical edges and do not mirror with language. Positions refer to host bounds, with outer insets taking priority over an offset; safe areas are not applied implicitly. Minimum size and square preference remain separate properties.
+
+The compatibility offset getter projects edge positions to `TMProgressMaxOffset` extremes; its setter changes only position. The margin getter reads the top content inset; assigning margin restores uniform inner and outer spacing. Use layoutConfiguration to read the full selection. Existing getter overrides remain effective, and compatibility KVO observers receive the completed selection.
+
 ## Explicit colors in 2.0
 
 `defaultIndicatorColor` changes the default for future indicators without touching current views. `applyContentColor(_:)` recolors labels, the normal button title and the current indicator without changing that default; repeated calls apply again. Explicit indicator coloring bypasses the compatibility appearance-proxy lookup. Circular remaining-area alpha multiplies the supplied color's alpha and follows its dynamic appearance.

@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Add explicit position and independent content/host insets, retaining compatibility layout properties and atomic KVO.
+
 - Simplify bar rendering to rounded paths and a proportional interior fill, including safe small-size and nonfinite-input behavior.
 
 - Fit circular indicators within rectangular bounds and safely bound their displayed progress.

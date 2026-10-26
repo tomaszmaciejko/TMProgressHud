@@ -91,6 +91,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDLayoutPreferences.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDLegacyProgressAdapter.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -175,6 +181,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHud+Layout.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHud+Lifecycle.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -205,7 +217,19 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudLayout.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHudMotionPolicy.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudPosition.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
           ]
@@ -307,6 +331,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/HUDChangeRecorder.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/HostLayoutTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
@@ -344,6 +374,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/LayoutContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/LayoutMigrationTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

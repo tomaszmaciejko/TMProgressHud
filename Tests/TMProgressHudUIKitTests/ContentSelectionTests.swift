@@ -21,16 +21,14 @@ struct ContentSelectionTests {
     @Test func observersSeeTheCompleteSelectionAndEqualSelectionIsANoOp() {
         let hud = TMProgressHud(frame: .zero)
         let custom = UIView()
-        var changes = 0
-        let modeObservation = hud.observe(\.mode, options: [.new]) { observed, _ in
+        let recorder = HUDChangeRecorder()
+        let modeObservation = recorder.observe(hud, \.mode) { observed in
             #expect(observed.mode == .customView)
             #expect(observed.customView === custom)
-            changes += 1
         }
-        let viewObservation = hud.observe(\.customView, options: [.new]) { observed, _ in
+        let viewObservation = recorder.observe(hud, \.customView) { observed in
             #expect(observed.mode == .customView)
             #expect(observed.customView === custom)
-            changes += 1
         }
         defer {
             modeObservation.invalidate()
@@ -38,9 +36,9 @@ struct ContentSelectionTests {
         }
         hud.setContent(.custom(custom))
         #expect(custom.superview === hud.bezelView)
-        #expect(changes == 2)
+        #expect(recorder.count == 2)
         hud.setContent(.custom(custom))
-        #expect(changes == 2)
+        #expect(recorder.count == 2)
     }
 
     @Test func selectingBuiltInContentReleasesCustomContent() {

@@ -26,6 +26,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDLayoutPreferences.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDLegacyProgressAdapter.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -110,6 +116,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHud+Layout.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/TMProgressHud+Lifecycle.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -140,7 +152,19 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudLayout.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/TMProgressHudMotionPolicy.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudPosition.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
       ]
@@ -207,7 +231,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "000000000000000000000046",
+      "id": "00000000000000000000004E",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

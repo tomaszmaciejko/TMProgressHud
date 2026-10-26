@@ -8,31 +8,89 @@ import UIKit
 @MainActor
 final class HUDLayout {
     struct Configuration {
-        let offset: CGPoint
-        let margin: CGFloat
+        let layout: TMProgressHudLayout
         let minimumSize: CGSize
         let isSquare: Bool
     }
 
     @MainActor
     private struct BezelConstraints {
+        let left: NSLayoutConstraint
         let centerX: NSLayoutConstraint
+        let right: NSLayoutConstraint
+        let top: NSLayoutConstraint
         let centerY: NSLayoutConstraint
+        let bottom: NSLayoutConstraint
         let minimumWidth: NSLayoutConstraint
         let minimumHeight: NSLayoutConstraint
         let square: NSLayoutConstraint
+        let outerLeft: NSLayoutConstraint
+        let outerRight: NSLayoutConstraint
+        let outerTop: NSLayoutConstraint
+        let outerBottom: NSLayoutConstraint
+        let topPadding: NSLayoutConstraint
+        let bottomPadding: NSLayoutConstraint
+        let paddingBalance: NSLayoutConstraint
 
-        var centering: [NSLayoutConstraint] { [centerX, centerY] }
+        var positioning: [NSLayoutConstraint] { [left, centerX, right, top, centerY, bottom] }
         var sizing: [NSLayoutConstraint] { [minimumWidth, minimumHeight, square] }
+        var outerEdges: [NSLayoutConstraint] { [outerLeft, outerRight, outerTop, outerBottom] }
+        var padding: [NSLayoutConstraint] { [topPadding, bottomPadding, paddingBalance] }
 
-        init(container: UIView, bezel: UIView) {
+        init(container: UIView, bezel: UIView, topSpacer: UIView, bottomSpacer: UIView) {
+            left = bezel.leftAnchor.constraint(equalTo: container.leftAnchor)
             centerX = bezel.centerXAnchor.constraint(equalTo: container.centerXAnchor)
+            right = bezel.rightAnchor.constraint(equalTo: container.rightAnchor)
+            top = bezel.topAnchor.constraint(equalTo: container.topAnchor)
             centerY = bezel.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+            bottom = bezel.bottomAnchor.constraint(equalTo: container.bottomAnchor)
             minimumWidth = bezel.widthAnchor.constraint(greaterThanOrEqualToConstant: 0)
             minimumHeight = bezel.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
             square = bezel.heightAnchor.constraint(equalTo: bezel.widthAnchor)
-            for constraint in centering { constraint.priority = HUDMetrics.contentPriority }
+            outerLeft = bezel.leftAnchor.constraint(greaterThanOrEqualTo: container.leftAnchor)
+            outerRight = bezel.rightAnchor.constraint(lessThanOrEqualTo: container.rightAnchor)
+            outerTop = bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor)
+            outerBottom = bezel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor)
+            topPadding = topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
+            bottomPadding = bottomSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
+            paddingBalance = topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor)
+            for constraint in positioning { constraint.priority = HUDMetrics.contentPriority }
             for constraint in sizing { constraint.priority = HUDMetrics.sizePriority }
+            for constraint in outerEdges { constraint.priority = HUDMetrics.sidePriority }
+        }
+
+        func update(_ configuration: Configuration) {
+            let layout = configuration.layout
+            let insets = layout.hostInsets
+            outerLeft.constant = insets.left
+            outerRight.constant = -insets.right
+            outerTop.constant = insets.top
+            outerBottom.constant = -insets.bottom
+            topPadding.constant = layout.contentInsets.top
+            bottomPadding.constant = layout.contentInsets.bottom
+            paddingBalance.constant = layout.contentInsets.top - layout.contentInsets.bottom
+            updatePosition(layout.position, insets: insets)
+            minimumWidth.constant = configuration.minimumSize.width
+            minimumHeight.constant = configuration.minimumSize.height
+            let hasMinimumSize = configuration.minimumSize != .zero
+            minimumWidth.isActive = hasMinimumSize
+            minimumHeight.isActive = hasMinimumSize
+            square.isActive = configuration.isSquare
+        }
+
+        private func updatePosition(_ position: TMProgressHudPosition, insets: UIEdgeInsets) {
+            left.constant = insets.left + position.offset.x
+            centerX.constant = position.offset.x
+            right.constant = -insets.right + position.offset.x
+            top.constant = insets.top + position.offset.y
+            centerY.constant = position.offset.y
+            bottom.constant = -insets.bottom + position.offset.y
+            left.isActive = position.horizontal == .left
+            centerX.isActive = position.horizontal == .center
+            right.isActive = position.horizontal == .right
+            top.isActive = position.vertical == .top
+            centerY.isActive = position.vertical == .center
+            bottom.isActive = position.vertical == .bottom
         }
     }
 
@@ -49,8 +107,9 @@ final class HUDLayout {
     private var arrangedViews: [UIView] = []
     private var fixedConstraints: [NSLayoutConstraint] = []
     private var bezelConstraints: BezelConstraints?
-    private var minimumMarginConstraints: [NSLayoutConstraint] = []
-    private var maximumMarginConstraints: [NSLayoutConstraint] = []
+    private var contentLeftConstraints: [NSLayoutConstraint] = []
+    private var contentRightConstraints: [NSLayoutConstraint] = []
+    private var contentCenterConstraints: [NSLayoutConstraint] = []
     private var gaps: [Gap] = []
 
     init() {
@@ -62,16 +121,15 @@ final class HUDLayout {
 
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
         let views = [topSpacer] + content + [bottomSpacer]
-        let sameContent =
-            arrangedViews.count == views.count
-            && zip(arrangedViews, views).allSatisfy { $0.0 === $0.1 }
+        let sameContent = arrangedViews.count == views.count && zip(arrangedViews, views).allSatisfy { $0.0 === $0.1 }
         let constraints: BezelConstraints
         if installedContainer === container, installedBezel === bezel, sameContent, let existing = bezelConstraints {
             constraints = existing
         } else {
             constraints = install(container: container, bezel: bezel, views: views)
         }
-        updateParameters(configuration, bezel: constraints)
+        constraints.update(configuration)
+        updateContentInsets(configuration.layout.contentInsets)
         updatePadding()
     }
 
@@ -87,54 +145,36 @@ final class HUDLayout {
     }
 
     private func install(container: UIView, bezel: UIView, views: [UIView]) -> BezelConstraints {
-        NSLayoutConstraint.deactivate(fixedConstraints + (bezelConstraints?.sizing ?? []))
+        NSLayoutConstraint.deactivate(
+            fixedConstraints + (bezelConstraints?.positioning ?? []) + (bezelConstraints?.sizing ?? []))
         fixedConstraints = []
-        minimumMarginConstraints = []
-        maximumMarginConstraints = []
+        contentLeftConstraints = []
+        contentRightConstraints = []
+        contentCenterConstraints = []
         gaps = []
         installedContainer = container
         installedBezel = bezel
         arrangedViews = views
         bezel.addSubview(topSpacer)
         bezel.addSubview(bottomSpacer)
-        let constraints = configureBezel(container: container, bezel: bezel)
+        let constraints = BezelConstraints(
+            container: container, bezel: bezel, topSpacer: topSpacer, bottomSpacer: bottomSpacer)
+        fixedConstraints += constraints.outerEdges + constraints.padding
         configureContent(views, bezel: bezel)
-        let spacerHeights = [
-            topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0),
-            bottomSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0),
-        ]
-        minimumMarginConstraints += spacerHeights
-        fixedConstraints += spacerHeights
-        fixedConstraints.append(topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor))
         NSLayoutConstraint.activate(fixedConstraints)
         bezelConstraints = constraints
         return constraints
     }
 
-    private func configureBezel(container: UIView, bezel: UIView) -> BezelConstraints {
-        let constraints = BezelConstraints(container: container, bezel: bezel)
-        minimumMarginConstraints = [
-            bezel.leadingAnchor.constraint(greaterThanOrEqualTo: container.leadingAnchor),
-            bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor),
-        ]
-        maximumMarginConstraints = [
-            bezel.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor),
-            bezel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor),
-        ]
-        for constraint in minimumMarginConstraints + maximumMarginConstraints {
-            constraint.priority = HUDMetrics.sidePriority
-        }
-        fixedConstraints += constraints.centering + minimumMarginConstraints + maximumMarginConstraints
-        return constraints
-    }
-
     private func configureContent(_ views: [UIView], bezel: UIView) {
         for view in views {
-            let leading = view.leadingAnchor.constraint(greaterThanOrEqualTo: bezel.leadingAnchor)
-            let trailing = view.trailingAnchor.constraint(lessThanOrEqualTo: bezel.trailingAnchor)
-            minimumMarginConstraints.append(leading)
-            maximumMarginConstraints.append(trailing)
-            fixedConstraints += [view.centerXAnchor.constraint(equalTo: bezel.centerXAnchor), leading, trailing]
+            let left = view.leftAnchor.constraint(greaterThanOrEqualTo: bezel.leftAnchor)
+            let right = view.rightAnchor.constraint(lessThanOrEqualTo: bezel.rightAnchor)
+            let center = view.centerXAnchor.constraint(equalTo: bezel.centerXAnchor)
+            contentLeftConstraints.append(left)
+            contentRightConstraints.append(right)
+            contentCenterConstraints.append(center)
+            fixedConstraints += [center, left, right]
         }
         fixedConstraints += [
             topSpacer.topAnchor.constraint(equalTo: bezel.topAnchor),
@@ -147,20 +187,9 @@ final class HUDLayout {
         }
     }
 
-    private func updateParameters(_ configuration: Configuration, bezel: BezelConstraints) {
-        bezel.centerX.constant = configuration.offset.x
-        bezel.centerY.constant = configuration.offset.y
-        for constraint in minimumMarginConstraints {
-            constraint.constant = configuration.margin
-        }
-        for constraint in maximumMarginConstraints {
-            constraint.constant = -configuration.margin
-        }
-        bezel.minimumWidth.constant = configuration.minimumSize.width
-        bezel.minimumHeight.constant = configuration.minimumSize.height
-        let hasMinimumSize = configuration.minimumSize != .zero
-        bezel.minimumWidth.isActive = hasMinimumSize
-        bezel.minimumHeight.isActive = hasMinimumSize
-        bezel.square.isActive = configuration.isSquare
+    private func updateContentInsets(_ insets: UIEdgeInsets) {
+        for constraint in contentLeftConstraints { constraint.constant = insets.left }
+        for constraint in contentRightConstraints { constraint.constant = -insets.right }
+        for constraint in contentCenterConstraints { constraint.constant = (insets.left - insets.right) / 2 }
     }
 }
