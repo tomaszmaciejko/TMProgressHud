@@ -91,6 +91,7 @@ open class TMBarProgressView: UIView {
 
     private func configureDrawing() {
         backgroundColor = .clear
+        contentMode = .redraw
         isOpaque = false
         isAccessibilityElement = true
         accessibilityTraits.insert(.updatesFrequently)

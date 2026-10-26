@@ -25,6 +25,16 @@ private final class BarInvalidationSpy: TMBarProgressView {
 @Suite(.serialized)
 @MainActor
 struct ViewInvalidationTests {
+    @Test func resizingIndicatorsRequestsFreshDrawing() {
+        for view in [TMRoundProgressView(), TMBarProgressView()] as [UIView] {
+            view.layer.displayIfNeeded()
+            #expect(!view.layer.needsDisplay())
+            view.bounds.size = CGSize(width: 160, height: 60)
+            #expect(view.contentMode == .redraw)
+            #expect(view.layer.needsDisplay())
+        }
+    }
+
     @Test func changingRoundStyleRequestsRedrawOnlyWhenNeeded() {
         let round = RoundInvalidationSpy()
         let initial = round.redrawRequests
