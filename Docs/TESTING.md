@@ -50,7 +50,7 @@ python3 Scripts/check-distribution.py binary --platform ios --artifact Artifacts
 python3 Scripts/check-distribution.py carthage --platform ios --artifact Carthage/Build/TMProgressHudUIKit.xcframework
 ```
 
-Repeat with `--platform tvos`. Add `--simulator-id <UUID>` to install and run a consumer's mode/action checks. SPM and CocoaPods also accept `--source-url <Git URL> --revision <full commit>` to test a remote checkout.
+Repeat with `--platform tvos`. Add `--simulator-id <UUID>` to install and run a consumer's mode/action checks. SPM and CocoaPods also accept `--source-url <Git URL> --revision <full commit>` to test a remote checkout. Reports record the checked local/artifact input or exact remote commit; they make no claim about release publication. A new execution invalidates its previous success report, and writes `validation.json` only after verification succeeds.
 
 For a signed release, verify its signature against the published certificate fingerprint:
 
