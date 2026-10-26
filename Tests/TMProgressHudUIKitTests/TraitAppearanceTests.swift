@@ -24,7 +24,7 @@ struct TraitAppearanceTests {
     @Test(arguments: IndicatorStyle.allCases, [false, true])
     func indicatorsRequestRedrawWhenColorAppearanceChanges(style: IndicatorStyle, decoded: Bool) throws {
         let original = style.makeView()
-        let view = try decoded ? roundTrip(original) : original
+        let view = try decoded ? archiveRoundTrip(original) : original
         view.traitOverrides.userInterfaceStyle = .light
         view.traitOverrides.accessibilityContrast = .normal
         view.updateTraitsIfNeeded()
@@ -47,7 +47,7 @@ struct TraitAppearanceTests {
         let original = HUDRoundedButtonView(frame: .zero)
         original.setTitleColor(.blue, for: .normal)
         #expect(original.layer.borderColor == UIColor.blue.cgColor)
-        let button = try decoded ? roundTrip(original) : original
+        let button = try decoded ? archiveRoundTrip(original) : original
         #expect(button.titleColor(for: .normal) == UIColor.blue)
         button.traitOverrides.userInterfaceStyle = .dark
         button.traitOverrides.accessibilityContrast = .normal
@@ -69,7 +69,7 @@ struct TraitAppearanceTests {
     }
 
     @Test func decodedButtonPreservesArchivedBorderAcrossAppearanceChanges() throws {
-        let button = try roundTrip(HUDRoundedButtonView(frame: .zero))
+        let button = try archiveRoundTrip(HUDRoundedButtonView(frame: .zero))
         let archivedBorder = button.layer.borderColor
         button.traitOverrides.userInterfaceStyle = .light
         button.updateTraitsIfNeeded()
@@ -123,13 +123,5 @@ struct TraitAppearanceTests {
             if traits.accessibilityContrast == .high { return .red }
             return traits.userInterfaceStyle == .dark ? .white : .black
         }
-    }
-
-    private func roundTrip<T: UIView>(_ view: T) throws -> T {
-        let data = try NSKeyedArchiver.archivedData(withRootObject: view, requiringSecureCoding: false)
-        let decoder = try NSKeyedUnarchiver(forReadingFrom: data)
-        decoder.requiresSecureCoding = false
-        defer { decoder.finishDecoding() }
-        return try #require(decoder.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? T)
     }
 }

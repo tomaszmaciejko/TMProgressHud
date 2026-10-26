@@ -193,12 +193,6 @@
       "name": "Swift tests",
       "children": [
         {
-          "path": "../TMProgressHudUIKitTests/AdditionalFidelityAuditTests.swift",
-          "target-membership": [
-            "TMProgressHudUIKitTests/compile-sources"
-          ]
-        },
-        {
           "path": "../TMProgressHudUIKitTests/ArchiveAndButtonTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
@@ -271,6 +265,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/ObjectiveCInteropTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/PresentationTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
@@ -289,6 +289,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/RenderingContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/SchedulingTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
@@ -296,6 +302,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/TraitAppearanceTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/ViewArchiving.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

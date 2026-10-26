@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 import UIKit
-@testable import TMProgressHudUIKit
+import TMProgressHudUIKit
 
 @Suite(.serialized)
 @MainActor

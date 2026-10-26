@@ -53,7 +53,6 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
             NSLog("TMProgressHud distribution verification could not save its receipt: %@", error.localizedDescription)
         }
     }
-
 }
 
 final class HUDDemoViewController: UIViewController {
@@ -63,7 +62,7 @@ final class HUDDemoViewController: UIViewController {
         static let symbolSize: CGFloat = 37
     }
 
-    private var hud: TMProgressHud?
+    private weak var hud: TMProgressHud?
 
     #if os(tvOS)
         override var preferredFocusEnvironments: [any UIFocusEnvironment] {
@@ -108,8 +107,8 @@ final class HUDDemoViewController: UIViewController {
         hud?.hide(animated: false)
         let presented = TMProgressHud.showAdded(to: view, animated: true)
         presented.mode = mode
-        presented.label.text = "Reference port"
-        presented.detailsLabel.text = "Native Swift HUD for UIKit."
+        presented.label.text = "Loading"
+        presented.detailsLabel.text = "An example of the selected HUD style."
         presented.progress = 0.5
         if mode == .customView {
             let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
@@ -118,7 +117,7 @@ final class HUDDemoViewController: UIViewController {
         }
         presented.button.setTitle("Close", for: .normal)
         presented.button.addAction(
-            UIAction { [weak self] _ in self?.hud?.hide(animated: true) }, for: .primaryActionTriggered)
+            UIAction { [weak presented] _ in presented?.hide(animated: true) }, for: .primaryActionTriggered)
         hud = presented
         #if os(tvOS)
             setNeedsFocusUpdate()

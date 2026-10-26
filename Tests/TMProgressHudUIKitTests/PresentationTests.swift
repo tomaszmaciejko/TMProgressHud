@@ -6,19 +6,19 @@ import Testing
 private final class PresentationSpy: HUDPresentationHost {
     var graceTime: TimeInterval = 0
     var minShowTime: TimeInterval = 0
-    var shows: [Bool] = []
-    var hides: [Bool] = []
-    var completions: [@MainActor () -> Void] = []
-    var finished = 0
+    var showAnimations: [Bool] = []
+    var hideAnimations: [Bool] = []
+    var hideCompletions: [@MainActor () -> Void] = []
+    var finishCount = 0
     var onFinish: (@MainActor () -> Void)?
 
-    func showPresentation(animated: Bool) { shows.append(animated) }
+    func showPresentation(animated: Bool) { showAnimations.append(animated) }
     func hidePresentation(animated: Bool, completion: @escaping @MainActor () -> Void) {
-        hides.append(animated)
-        completions.append(completion)
+        hideAnimations.append(animated)
+        hideCompletions.append(completion)
     }
     func finishPresentation() {
-        finished += 1
+        finishCount += 1
         onFinish?()
     }
 }
@@ -36,14 +36,14 @@ struct PresentationTests {
         presentation.hide(animated: false)
         #expect(presentation.phase == .hiding)
         #expect(presentation.hasHideRequest)
-        let completion = try #require(host.completions.first)
+        let completion = try #require(host.hideCompletions.first)
         completion()
         completion()
         presentation.hide(animated: true)
         presentation.hide(animated: true, afterDelay: 10)
         #expect(presentation.phase == .hidden)
-        #expect(host.finished == 1)
-        #expect(host.hides == [false])
+        #expect(host.finishCount == 1)
+        #expect(host.hideAnimations == [false])
     }
 
     @Test func graceAndMinimumUseExplicitPhases() throws {
@@ -58,17 +58,17 @@ struct PresentationTests {
         #expect(presentation.phase == .waitingForGrace)
         #expect(!presentation.hasHideRequest)
         time.actions.last?.fire()
-        #expect(host.shows == [true])
-        time.instant = time.instant.advanced(by: .seconds(2))
+        #expect(host.showAnimations == [true])
+        time.advance(by: .seconds(2))
         presentation.hide(animated: false)
         #expect(presentation.phase == .waitingForMinimum)
         #expect(presentation.hasHideRequest)
         #expect(time.requestedIntervals.last == 3)
         time.actions.last?.fire()
         #expect(presentation.phase == .hiding)
-        let completion = try #require(host.completions.first)
+        let completion = try #require(host.hideCompletions.first)
         completion()
-        #expect(host.finished == 1)
+        #expect(host.finishCount == 1)
     }
 
     @Test func obsoleteAnimationCannotFinishNewPresentation() throws {
@@ -76,18 +76,18 @@ struct PresentationTests {
         let presentation = HUDPresentation(host: host)
         presentation.show(animated: true)
         presentation.hide(animated: true)
-        let oldCompletion = try #require(host.completions.first)
+        let oldCompletion = try #require(host.hideCompletions.first)
         host.graceTime = 10
         presentation.show(animated: false)
         oldCompletion()
         #expect(presentation.phase == .visible)
         #expect(!presentation.hasHideRequest)
-        #expect(host.finished == 0)
+        #expect(host.finishCount == 0)
         presentation.hide(animated: false)
-        let currentCompletion = try #require(host.completions.last)
+        let currentCompletion = try #require(host.hideCompletions.last)
         currentCompletion()
-        #expect(host.finished == 1)
-        #expect(host.hides == [true, false])
+        #expect(host.finishCount == 1)
+        #expect(host.hideAnimations == [true, false])
     }
 
     @Test func visiblePresentationDoesNotReapplyGrace() {
@@ -102,7 +102,7 @@ struct PresentationTests {
         presentation.show(animated: false)
         #expect(presentation.phase == .visible)
         #expect(time.requestedIntervals == [5])
-        #expect(host.shows == [true, false])
+        #expect(host.showAnimations == [true, false])
     }
 
     @Test func delayedHideIsReplacedAndNewShowCancelsIt() throws {
@@ -115,14 +115,14 @@ struct PresentationTests {
         let beforeShow = try #require(time.actions.last)
         presentation.show(animated: false)
         beforeShow.fire()
-        #expect(host.hides.isEmpty)
+        #expect(host.hideAnimations.isEmpty)
         presentation.hide(animated: true, afterDelay: 1)
         let replaced = try #require(time.actions.last)
         presentation.hide(animated: false, afterDelay: 2)
         replaced.fire()
-        #expect(host.hides.isEmpty)
+        #expect(host.hideAnimations.isEmpty)
         time.actions.last?.fire()
-        #expect(host.hides == [false])
+        #expect(host.hideAnimations == [false])
         presentation.hide(animated: true, afterDelay: 3)
         #expect(time.requestedIntervals == [5, 1, 2])
     }
@@ -139,11 +139,11 @@ struct PresentationTests {
             presentation.show(animated: true)
         }
         presentation.hide(animated: true)
-        #expect(host.hides == [false])
-        let completion = try #require(host.completions.first)
+        #expect(host.hideAnimations == [false])
+        let completion = try #require(host.hideCompletions.first)
         completion()
         time.actions.last?.fire()
-        #expect(host.shows.isEmpty)
+        #expect(host.showAnimations.isEmpty)
         #expect(presentation.phase == .hidden)
     }
 
@@ -153,10 +153,10 @@ struct PresentationTests {
         host.onFinish = { presentation.show(animated: false) }
         presentation.show(animated: false)
         presentation.hide(animated: false)
-        let oldCompletion = try #require(host.completions.first)
+        let oldCompletion = try #require(host.hideCompletions.first)
         oldCompletion()
         oldCompletion()
-        #expect(host.finished == 1)
+        #expect(host.finishCount == 1)
         #expect(presentation.phase == .visible)
         #expect(!presentation.hasHideRequest)
         host.onFinish = nil
@@ -190,7 +190,7 @@ struct PresentationTests {
         presentation.show(animated: false)
         presentation.hide(animated: true, afterDelay: 5)
         host.minShowTime = 10
-        time.instant = time.instant.advanced(by: .seconds(3))
+        time.advance(by: .seconds(3))
         time.actions.last?.fire()
         #expect(presentation.phase == .waitingForMinimum)
         #expect(time.requestedIntervals.last == 7)
@@ -198,6 +198,6 @@ struct PresentationTests {
         host.minShowTime = 0
         presentation.hide(animated: false)
         oldMinimum.fire()
-        #expect(host.hides == [false])
+        #expect(host.hideAnimations == [false])
     }
 }

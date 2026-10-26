@@ -3,7 +3,7 @@ import Testing
 import UIKit
 @testable import TMProgressHudUIKit
 
-@Suite(.serialized)
+@Suite(.serialized, .timeLimit(.minutes(1)))
 @MainActor
 struct LifecycleTests {
     @Test func shortWorkNeverBecomesVisible() throws {
@@ -34,7 +34,7 @@ struct LifecycleTests {
         hud.show(animated: false)
         try #require(time.actions.last).fire()
         #expect(hud.alpha == 1)
-        time.instant = time.instant.advanced(by: .seconds(2))
+        time.advance(by: .seconds(2))
         hud.hide(animated: false)
         let minimumAction = try #require(time.actions.last)
         #expect(time.requestedIntervals.last == 3)
@@ -91,7 +91,7 @@ struct LifecycleTests {
         hud.minShowTime = 1
         hud.graceTime = -1
         hud.show(animated: false)
-        time.instant = time.instant.advanced(by: .seconds(2))
+        time.advance(by: .seconds(2))
         hud.hide(animated: false)
         #expect(time.requestedIntervals.isEmpty)
         #expect(hud.alpha == 0)
@@ -111,7 +111,7 @@ struct LifecycleTests {
         hud.graceTime = 0
         hud.minShowTime = 10
         hud.show(animated: false)
-        time.instant = time.instant.advanced(by: .seconds(2))
+        time.advance(by: .seconds(2))
         oldGrace.fire()
         hud.hide(animated: false)
         #expect(time.requestedIntervals.last == 8)

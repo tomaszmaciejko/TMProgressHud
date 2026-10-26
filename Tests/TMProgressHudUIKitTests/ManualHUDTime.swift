@@ -3,9 +3,9 @@ import Foundation
 
 @MainActor
 final class ManualHUDTime {
-    var instant = ContinuousClock.now
-    var actions: [HUDScheduledAction] = []
-    var requestedIntervals: [TimeInterval] = []
+    private(set) var instant = ContinuousClock.now
+    private(set) var actions: [HUDScheduledAction] = []
+    private(set) var requestedIntervals: [TimeInterval] = []
 
     var environment: HUDTimingEnvironment {
         HUDTimingEnvironment(
@@ -19,5 +19,13 @@ final class ManualHUDTime {
         )
     }
 
-    func invalidate() { for action in actions { action.cancel() } }
+    func advance(by duration: Duration) {
+        instant = instant.advanced(by: duration)
+    }
+
+    func invalidate() {
+        for action in actions {
+            action.cancel()
+        }
+    }
 }

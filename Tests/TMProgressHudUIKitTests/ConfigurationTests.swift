@@ -35,6 +35,7 @@ struct ConfigurationTests {
         #expect(round.progressTintColor == .blue)
         #expect(round.backgroundTintColor == .yellow)
     }
+
     @Test func bulkColorChangesAreExplicitAndNewIndicatorsInherit() throws {
         let hud = TMProgressHud(frame: .zero)
         hud.contentColor = .red

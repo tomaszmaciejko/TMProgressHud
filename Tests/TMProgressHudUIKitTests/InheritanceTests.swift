@@ -1,6 +1,6 @@
 import Testing
 import UIKit
-@testable import TMProgressHudUIKit
+import TMProgressHudUIKit
 
 @MainActor
 private final class GetterConfiguredHUD: TMProgressHud {

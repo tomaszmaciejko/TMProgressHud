@@ -2,7 +2,7 @@ import Foundation
 import MBProgressHUDReference
 import Testing
 import UIKit
-@testable import TMProgressHudUIKit
+import TMProgressHudUIKit
 
 @Suite(.serialized)
 @MainActor
@@ -173,6 +173,26 @@ struct LayoutContractTests {
             }
             expectFrames(hud, reference)
             #expect(Set((hud.constraints + hud.bezelView.constraints).map(ObjectIdentifier.init)) == constraintIDs)
+        }
+    }
+
+    @Test func layoutMatchesOriginalForLTRAndRTL() throws {
+        for direction in [UISemanticContentAttribute.forceLeftToRight, .forceRightToLeft] {
+            let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+            host.semanticContentAttribute = direction
+            let original = MBProgressHUD.showAdded(to: host, animated: false)
+            let port = TMProgressHud.showAdded(to: host, animated: false)
+            original.label.text = "Loading a long resource"
+            port.label.text = original.label.text
+            original.detailsLabel.text = "Additional information"
+            port.detailsLabel.text = original.detailsLabel.text
+            original.offset = CGPoint(x: 100, y: -25)
+            port.offset = original.offset
+            host.layoutIfNeeded()
+            #expect(port.bezelView.frame == original.bezelView.frame)
+            #expect(port.label.frame == original.label.frame)
+            original.hide(animated: false)
+            port.hide(animated: false)
         }
     }
 

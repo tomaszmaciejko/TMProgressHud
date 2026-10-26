@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import TMProgressHudUIKit
 
-@Suite(.serialized)
+@Suite(.serialized, .timeLimit(.minutes(1)))
 @MainActor
 struct SchedulingTests {
     @Test func actionsAreOneShotAndCancellationIsIdempotent() {

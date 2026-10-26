@@ -14,22 +14,22 @@ private final class ActionReceiver: NSObject {
 struct ArchiveAndButtonTests {
     @Test func supportedCoderInitializersRestoreUsableViews() throws {
         let frame = CGRect(x: 10, y: 20, width: 120, height: 80)
-        let hud = try roundTrip(TMProgressHud(frame: frame))
+        let hud = try archiveRoundTrip(TMProgressHud(frame: frame))
         #expect(hud.frame == frame)
         #expect(hud.mode == .indeterminate)
         #expect(hud.indicator is UIActivityIndicatorView)
         hud.show(animated: false)
         hud.hide(animated: false)
-        let round = try roundTrip(TMRoundProgressView(frame: frame))
+        let round = try archiveRoundTrip(TMRoundProgressView(frame: frame))
         #expect(round.frame == frame)
         #expect(round.progressTintColor == .white)
-        let bar = try roundTrip(TMBarProgressView(frame: frame))
+        let bar = try archiveRoundTrip(TMBarProgressView(frame: frame))
         #expect(bar.frame == frame)
         #expect(bar.progressColor == .white)
-        let background = try roundTrip(TMBackgroundView(frame: frame))
+        let background = try archiveRoundTrip(TMBackgroundView(frame: frame))
         #expect(background.frame == frame)
         #expect(background.style == .blur)
-        let button = try roundTrip(HUDRoundedButtonView(frame: frame))
+        let button = try archiveRoundTrip(HUDRoundedButtonView(frame: frame))
         #expect(button.layer.borderWidth == 1)
     }
 
@@ -43,7 +43,7 @@ struct ArchiveAndButtonTests {
         hud.progress = 0.75
         hud.label.text = "Loading"
         for _ in 0..<2 {
-            hud = try roundTrip(hud)
+            hud = try archiveRoundTrip(hud)
             #expect(hud.subviews.filter { $0 is TMBackgroundView }.count == 2)
             #expect(hud.viewWithTag(clientTag) != nil)
             #expect(hud.mode == .indeterminate)
@@ -64,7 +64,7 @@ struct ArchiveAndButtonTests {
         let clientTag = 42
         client.tag = clientTag
         initial.addSubview(client)
-        let decoded = try roundTrip(initial)
+        let decoded = try archiveRoundTrip(initial)
         #expect(decoded.subviews.compactMap { $0 as? UIVisualEffectView }.count == 1)
         #expect(decoded.viewWithTag(clientTag) != nil)
         #expect(decoded.frame == initial.frame)
@@ -154,14 +154,6 @@ struct ArchiveAndButtonTests {
         let decoder = try NSKeyedUnarchiver(forReadingFrom: data)
         decoder.requiresSecureCoding = false
         decoder.setClass(type, forClassName: NSStringFromClass(UIView.self))
-        defer { decoder.finishDecoding() }
-        return try #require(decoder.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? T)
-    }
-
-    private func roundTrip<T: UIView>(_ view: T) throws -> T {
-        let data = try NSKeyedArchiver.archivedData(withRootObject: view, requiringSecureCoding: false)
-        let decoder = try NSKeyedUnarchiver(forReadingFrom: data)
-        decoder.requiresSecureCoding = false
         defer { decoder.finishDecoding() }
         return try #require(decoder.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? T)
     }
