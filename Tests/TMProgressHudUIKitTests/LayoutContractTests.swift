@@ -116,6 +116,28 @@ struct LayoutContractTests {
         #expect(Set((hud.constraints + hud.bezelView.constraints).map(ObjectIdentifier.init)) == originalIDs)
     }
 
+    @Test func axesAndMinimumDimensionsUpdateIndependently() {
+        let host = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let hud = TMProgressHud(view: host)
+        hud.setContent(.text)
+        host.addSubview(hud)
+        let scenarios: [(offset: CGPoint, minimum: CGSize)] = [
+            (CGPoint(x: 12, y: -25), CGSize(width: 140, height: 90)),
+            (CGPoint(x: -18, y: 15), CGSize(width: 180, height: 90)),
+            (CGPoint(x: 12, y: 15), CGSize(width: 140, height: 110)),
+        ]
+        for scenario in scenarios {
+            hud.offset = scenario.offset
+            hud.minSize = scenario.minimum
+            host.layoutIfNeeded()
+            hud.setNeedsLayout()
+            hud.layoutIfNeeded()
+            #expect(hud.bezelView.frame.midX == host.bounds.midX + scenario.offset.x)
+            #expect(hud.bezelView.frame.midY == host.bounds.midY + scenario.offset.y)
+            #expect(hud.bezelView.bounds.size == scenario.minimum)
+        }
+    }
+
     @Test func repeatedContentChangesMatchReference() throws {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud(view: host)
