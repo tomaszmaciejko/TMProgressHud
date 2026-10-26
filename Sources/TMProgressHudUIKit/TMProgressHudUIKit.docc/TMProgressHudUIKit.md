@@ -17,7 +17,19 @@ hud.hide(animated: true)
 
 The convenience helper removes the HUD on hide. To configure grace time, create a HUD with `init(view:)`, set timing properties, attach it and then show it.
 
-Version 1.0 retains reference defaults and behaviors. Progress is not clamped; repeated hides can invoke repeated callbacks; timing follows the reference wall clock; ring-to-pie reuse retains the annular flag. Call hide to end progress polling rather than relying on removal alone. The caller can customize the exposed labels and custom UIView content.
+Progress values are forwarded without clamping. A new show supersedes unfinished hiding; completion and delegate callbacks run once per completed presentation. A Progress source is observed only while the HUD is presented in a window. The caller can customize the exposed labels and custom UIView content.
+
+## System progress bar
+
+Use UIKit's system appearance through custom content. The HUD forwards progress to the view; an explicit width lets Auto Layout size the bar.
+
+```swift
+let progressView = UIProgressView(progressViewStyle: .default)
+progressView.widthAnchor.constraint(equalToConstant: 120).isActive = true
+hud.customView = progressView
+hud.mode = .customView
+hud.progress = 0.5
+```
 
 ## Topics
 
@@ -36,3 +48,4 @@ Version 1.0 retains reference defaults and behaviors. Progress is not clamped; r
 - ``TMBarProgressView``
 - ``TMBackgroundView``
 - ``TMProgressHudBackgroundStyle``
+- ``TMProgressHudProgressReporting``

@@ -10,6 +10,30 @@ private final class SwiftProgressView: UIView, TMProgressHudProgressReporting {
 @Suite(.serialized)
 @MainActor
 struct IndicatorContractTests {
+    @Test func nativeUIKitProgressViewReceivesProgressAndKeepsItsWidth() {
+        let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        let hud = TMProgressHud.showAdded(to: host, animated: false)
+        defer { hud.hide(animated: false) }
+        let native = UIProgressView(progressViewStyle: .default)
+        let width: CGFloat = 120
+        native.widthAnchor.constraint(equalToConstant: width).isActive = true
+        hud.customView = native
+        hud.mode = .customView
+        hud.progress = 0.25
+        #expect(native.progress == 0.25)
+        hud.progress = 0.75
+        host.layoutIfNeeded()
+        #expect(native.progress == 0.75)
+        #expect(native.frame.width == width)
+        #expect(native.superview === hud.bezelView)
+        hud.mode = .determinateHorizontalBar
+        #expect(native.superview == nil)
+        hud.progress = 0.5
+        hud.mode = .customView
+        #expect(native.progress == 0.5)
+        #expect(native.superview === hud.bezelView)
+    }
+
     @Test func nativeSwiftCustomViewReceivesUnnormalizedProgress() {
         let hud = TMProgressHud(frame: .zero)
         let custom = SwiftProgressView()
