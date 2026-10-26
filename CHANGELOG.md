@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Update an already displayed action button and its spacing when actions are registered or removed.
+
 - Restore caller graphics state after drawing circular indicators.
 
 - Make custom content use typed progress by default; add explicit legacyCustom opt-in while keeping old property behavior.

@@ -22,6 +22,32 @@ final class HUDRoundedButtonView: UIButton {
         configureBorder()
     }
 
+    // Registered events affect this button’s intrinsic size, unlike a standard UIButton.
+    override func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event) {
+        super.addTarget(target, action: action, for: controlEvents)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControl.Event) {
+        super.removeTarget(target, action: action, for: controlEvents)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func addAction(_ action: UIAction, for controlEvents: UIControl.Event) {
+        super.addAction(action, for: controlEvents)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func removeAction(_ action: UIAction, for controlEvents: UIControl.Event) {
+        super.removeAction(action, for: controlEvents)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func removeAction(identifiedBy actionIdentifier: UIAction.Identifier, for controlEvents: UIControl.Event) {
+        super.removeAction(identifiedBy: actionIdentifier, for: controlEvents)
+        invalidateIntrinsicContentSize()
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = ceil(bounds.height / 2)

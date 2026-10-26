@@ -385,6 +385,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/LateActionLayoutTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/LayoutContractTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
