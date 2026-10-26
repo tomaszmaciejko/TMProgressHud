@@ -54,118 +54,103 @@ struct ProgressBindingTests {
         binding.stop()
     }
 
-    @Test func backgroundUpdatesArriveOnMainActor() async {
+    @Test func backgroundUpdatesArriveOnMainActor() async throws {
         let source = Progress(totalUnitCount: 100)
-        var completed: CheckedContinuation<Void, Never>?
+        let completed = CallbackExpectation()
         var values: [Float] = []
         let binding = HUDProgressBinding { value in
             #expect(Thread.isMainThread)
             values.append(value)
             if value == 0.5 {
-                completed?.resume()
-                completed = nil
+                completed.signal()
             }
         }
         binding.replace(with: source)
         binding.start()
         defer { binding.stop() }
-        await withCheckedContinuation { continuation in
-            completed = continuation
-            DispatchQueue.global().async { source.completedUnitCount = 50 }
-        }
+        DispatchQueue.global().async { source.completedUnitCount = 50 }
+        try await completed.wait()
         #expect(values.last == 0.5)
     }
 
-    @Test func burstsCoalesceToLatestValue() async {
+    @Test func burstsCoalesceToLatestValue() async throws {
         let source = Progress(totalUnitCount: 1000)
-        var completed: CheckedContinuation<Void, Never>?
+        let completed = CallbackExpectation()
         var values: [Float] = []
         let binding = HUDProgressBinding { value in
             values.append(value)
             if value == 1 {
-                completed?.resume()
-                completed = nil
+                completed.signal()
             }
         }
         binding.replace(with: source)
         binding.start()
         defer { binding.stop() }
-        await withCheckedContinuation { continuation in
-            completed = continuation
-            for count in 1...1000 { source.completedUnitCount = Int64(count) }
-        }
+        for count in 1...1000 { source.completedUnitCount = Int64(count) }
+        try await completed.wait()
         #expect(values == [0, 1])
     }
 
-    @Test func replacedSourcesCannotDeliverQueuedValues() async {
+    @Test func replacedSourcesCannotDeliverQueuedValues() async throws {
         let first = Progress(totalUnitCount: 100)
         let second = Progress(totalUnitCount: 100)
         second.completedUnitCount = 80
-        var completed: CheckedContinuation<Void, Never>?
+        let completed = CallbackExpectation()
         var values: [Float] = []
         let binding = HUDProgressBinding { value in
             values.append(value)
             if value == 0.9 {
-                completed?.resume()
-                completed = nil
+                completed.signal()
             }
         }
         binding.replace(with: first)
         binding.start()
         defer { binding.stop() }
-        await withCheckedContinuation { continuation in
-            completed = continuation
-            first.completedUnitCount = 25
-            binding.replace(with: second)
-            first.completedUnitCount = 50
-            second.completedUnitCount = 90
-        }
+        first.completedUnitCount = 25
+        binding.replace(with: second)
+        first.completedUnitCount = 50
+        second.completedUnitCount = 90
+        try await completed.wait()
         #expect(values == [0, 0.8, 0.9])
     }
 
-    @Test func stopAndRestartDiscardQueuedValues() async {
+    @Test func stopAndRestartDiscardQueuedValues() async throws {
         let source = Progress(totalUnitCount: 100)
-        var completed: CheckedContinuation<Void, Never>?
+        let completed = CallbackExpectation()
         var values: [Float] = []
         let binding = HUDProgressBinding { value in
             values.append(value)
             if value == 0.8 {
-                completed?.resume()
-                completed = nil
+                completed.signal()
             }
         }
         binding.replace(with: source)
         binding.start()
         defer { binding.stop() }
-        await withCheckedContinuation { continuation in
-            completed = continuation
-            source.completedUnitCount = 50
-            binding.stop()
-            source.completedUnitCount = 75
-            binding.start()
-            source.completedUnitCount = 80
-        }
+        source.completedUnitCount = 50
+        binding.stop()
+        source.completedUnitCount = 75
+        binding.start()
+        source.completedUnitCount = 80
+        try await completed.wait()
         #expect(values == [0, 0.75, 0.8])
     }
 
-    @Test func childProgressUpdatesParentFraction() async {
+    @Test func childProgressUpdatesParentFraction() async throws {
         let parent = Progress(totalUnitCount: 100)
         let child = Progress(totalUnitCount: 10)
         parent.addChild(child, withPendingUnitCount: 100)
-        var completed: CheckedContinuation<Void, Never>?
+        let completed = CallbackExpectation()
         let binding = HUDProgressBinding { value in
             if value == 0.5 {
-                completed?.resume()
-                completed = nil
+                completed.signal()
             }
         }
         binding.replace(with: parent)
         binding.start()
         defer { binding.stop() }
-        await withCheckedContinuation { continuation in
-            completed = continuation
-            DispatchQueue.global().async { child.completedUnitCount = 5 }
-        }
+        DispatchQueue.global().async { child.completedUnitCount = 5 }
+        try await completed.wait()
         #expect(parent.fractionCompleted == 0.5)
         #expect(parent.completedUnitCount == 0)
     }
@@ -213,14 +198,14 @@ struct ProgressBindingTests {
         defer { hud.hide(animated: false) }
         let source = Progress(totalUnitCount: 100)
         hud.progressObject = source
-        var observation: NSKeyValueObservation?
-        await withCheckedContinuation { continuation in
-            observation = hud.observe(\.progress, options: [.new]) { _, change in
-                if change.newValue == 0.5 { continuation.resume() }
-            }
-            DispatchQueue.global().async { source.completedUnitCount = 50 }
+        let completed = CallbackExpectation()
+        let observation = hud.observe(\.progress, options: [.new]) { _, change in
+            if change.newValue == 0.5 { completed.signal() }
         }
-        observation?.invalidate()
+        defer { observation.invalidate() }
+        DispatchQueue.global().async { source.completedUnitCount = 50 }
+        try await completed.wait()
+        observation.invalidate()
         #expect(hud.progress == 0.5)
         hud.hide(animated: false)
         source.completedUnitCount = 75

@@ -22,17 +22,17 @@ struct SchedulingTests {
     }
 
     @Test(arguments: [0.0, -1.0, -Double.infinity, Double.nan])
-    func immediateActionsRunOnTheMainActor(interval: Double) async {
+    func immediateActionsRunOnTheMainActor(interval: Double) async throws {
         var scheduled: HUDScheduledAction?
         var calls = 0
-        await withCheckedContinuation { continuation in
-            scheduled = HUDScheduledAction.scheduled(after: interval) {
-                #expect(!Task.isCancelled)
-                calls += 1
-                continuation.resume()
-            }
-            #expect(calls == 0)
+        let completed = CallbackExpectation()
+        scheduled = HUDScheduledAction.scheduled(after: interval) {
+            #expect(!Task.isCancelled)
+            calls += 1
+            completed.signal()
         }
+        #expect(calls == 0)
+        try await completed.wait()
         #expect(calls == 1)
         #expect(scheduled?.isPending == false)
         scheduled?.fire()

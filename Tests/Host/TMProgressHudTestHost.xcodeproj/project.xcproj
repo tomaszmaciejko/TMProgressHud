@@ -205,6 +205,18 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/CallbackExpectation.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/CallbackExpectationTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/ConfigurationTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"

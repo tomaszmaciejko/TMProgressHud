@@ -155,18 +155,19 @@ struct LifecycleTests {
         hud.hide(animated: false)
     }
 
-    @Test func productionDelayedHideDeliversCompletion() async {
+    @Test func productionDelayedHideDeliversCompletion() async throws {
         let hud = TMProgressHud(frame: .zero)
         hud.show(animated: false)
-        await withCheckedContinuation { continuation in
-            hud.completionBlock = { continuation.resume() }
-            hud.hide(animated: false, afterDelay: 0)
-        }
+        let completed = CallbackExpectation()
+        hud.completionBlock = { completed.signal() }
+        defer { hud.completionBlock = nil }
+        hud.hide(animated: false, afterDelay: 0)
+        try await completed.wait()
         #expect(hud.alpha == 0)
         hud.completionBlock = nil
     }
 
-    @Test func animationVariantsCompleteAndHide() async {
+    @Test func animationVariantsCompleteAndHide() async throws {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         for type in [TMProgressHudAnimation.fade, .zoom, .zoomIn, .zoomOut] {
             let hud = TMProgressHud(view: host)
@@ -174,10 +175,11 @@ struct LifecycleTests {
             hud.animationType = type
             hud.show(animated: true)
             #expect(hud.alpha == 1)
-            await withCheckedContinuation { continuation in
-                hud.completionBlock = { continuation.resume() }
-                hud.hide(animated: true)
-            }
+            let completed = CallbackExpectation()
+            hud.completionBlock = { completed.signal() }
+            defer { hud.completionBlock = nil }
+            hud.hide(animated: true)
+            try await completed.wait()
             #expect(hud.alpha == 0)
             hud.completionBlock = nil
             hud.removeFromSuperview()
@@ -198,18 +200,19 @@ struct LifecycleTests {
         hud.hide(animated: false)
     }
 
-    @Test func animatedHideRemovesHUDFromHostBeforeCompletion() async {
+    @Test func animatedHideRemovesHUDFromHostBeforeCompletion() async throws {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud.showAdded(to: host, animated: false)
         #expect(hud.superview === host)
-        await withCheckedContinuation { continuation in
-            hud.completionBlock = { [weak hud] in
-                #expect(hud?.superview == nil)
-                #expect(hud?.alpha == 0)
-                continuation.resume()
-            }
-            hud.hide(animated: true)
+        let completed = CallbackExpectation()
+        hud.completionBlock = { [weak hud] in
+            #expect(hud?.superview == nil)
+            #expect(hud?.alpha == 0)
+            completed.signal()
         }
+        defer { hud.completionBlock = nil }
+        hud.hide(animated: true)
+        try await completed.wait()
         #expect(!host.subviews.contains { $0 === hud })
         hud.completionBlock = nil
     }
