@@ -39,6 +39,7 @@ hud.setProgressSource(.manual(0.5))
 - ``TMProgressHudProgressSource``
 - ``TMProgressHudMode``
 - ``TMProgressHudAnimation``
+- ``TMProgressHudMotionPolicy``
 - ``TMProgressHudDelegate``
 - ``TMProgressHudCompletionBlock``
 - ``TMProgressMaxOffset``

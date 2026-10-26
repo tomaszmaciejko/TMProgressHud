@@ -143,6 +143,12 @@ open class TMProgressHud: UIView {
     /// The minimum visible duration in monotonic seconds, initially zero.
     @objc open dynamic var minShowTime: TimeInterval = 0
 
+    /// Controls future transition motion and current HUD-owned tilt effects, following the system by default.
+    public var motionPolicy: TMProgressHudMotionPolicy {
+        get { motionSettings.policy }
+        set { motionSettings.policy = newValue }
+    }
+
     /// The transition style, initially fade.
     @objc open dynamic var animationType: TMProgressHudAnimation = .fade
 
@@ -176,6 +182,7 @@ open class TMProgressHud: UIView {
     private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
 
     var contentSelection: (mode: TMProgressHudMode, customView: UIView?) = (.indeterminate, nil)
+    lazy var motionSettings = HUDMotionSettings { [weak self] in self?.updateBezelMotionEffects() }
     var managedIndicator: HUDIndicator?
     var indicator: UIView? { managedIndicator?.view }
     var bezelMotionEffects: UIMotionEffectGroup?

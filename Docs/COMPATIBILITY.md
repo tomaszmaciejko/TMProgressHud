@@ -32,6 +32,10 @@ Use `setProgressSource(.manual(value))` to stop observation before assigning a v
 
 The compatibility `contentColor` property retains its earlier combined behavior described below.
 
+## Motion in 2.0
+
+`motionPolicy` defaults to `.system`, following Reduce Motion. `.reduced` uses fade instead of zoom and suppresses HUD-owned tilt effects; `.full` explicitly allows the selected motion. Changes affect future transitions and current owned tilt effects. Effects added by the caller and the requested areDefaultMotionEffectsEnabled value are preserved. Passing animated: false still disables the transition.
+
 ## Configuration
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.

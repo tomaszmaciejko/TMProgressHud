@@ -38,6 +38,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDMotionSettings.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDPresentation.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -110,6 +116,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/TMProgressHudMotionPolicy.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -171,7 +183,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "00000000000000000000003A",
+      "id": "00000000000000000000003E",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

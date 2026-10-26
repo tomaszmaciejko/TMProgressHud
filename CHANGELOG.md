@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Follow Reduce Motion for zoom and HUD-owned tilt effects, with an explicit per-HUD policy.
+
 - Scale default labels and action-button typography with Dynamic Type.
 
 - Keep new facade operations closed to overriding while preserving existing subclassing hooks for compatibility.

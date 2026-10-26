@@ -103,6 +103,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDMotionSettings.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDPresentation.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -170,6 +176,12 @@
         },
         {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudMotionPolicy.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
           ]
@@ -308,6 +320,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/ManualHUDTime.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/MotionPolicyTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

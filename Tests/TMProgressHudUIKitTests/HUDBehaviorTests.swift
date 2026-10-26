@@ -170,6 +170,7 @@ struct HUDBehaviorTests {
         hud.minSize = unchangedMinsize
         let unchangedIssquare = hud.isSquare
         hud.isSquare = unchangedIssquare
+        hud.motionPolicy = .full
         hud.areDefaultMotionEffectsEnabled = true
         #expect(hud.bezelView.motionEffects.count == 1)
         hud.show(animated: false)
@@ -182,6 +183,7 @@ struct HUDBehaviorTests {
 
     @Test func motionEffectsAreIdempotentAndPreserveClientEffects() throws {
         let hud = TMProgressHud(frame: .zero)
+        hud.motionPolicy = .full
         let clientEffect = UIInterpolatingMotionEffect(keyPath: "alpha", type: .tiltAlongHorizontalAxis)
         hud.bezelView.addMotionEffect(clientEffect)
         hud.areDefaultMotionEffectsEnabled = true

@@ -31,7 +31,9 @@ extension TMProgressHud: HUDPresentationHost {
 
     func animate(isAppearing: Bool, type: TMProgressHudAnimation, completion: ((Bool) -> Void)?) {
         let resolvedType: TMProgressHudAnimation
-        if type == .zoom {
+        if motionSettings.shouldReduceMotion {
+            resolvedType = .fade
+        } else if type == .zoom {
             resolvedType = isAppearing ? .zoomIn : .zoomOut
         } else {
             resolvedType = type
@@ -86,7 +88,7 @@ extension TMProgressHud: HUDPresentationHost {
     // MARK: - Motion effects
 
     func updateBezelMotionEffects() {
-        if areDefaultMotionEffectsEnabled {
+        if areDefaultMotionEffectsEnabled && !motionSettings.shouldReduceMotion {
             guard bezelMotionEffects == nil else { return }
             let horizontal = motionEffect(key: "center.x", type: .tiltAlongHorizontalAxis)
             let vertical = motionEffect(key: "center.y", type: .tiltAlongVerticalAxis)
