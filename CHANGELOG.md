@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Draw horizontal bars consistently during partial updates and with shifted bounds.
+
 - Start a reused custom spinner when switching to indeterminate mode.
 
 - Restore normal HUD geometry when showing without animation after a zoom dismissal.

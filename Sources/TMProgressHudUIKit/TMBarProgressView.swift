@@ -94,6 +94,13 @@ open class TMBarProgressView: UIView {
     /// Draws the border and current progress fill.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
+        context.saveGState()
+        defer { context.restoreGState() }
+        context.translateBy(x: bounds.minX, y: bounds.minY)
+        drawBar(in: CGRect(origin: .zero, size: bounds.size), context: context)
+    }
+
+    private func drawBar(in rect: CGRect, context: CGContext) {
         let border = Geometry.border
         let inset = Geometry.inset
         let borderRadius = rect.height / 2 - border

@@ -124,6 +124,24 @@ struct RenderingContractTests {
         }
     }
 
+    @Test(arguments: [Float(0), 0.01, 0.5, 0.99, 1, 2])
+    func barPartialDrawingMatchesFullDrawing(progress: Float) throws {
+        let bar = TMBarProgressView(frame: CGRect(x: 0, y: 0, width: 120, height: 20))
+        bar.progress = progress
+        let region = CGRect(x: 40, y: 0, width: 40, height: 20)
+        let full = try pixels(bar, clippingRect: region)
+        let partial = try pixels(bar, drawingRect: region, clippingRect: region)
+        #expect(partial == full)
+    }
+
+    @Test func barDrawingUsesItsBoundsOrigin() throws {
+        let bar = TMBarProgressView(frame: CGRect(x: 0, y: 0, width: 120, height: 20))
+        bar.progress = 0.5
+        let original = try pixels(bar)
+        bar.bounds.origin = CGPoint(x: 17, y: 9)
+        #expect(try pixels(bar) == original)
+    }
+
     private func rasterDifference(_ actual: Data, _ expected: Data) throws -> (maximum: Int, changed: Int) {
         try #require(actual.count == expected.count)
         return actual.withUnsafeBytes { actualBytes in
@@ -140,12 +158,17 @@ struct RenderingContractTests {
         }
     }
 
-    private func pixels(_ view: UIView, fillAfterDrawing: Bool = false) throws -> Data {
+    private func pixels(
+        _ view: UIView, fillAfterDrawing: Bool = false,
+        drawingRect: CGRect? = nil, clippingRect: CGRect? = nil
+    ) throws -> Data {
         let format = UIGraphicsImageRendererFormat()
         format.scale = 3
         format.preferredRange = .standard
         let image = UIGraphicsImageRenderer(size: view.bounds.size, format: format).image { context in
-            view.draw(view.bounds)
+            context.cgContext.translateBy(x: -view.bounds.minX, y: -view.bounds.minY)
+            context.cgContext.clip(to: clippingRect ?? view.bounds)
+            view.draw(drawingRect ?? view.bounds)
             if fillAfterDrawing { context.cgContext.fill(view.bounds) }
         }
         return try #require(image.cgImage?.dataProvider?.data) as Data
