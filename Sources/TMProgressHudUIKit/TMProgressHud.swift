@@ -255,7 +255,7 @@ open class TMProgressHud: UIView {
     /// A new show discards this request's completion. Repeated hides while waiting for the minimum duration
     /// keep the first request's completion; hides during or after dismissal are ignored.
     /// This completion runs before the compatibility completionBlock and delegate notification.
-    @objc(hideAnimated:completion:) open dynamic func hide(
+    @objc(hideAnimated:completion:) public final func hide(
         animated: Bool, completion: @escaping @MainActor (TMProgressHud) -> Void
     ) {
         presentation.hide(animated: animated) { [weak self] in

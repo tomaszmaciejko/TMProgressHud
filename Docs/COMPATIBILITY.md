@@ -50,6 +50,8 @@ Objective-C selectors and dynamic progress setters are preserved. Swift does not
 
 ## Subclassing
 
+The existing open UIKit API remains available for compatibility. New selection/color methods and per-request hide completion are closed facade operations. Prefer custom UIView composition and TMProgressHudProgressReporting for new integrations.
+
 Open indicator color/style getters are used by drawing. HUD color application and progress observation also read the public getters, so an override is reflected in the result. This deliberately differs from the original implementation's direct reads of private drawing fields.
 
 Return stable child-view and progress-source instances between configuration changes. Forward overridden setters to `super` to preserve updates, and request `setNeedsDisplay()` when a computed drawing value changes independently of a setter. Existing Objective-C selectors, KVC keys and progress KVO remain supported.
