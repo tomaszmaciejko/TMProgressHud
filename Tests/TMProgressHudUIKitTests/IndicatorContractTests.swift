@@ -81,6 +81,20 @@ struct IndicatorContractTests {
         #expect(hud.indicator === spinner)
     }
 
+    @Test(arguments: [false, true])
+    func indeterminateModeStartsReusedSpinner(wasAnimating: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        let spinner = UIActivityIndicatorView(style: .large)
+        if wasAnimating { spinner.startAnimating() }
+        hud.customView = spinner
+        hud.mode = .customView
+        #expect(spinner.isAnimating == wasAnimating)
+        hud.mode = .indeterminate
+        #expect(hud.indicator === spinner)
+        #expect(spinner.isAnimating)
+        #expect(!spinner.isHidden)
+    }
+
     @Test func plainCustomViewHasNoProgressContractAndPreservesTintWithoutBulkColor() {
         let hud = TMProgressHud(frame: .zero)
         hud.contentColor = nil

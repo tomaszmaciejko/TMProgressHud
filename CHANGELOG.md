@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Start a reused custom spinner when switching to indeterminate mode.
+
 - Restore normal HUD geometry when showing without animation after a zoom dismissal.
 
 - Require iOS 17+ and tvOS 17+. Package installation still supports Swift 6.0+; editing the bundled JSON Xcode projects requires Xcode 27+.

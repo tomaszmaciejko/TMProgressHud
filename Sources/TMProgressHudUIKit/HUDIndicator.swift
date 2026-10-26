@@ -22,8 +22,8 @@ struct HUDIndicator {
             let spinner = previous as? UIActivityIndicatorView ?? UIActivityIndicatorView(style: .large)
             if spinner !== previous {
                 spinner.color = .white
-                spinner.startAnimating()
             }
+            spinner.startAnimating()
             return spinnerIndicator(spinner)
         case .determinate, .annularDeterminate:
             let round = previous as? TMRoundProgressView ?? TMRoundProgressView()
