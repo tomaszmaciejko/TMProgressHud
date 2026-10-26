@@ -112,15 +112,19 @@ struct RenderingContractTests {
         #expect(try pixels(portBar) != pixels(originalBar))
     }
 
-    @Test func circularDrawingPreservesContextFillColor() throws {
-        let port = TMRoundProgressView()
-        let original = MBRoundProgressView()
-        for annular in [false, true] {
-            port.isAnnular = annular
-            original.isAnnular = annular
-            port.progressTintColor = .red
-            original.progressTintColor = .red
-            #expect(try pixels(port, fillAfterDrawing: true) == pixels(original, fillAfterDrawing: true))
+    @Test func indicatorDrawingRestoresCallerGraphicsState() throws {
+        let outlined = TMRoundProgressView()
+        let ring = TMRoundProgressView()
+        ring.isAnnular = true
+        for round in [outlined, ring] {
+            round.progress = 0.4
+            round.progressTintColor = UIColor.red.withAlphaComponent(0.37)
+        }
+        let bar = TMBarProgressView()
+        bar.progress = 0.4
+        for view in [outlined, ring, bar] as [UIView] {
+            let expected = try callerMarkerPixels(view, drawsIndicator: false)
+            #expect(try callerMarkerPixels(view, drawsIndicator: true) == expected)
         }
     }
 
@@ -142,6 +146,31 @@ struct RenderingContractTests {
         #expect(try pixels(bar) == original)
     }
 
+    private func callerMarkerPixels(_ view: UIView, drawsIndicator: Bool) throws -> Data {
+        // The marker is outside the indicator. Its fill, blend and stroke must be independent
+        // of whether the caller drew an indicator before continuing its own composition.
+        let marker = CGRect(x: view.bounds.width + 8, y: 8, width: 24, height: 24)
+        let canvas = CGSize(width: marker.maxX + 8, height: max(view.bounds.height, marker.maxY) + 8)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 3
+        format.preferredRange = .standard
+        let image = UIGraphicsImageRenderer(size: canvas, format: format).image { renderer in
+            let context = renderer.cgContext
+            context.setFillColor(UIColor.blue.cgColor)
+            context.fill(CGRect(origin: .zero, size: canvas))
+            context.setFillColor(UIColor.green.withAlphaComponent(0.5).cgColor)
+            context.setStrokeColor(UIColor.yellow.cgColor)
+            context.setLineWidth(3)
+            if drawsIndicator { view.draw(view.bounds) }
+            context.fill(marker)
+            context.stroke(marker.insetBy(dx: 3, dy: 3))
+        }
+        let cropped = UIGraphicsImageRenderer(size: marker.size, format: format).image { _ in
+            image.draw(at: CGPoint(x: -marker.minX, y: -marker.minY))
+        }
+        return try #require(cropped.cgImage?.dataProvider?.data) as Data
+    }
+
     private func rasterDifference(_ actual: Data, _ expected: Data) throws -> (maximum: Int, changed: Int) {
         try #require(actual.count == expected.count)
         return actual.withUnsafeBytes { actualBytes in
@@ -159,7 +188,7 @@ struct RenderingContractTests {
     }
 
     private func pixels(
-        _ view: UIView, fillAfterDrawing: Bool = false,
+        _ view: UIView,
         drawingRect: CGRect? = nil, clippingRect: CGRect? = nil
     ) throws -> Data {
         let format = UIGraphicsImageRendererFormat()
@@ -169,7 +198,6 @@ struct RenderingContractTests {
             context.cgContext.translateBy(x: -view.bounds.minX, y: -view.bounds.minY)
             context.cgContext.clip(to: clippingRect ?? view.bounds)
             view.draw(drawingRect ?? view.bounds)
-            if fillAfterDrawing { context.cgContext.fill(view.bounds) }
         }
         return try #require(image.cgImage?.dataProvider?.data) as Data
     }

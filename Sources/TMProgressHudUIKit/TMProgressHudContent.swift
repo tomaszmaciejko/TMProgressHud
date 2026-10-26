@@ -7,7 +7,7 @@ import UIKit
 public enum TMProgressHudContent {
     /// An animating activity indicator.
     case activity
-    /// A circular pie progress indicator.
+    /// An outlined circular progress indicator, historically called the pie style.
     case pie
     /// A circular ring progress indicator.
     case ring

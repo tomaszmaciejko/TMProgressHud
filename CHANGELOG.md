@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Restore caller graphics state after drawing circular indicators.
+
 - Make custom content use typed progress by default; add explicit legacyCustom opt-in while keeping old property behavior.
 
 - Add explicit position and independent content/host insets, retaining compatibility layout properties and atomic KVO.

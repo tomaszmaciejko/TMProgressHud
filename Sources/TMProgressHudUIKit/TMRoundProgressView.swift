@@ -4,7 +4,7 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-/// A circular progress indicator with pie and ring styles.
+/// A circular progress indicator with outlined and annular styles.
 @MainActor
 @objc(TMRoundProgressView)
 open class TMRoundProgressView: UIView {
@@ -37,7 +37,7 @@ open class TMRoundProgressView: UIView {
 
     private var storedProgressTintColor: UIColor = .white
 
-    /// The remaining/background color, initially white at alpha 0.1.
+    /// The annular track color, initially white at alpha 0.1.
     @objc open dynamic var backgroundTintColor: UIColor {
         get { storedBackgroundTintColor }
         set {
@@ -108,6 +108,8 @@ open class TMRoundProgressView: UIView {
     /// Draws the current progress in the selected style.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
+        context.saveGState()
+        defer { context.restoreGState() }
         let diameter = min(bounds.width, bounds.height)
         guard diameter > Geometry.lineWidth * 2 else { return }
         let circleBounds = CGRect(
@@ -117,7 +119,7 @@ open class TMRoundProgressView: UIView {
         if isAnnular {
             drawRing(in: circleBounds, fraction: fraction)
         } else {
-            drawPie(in: context, bounds: circleBounds, fraction: fraction)
+            drawOutlinedCircle(in: context, bounds: circleBounds, fraction: fraction)
         }
     }
 
@@ -142,11 +144,10 @@ open class TMRoundProgressView: UIView {
         path.stroke()
     }
 
-    private func drawPie(in context: CGContext, bounds: CGRect, fraction: CGFloat) {
+    private func drawOutlinedCircle(in context: CGContext, bounds: CGRect, fraction: CGFloat) {
         let lineWidth = Geometry.lineWidth
         let circle = bounds.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
         progressTintColor.setStroke()
-        backgroundTintColor.setFill()
         context.setLineWidth(lineWidth)
         context.strokeEllipse(in: circle)
         let pathWidth = lineWidth * 2
