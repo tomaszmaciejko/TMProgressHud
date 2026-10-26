@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name = 'TMProgressHudUIKit'
   s.version = File.read(File.join(__dir__, 'VERSION')).strip
   s.summary = 'Native Swift progress and status HUD for UIKit on iOS and tvOS.'
-  s.description = 'A reference-faithful Swift UIKit HUD with progress indicators, custom content, action buttons and deterministic regression protection.'
+  s.description = 'A Swift UIKit HUD with progress indicators, custom content, action buttons and configurable presentation.'
   s.homepage = 'https://github.com/tomaszmaciejko/TMProgressHud'
   s.author = 'Tomasz Maciejko'
   s.license = { :type => 'MIT', :file => 'LICENSE' }

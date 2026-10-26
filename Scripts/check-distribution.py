@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Build a distribution consumer and report only verified installation and runtime facts."""
+from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 import importlib.util
