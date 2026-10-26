@@ -184,6 +184,20 @@ struct LifecycleTests {
         }
     }
 
+    @Test(arguments: [TMProgressHudAnimation.zoom, .zoomIn, .zoomOut])
+    func nonanimatedReshowRestoresVisibleGeometry(type: TMProgressHudAnimation) {
+        let hud = TMProgressHud(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        hud.animationType = type
+        hud.show(animated: false)
+        hud.hide(animated: true)
+        hud.show(animated: false)
+        #expect(hud.bezelView.transform == .identity)
+        #expect(hud.bezelView.alpha == 1)
+        #expect(hud.backgroundView.alpha == 1)
+        #expect(hud.alpha == 1)
+        hud.hide(animated: false)
+    }
+
     @Test func animatedHideRemovesHUDFromHostBeforeCompletion() async {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud.showAdded(to: host, animated: false)

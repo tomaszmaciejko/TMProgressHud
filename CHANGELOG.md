@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Restore normal HUD geometry when showing without animation after a zoom dismissal.
+
 - Require iOS 17+ and tvOS 17+. Package installation still supports Swift 6.0+; editing the bundled JSON Xcode projects requires Xcode 27+.
 - Give layout, presentation phases, scheduled actions, Progress observation and indicator updates explicit owners. Use monotonic timing and observe Progress only while presented in a window.
 - Ignore obsolete timing and animation completions; deliver completion callbacks once per presentation. Release detached HUDs instead of retaining them through progress polling.

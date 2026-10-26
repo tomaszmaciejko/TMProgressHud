@@ -14,8 +14,7 @@ extension TMProgressHud: HUDPresentationHost {
         if animated {
             animate(isAppearing: true, type: animationType, completion: nil)
         } else {
-            bezelView.alpha = 1
-            backgroundView.alpha = 1
+            applyAnimationState(isAppearing: true, type: animationType)
         }
     }
 
@@ -50,23 +49,24 @@ extension TMProgressHud: HUDPresentationHost {
             springDuration: HUDMetrics.animationPerceivedDuration, bounce: 0,
             initialSpringVelocity: 0, delay: 0, options: .beginFromCurrentState,
             animations: {
-                self.applyAnimationState(isAppearing: isAppearing, type: resolvedType, small: small, large: large)
+                self.applyAnimationState(isAppearing: isAppearing, type: resolvedType)
             },
             completion: completion
         )
     }
 
-    private func applyAnimationState(
-        isAppearing: Bool, type: TMProgressHudAnimation,
-        small: CGAffineTransform, large: CGAffineTransform
-    ) {
+    private func applyAnimationState(isAppearing: Bool, type: TMProgressHudAnimation) {
+        let scale: CGFloat
         if isAppearing {
-            bezelView.transform = .identity
-        } else if type == .zoomIn {
-            bezelView.transform = large
-        } else if type == .zoomOut {
-            bezelView.transform = small
+            scale = 1
+        } else {
+            switch type {
+            case .zoomIn: scale = HUDMetrics.enlargedScale
+            case .zoomOut: scale = HUDMetrics.reducedScale
+            default: scale = 1
+            }
         }
+        bezelView.transform = CGAffineTransform(scaleX: scale, y: scale)
         bezelView.alpha = isAppearing ? 1 : 0
         backgroundView.alpha = isAppearing ? 1 : 0
     }
