@@ -20,6 +20,7 @@
 - Make mode, animation and background-style values Sendable for checked transfer between Swift tasks.
 - Keep enabled motion effects across repeated presentations and preserve effects added by the caller.
 - Avoid a transient blur view for the solid HUD background and reuse the effect view when its blur material changes.
+- Use native CGFloat precision for circular angles and documented opacity values instead of preserving C float promotion.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

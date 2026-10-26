@@ -9,7 +9,7 @@ final class HUDRoundedButtonView: UIButton {
     private enum Metrics {
         static let borderWidth: CGFloat = 1
         static let horizontalPadding: CGFloat = 20
-        static let highlightAlpha: CGFloat = CGFloat(Float(0.1))
+        static let highlightAlpha: CGFloat = 0.1
     }
 
     private var borderColorSource: UIColor?

@@ -11,11 +11,9 @@ open class TMRoundProgressView: UIView {
     private enum Geometry {
         static let size = CGSize(width: 37, height: 37)
         static let lineWidth: CGFloat = 2
-        static let backgroundAlpha: CGFloat = CGFloat(Float(0.1))
-        // Match the original C conversion (float)M_PI, not Swift Float.pi.
-        static let referencePi = Float(Double.pi)
-        static let startAngle = -CGFloat(referencePi) / 2
-        static let fullTurn = 2 * CGFloat(referencePi)
+        static let backgroundAlpha: CGFloat = 0.1
+        static let startAngle: CGFloat = -.pi / 2
+        static let fullTurn: CGFloat = 2 * .pi
     }
 
     /// The unnormalized progress value.
@@ -113,7 +111,7 @@ open class TMRoundProgressView: UIView {
         background.stroke()
         let path = UIBezierPath(
             arcCenter: center, radius: radius, startAngle: Geometry.startAngle,
-            endAngle: Geometry.startAngle + CGFloat(progress * 2 * Geometry.referencePi), clockwise: true
+            endAngle: Geometry.startAngle + CGFloat(progress) * Geometry.fullTurn, clockwise: true
         )
         path.lineWidth = Geometry.lineWidth
         path.lineCapStyle = .square
@@ -133,7 +131,7 @@ open class TMRoundProgressView: UIView {
             arcCenter: CGPoint(x: bounds.midX, y: bounds.midY),
             radius: bounds.width / 2 - pathWidth / 2,
             startAngle: Geometry.startAngle,
-            endAngle: Geometry.startAngle + CGFloat(progress * 2 * Geometry.referencePi),
+            endAngle: Geometry.startAngle + CGFloat(progress) * Geometry.fullTurn,
             clockwise: true
         )
         path.lineWidth = pathWidth

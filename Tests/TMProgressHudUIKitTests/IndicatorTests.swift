@@ -6,7 +6,7 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct IndicatorTests {
-    @Test func defaultsAndUnnormalizedProgressMatchReference() {
+    @Test func defaultsAndUnnormalizedProgressHaveStableValues() {
         let round = TMRoundProgressView()
         let bar = TMBarProgressView()
         #expect(round.frame.size == CGSize(width: 37, height: 37))
@@ -14,7 +14,7 @@ struct IndicatorTests {
         #expect(bar.frame.size == CGSize(width: 120, height: 20))
         #expect(bar.intrinsicContentSize == MBBarProgressView().intrinsicContentSize)
         #expect(!round.isAnnular)
-        #expect(round.backgroundTintColor == MBRoundProgressView().backgroundTintColor)
+        #expect(round.backgroundTintColor == UIColor(white: 1, alpha: 0.1))
         for value: Float in [-1, 0, 0.5, 1, 2, .infinity, -.infinity] {
             round.progress = value
             bar.progress = value
@@ -102,6 +102,16 @@ struct IndicatorTests {
         #expect(TMProgressHudBackgroundStyle.solidColor.rawValue == 0)
         #expect(TMProgressHudBackgroundStyle.blur.rawValue == 1)
         #expect(TMProgressMaxOffset == MBProgressMaxOffset)
+    }
+
+    @Test func defaultColorsUseDocumentedCGFloatAlphas() {
+        let hud = TMProgressHud(frame: .zero)
+        #expect(hud.contentColor == UIColor.label.withAlphaComponent(0.7))
+        let round = TMRoundProgressView()
+        #expect(round.backgroundTintColor == UIColor(white: 1, alpha: 0.1))
+        hud.button.setTitleColor(.green, for: .selected)
+        hud.button.isHighlighted = true
+        #expect(hud.button.backgroundColor == UIColor.green.withAlphaComponent(0.1))
     }
 
     @Test func appearanceValuesCanCrossTaskBoundaries() async {

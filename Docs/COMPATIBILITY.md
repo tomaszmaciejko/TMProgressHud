@@ -7,6 +7,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 ## Preserved behavior
 
 - Progress values are stored and forwarded without clamping.
+- Version 2.0 uses native CGFloat precision for circular angles and opacity constants; it does not preserve C float-promotion artifacts. A few antialiasing samples at enlarged sizes may differ from 1.x.
 - Enabled tilt effects remain installed across repeated presentations. Disabling them removes only the HUD-owned group.
 - Completion and delegate callbacks occur once per completed presentation, in that order. Repeated hide calls after completion do nothing; a new show cancels unfinished hiding and its callback. Re-showing visible content skips the grace delay.
 - Switching between pie and ring updates the reused indicator in both directions.

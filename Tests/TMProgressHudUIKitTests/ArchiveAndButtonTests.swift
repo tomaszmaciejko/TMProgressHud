@@ -50,10 +50,7 @@ struct ArchiveAndButtonTests {
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.green, for: .selected)
         button.isHighlighted = true
-        let reference = MBProgressHUD(view: UIView()).button
-        reference.setTitleColor(.green, for: .selected)
-        reference.isHighlighted = true
-        #expect(button.backgroundColor == reference.backgroundColor)
+        #expect(button.backgroundColor == UIColor.green.withAlphaComponent(0.1))
         button.isHighlighted = false
         #expect(button.backgroundColor == .clear)
         button.setTitleColor(nil, for: .normal)

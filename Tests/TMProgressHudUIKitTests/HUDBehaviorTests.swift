@@ -27,7 +27,7 @@ struct HUDBehaviorTests {
         let original = MBProgressHUD(view: host)
         #expect(hud.frame == original.frame)
         #expect(hud.margin == original.margin)
-        #expect(hud.contentColor == original.contentColor)
+        #expect(hud.contentColor == UIColor.label.withAlphaComponent(0.7))
         #expect(hud.alpha == original.alpha)
         #expect(hud.superview == nil)
         #expect(hud.label.font == original.label.font)

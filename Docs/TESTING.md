@@ -29,7 +29,7 @@ TMHUD_TEST_DESTINATION='platform=tvOS Simulator,id=<UUID>' ./Scripts/test.sh
 
 The scripts boot the selected simulator, run tests and enforce 100% executable production line coverage. Results and coverage reports are written under `.build/`. Reports are tied to source hashes; stale reports fail the gate. Declaration-only files with no compiler coverage regions are individually accounted for in `Scripts/coverage-unmapped.json`.
 
-Regression tests cover the development contract and compare preserved behavior with the pinned Objective-C implementation. `Scripts/verify-reference.py` checks its checksums and the API inventory in `Tests/ReferenceAPI/api-inventory.json`. The reference is never linked into the shipped library.
+Regression tests cover the development contract and compare preserved behavior with the pinned Objective-C implementation. Circular drawing remains byte-identical at the default size; enlarged-image comparisons bound the sparse antialiasing changes caused by native CGFloat precision. `Scripts/verify-reference.py` checks its checksums and the API inventory in `Tests/ReferenceAPI/api-inventory.json`. The reference is never linked into the shipped library.
 
 ## Packaging checks
 

@@ -1,9 +1,9 @@
 [
   {
     "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
-    "sha256": "88797e7aa124642fa1b1cf6f19b0df172c081fc04e7e1eed9c6ef6b27afa8139",
+    "sha256": "928d8d6abd486406c4555a61c212d89dd6387a91dba4a12c4561fdd5c2d118ed",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Reviewed for iOS/tvOS 17 spring modernization: renamed and documented a static duration constant; declaration-only body has no executable-line exclusion."
+    "decision": "Reviewed native CGFloat alpha literal replacing C Float promotion; declarations have no executable regions. Exact documented alphas are tested separately."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
