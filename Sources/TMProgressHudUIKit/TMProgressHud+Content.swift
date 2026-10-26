@@ -46,16 +46,21 @@ extension TMProgressHud {
     private func configureLabels() {
         for item in [label, detailsLabel] {
             item.adjustsFontSizeToFitWidth = false
+            item.adjustsFontForContentSizeCategory = true
             item.textAlignment = .center
             item.textColor = contentColor
             item.isOpaque = false
             item.backgroundColor = .clear
         }
-        label.font = .boldSystemFont(ofSize: HUDMetrics.titleFontSize)
-        detailsLabel.font = .boldSystemFont(ofSize: HUDMetrics.detailFontSize)
+        label.font = UIFontMetrics(forTextStyle: .headline).scaledFont(
+            for: .boldSystemFont(ofSize: HUDMetrics.titleFontSize), compatibleWith: label.traitCollection)
+        detailsLabel.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
+            for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: detailsLabel.traitCollection)
         detailsLabel.numberOfLines = 0
         button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = .boldSystemFont(ofSize: HUDMetrics.detailFontSize)
+        button.titleLabel?.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
+            for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: button.traitCollection)
+        button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(contentColor, for: .normal)
     }
 

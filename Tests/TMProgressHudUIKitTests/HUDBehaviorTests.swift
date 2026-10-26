@@ -21,7 +21,7 @@ private final class HUDSubclass: TMProgressHud {}
 @Suite(.serialized)
 @MainActor
 struct HUDBehaviorTests {
-    @Test func initialStateAndHostHelpers() {
+    @Test func initialStateAndHostHelpers() throws {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud(view: host)
         let original = MBProgressHUD(view: host)
@@ -30,8 +30,16 @@ struct HUDBehaviorTests {
         #expect(hud.contentColor == UIColor.label.withAlphaComponent(0.7))
         #expect(hud.alpha == original.alpha)
         #expect(hud.superview == nil)
-        #expect(hud.label.font == original.label.font)
-        #expect(hud.detailsLabel.font == original.detailsLabel.font)
+        // Dynamic Type adds scaling metadata; base face, size and weight remain unchanged.
+        for (actual, reference) in [
+            (hud.label.font, original.label.font), (hud.detailsLabel.font, original.detailsLabel.font),
+        ] {
+            let actual = try #require(actual)
+            let reference = try #require(reference)
+            #expect(actual.fontName == reference.fontName)
+            #expect(actual.pointSize == reference.pointSize)
+            #expect(actual.fontDescriptor.symbolicTraits == reference.fontDescriptor.symbolicTraits)
+        }
         #expect(hud.detailsLabel.numberOfLines == 0)
         #expect(!TMProgressHud.hide(for: host, animated: false))
         host.addSubview(UIView())

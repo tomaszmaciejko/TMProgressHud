@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Scale default labels and action-button typography with Dynamic Type.
+
 - Keep new facade operations closed to overriding while preserving existing subclassing hooks for compatibility.
 
 - Separate future indicator colors from explicit recoloring; explicit circular tinting preserves dynamic alpha and transparency.

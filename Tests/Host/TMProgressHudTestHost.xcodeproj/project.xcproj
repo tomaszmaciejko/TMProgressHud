@@ -205,6 +205,12 @@
       "name": "Swift tests",
       "children": [
         {
+          "path": "../TMProgressHudUIKitTests/AccessibilityTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/ArchiveAndButtonTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
