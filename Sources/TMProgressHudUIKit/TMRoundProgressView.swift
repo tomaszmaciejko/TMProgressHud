@@ -80,9 +80,21 @@ open class TMRoundProgressView: UIView {
         configureDrawing()
     }
 
+    /// A localized percentage for finite progress, bounded to 0...100 percent.
+    ///
+    /// An application-supplied accessibility value takes precedence; nil restores automatic formatting.
+    open override var accessibilityValue: String? {
+        get {
+            super.accessibilityValue ?? HUDProgressAccessibility.value(for: progress, language: accessibilityLanguage)
+        }
+        set { super.accessibilityValue = newValue }
+    }
+
     private func configureDrawing() {
         backgroundColor = .clear
         isOpaque = false
+        isAccessibilityElement = true
+        accessibilityTraits.insert(.updatesFrequently)
         registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
             (view: TMRoundProgressView, _) in
             view.setNeedsDisplay()

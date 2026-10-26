@@ -36,6 +36,12 @@ The compatibility `contentColor` property retains its earlier combined behavior 
 
 `motionPolicy` defaults to `.system`, following Reduce Motion. `.reduced` uses fade instead of zoom and suppresses HUD-owned tilt effects; `.full` explicitly allows the selected motion. Changes affect future transitions and current owned tilt effects. Effects added by the caller and the requested areDefaultMotionEffectsEnabled value are preserved. Passing animated: false still disables the transition.
 
+## Accessible progress in 2.0
+
+Built-in pie, ring and bar views expose a localized percentage as their accessibility value. Finite values are bounded to 0...100 percent for this description only; raw progress remains unchanged. Nonfinite values have no numeric description. No per-update announcements are posted.
+
+Set accessibilityLanguage, accessibilityLabel or an application-specific accessibilityValue when needed. Setting accessibilityValue back to nil restores the automatic percentage. Custom content keeps its own accessibility semantics; adopting the progress protocol does not replace its label, value or traits. Actual VoiceOver interaction remains a separate manual check.
+
 ## Configuration
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.

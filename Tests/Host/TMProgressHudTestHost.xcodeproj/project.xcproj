@@ -115,6 +115,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDProgressAccessibility.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDProgressBinding.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -338,6 +344,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/PresentationTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/ProgressAccessibilityTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

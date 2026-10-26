@@ -50,6 +50,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDProgressAccessibility.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDProgressBinding.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -183,7 +189,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "00000000000000000000003E",
+      "id": "000000000000000000000040",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

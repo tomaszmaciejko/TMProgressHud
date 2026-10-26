@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Expose localized accessible progress values while preserving application overrides and raw input values.
+
 - Follow Reduce Motion for zoom and HUD-owned tilt effects, with an explicit per-HUD policy.
 
 - Scale default labels and action-button typography with Dynamic Type.
