@@ -6,7 +6,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 
 ## Behavior
 
-- Progress values are stored and forwarded without clamping.
+- Progress values are stored and forwarded without clamping. Built-in circular drawings bound finite values to 0...1 and draw nonfinite values as zero. Circles fit the smaller bounds dimension and are centered; dimensions of 4 points or less draw nothing. These are intentional 2.0 rendering changes.
 - Round-style and bar-border color changes request redraw; equal values do not add redraw work.
 - Version 2.0 uses native CGFloat precision for circular angles and opacity constants; it does not preserve C float-promotion artifacts. A few antialiasing samples at enlarged sizes may differ from 1.x.
 - Enabled tilt effects remain installed across repeated presentations. Disabling them removes only the HUD-owned group.

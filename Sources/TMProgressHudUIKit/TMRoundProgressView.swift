@@ -108,10 +108,20 @@ open class TMRoundProgressView: UIView {
     /// Draws the current progress in the selected style.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
-        if isAnnular { drawRing() } else { drawPie(in: context) }
+        let diameter = min(bounds.width, bounds.height)
+        guard diameter > Geometry.lineWidth * 2 else { return }
+        let circleBounds = CGRect(
+            x: bounds.midX - diameter / 2, y: bounds.midY - diameter / 2,
+            width: diameter, height: diameter)
+        let fraction = CGFloat(HUDProgressValue.boundedFraction(progress))
+        if isAnnular {
+            drawRing(in: circleBounds, fraction: fraction)
+        } else {
+            drawPie(in: context, bounds: circleBounds, fraction: fraction)
+        }
     }
 
-    private func drawRing() {
+    private func drawRing(in bounds: CGRect, fraction: CGFloat) {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let radius = (bounds.width - Geometry.lineWidth) / 2
         let background = UIBezierPath(
@@ -124,7 +134,7 @@ open class TMRoundProgressView: UIView {
         background.stroke()
         let path = UIBezierPath(
             arcCenter: center, radius: radius, startAngle: Geometry.startAngle,
-            endAngle: Geometry.startAngle + CGFloat(progress) * Geometry.fullTurn, clockwise: true
+            endAngle: Geometry.startAngle + fraction * Geometry.fullTurn, clockwise: true
         )
         path.lineWidth = Geometry.lineWidth
         path.lineCapStyle = .square
@@ -132,7 +142,7 @@ open class TMRoundProgressView: UIView {
         path.stroke()
     }
 
-    private func drawPie(in context: CGContext) {
+    private func drawPie(in context: CGContext, bounds: CGRect, fraction: CGFloat) {
         let lineWidth = Geometry.lineWidth
         let circle = bounds.insetBy(dx: lineWidth / 2, dy: lineWidth / 2)
         progressTintColor.setStroke()
@@ -144,7 +154,7 @@ open class TMRoundProgressView: UIView {
             arcCenter: CGPoint(x: bounds.midX, y: bounds.midY),
             radius: bounds.width / 2 - pathWidth / 2,
             startAngle: Geometry.startAngle,
-            endAngle: Geometry.startAngle + CGFloat(progress) * Geometry.fullTurn,
+            endAngle: Geometry.startAngle + fraction * Geometry.fullTurn,
             clockwise: true
         )
         path.lineWidth = pathWidth

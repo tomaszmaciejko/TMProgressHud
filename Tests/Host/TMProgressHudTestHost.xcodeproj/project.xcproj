@@ -127,6 +127,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDProgressValue.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDRoundedButtonView.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -314,6 +320,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/IndicatorContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/IndicatorGeometryTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

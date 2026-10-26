@@ -61,7 +61,7 @@ struct RenderingContractTests {
     @Test func roundDrawingPreservesShapeAtNativePrecision() throws {
         for size: CGFloat in [37, 123, 512] {
             for annular in [false, true] {
-                for progress: Float in [0.1234567, 0.3333333, 0.731, 1.234567] {
+                for progress: Float in [0.1234567, 0.3333333, 0.731, 0.876543] {
                     let rect = CGRect(x: 0, y: 0, width: size, height: size)
                     let original = MBRoundProgressView(frame: rect)
                     let port = TMRoundProgressView(frame: rect)

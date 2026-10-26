@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Fit circular indicators within rectangular bounds and safely bound their displayed progress.
+
 - Redraw built-in indicators after resizing instead of stretching a cached drawing.
 
 - Follow Reduce Transparency with an adaptive opaque background and explicit per-background policy.
