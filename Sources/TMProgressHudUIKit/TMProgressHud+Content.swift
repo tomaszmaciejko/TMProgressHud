@@ -78,11 +78,23 @@ extension TMProgressHud {
         managedIndicator?.updateProgress(progress)
     }
 
+    /// Recolors labels, the normal button title and the current indicator without changing its default color.
+    ///
+    /// Explicit coloring overrides the compatibility appearance proxy. A ring's remaining-area opacity
+    /// is derived from the supplied color, including its alpha and appearance traits.
+    public func applyContentColor(_ color: UIColor) {
+        applyContentColor(color, policy: .explicit)
+    }
+
     func updateContentColor(_ color: UIColor?) {
         guard let color else { return }
+        applyContentColor(color, policy: .appearanceFirst)
+    }
+
+    private func applyContentColor(_ color: UIColor, policy: HUDIndicator.ColorPolicy) {
         label.textColor = color
         detailsLabel.textColor = color
         button.setTitleColor(color, for: .normal)
-        managedIndicator?.updateColor(color)
+        managedIndicator?.updateColor(color, policy: policy)
     }
 }

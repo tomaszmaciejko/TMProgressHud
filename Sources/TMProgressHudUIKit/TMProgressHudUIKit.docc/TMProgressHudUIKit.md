@@ -35,6 +35,8 @@ hud.setProgressSource(.manual(0.5))
 ### Presentation
 
 - ``TMProgressHud``
+- ``TMProgressHudContent``
+- ``TMProgressHudProgressSource``
 - ``TMProgressHudMode``
 - ``TMProgressHudAnimation``
 - ``TMProgressHudDelegate``

@@ -26,6 +26,12 @@ Use `setContent(.custom(view))` to select custom content in one call, or `.activ
 
 Use `setProgressSource(.manual(value))` to stop observation before assigning a value, or `.observed(progress)` to select Foundation Progress. The compatibility progress/progressObject setters remain available; their independent use can still combine manual updates with observation.
 
+## Explicit colors in 2.0
+
+`defaultIndicatorColor` changes the default for future indicators without touching current views. `applyContentColor(_:)` recolors labels, the normal button title and the current indicator without changing that default; repeated calls apply again. Explicit indicator coloring bypasses the compatibility appearance-proxy lookup. Circular remaining-area alpha multiplies the supplied color's alpha and follows its dynamic appearance.
+
+The compatibility `contentColor` property retains its earlier combined behavior described below.
+
 ## Configuration
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.

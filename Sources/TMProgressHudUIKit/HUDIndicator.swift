@@ -5,15 +5,20 @@ import UIKit
 /// Owns the view and the operations supported by one selected indicator.
 @MainActor
 struct HUDIndicator {
+    enum ColorPolicy {
+        case appearanceFirst
+        case explicit
+    }
+
     let view: UIView
     private let receiveProgress: ((Float) -> Void)?
-    private let receiveColor: (UIColor?) -> Void
+    private let receiveColor: (UIColor?, ColorPolicy) -> Void
 
     func updateProgress(_ progress: Float) {
         receiveProgress?(progress)
     }
-    func updateColor(_ color: UIColor?) {
-        receiveColor(color)
+    func updateColor(_ color: UIColor?, policy: ColorPolicy = .appearanceFirst) {
+        receiveColor(color, policy)
     }
 
     static func make(mode: TMProgressHudMode, customView: UIView?, reusing previous: UIView?) -> HUDIndicator? {
@@ -39,33 +44,38 @@ struct HUDIndicator {
     }
 
     private static func spinnerIndicator(_ view: UIActivityIndicatorView) -> HUDIndicator {
-        HUDIndicator(view: view, receiveProgress: nil) { color in
+        HUDIndicator(view: view, receiveProgress: nil) { color, policy in
             view.color =
-                appearanceColor(#selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self)
+                appearanceColor(
+                    #selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self, policy: policy)
                 ?? color ?? view.color
         }
     }
 
     private static func roundIndicator(_ view: TMRoundProgressView) -> HUDIndicator {
-        HUDIndicator(view: view, receiveProgress: { view.progress = $0 }) { color in
+        HUDIndicator(view: view, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressTintColor =
                 appearanceColor(
-                    #selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self)
+                    #selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self,
+                    policy: policy)
                 ?? color ?? view.progressTintColor
             view.backgroundTintColor =
                 appearanceColor(
-                    #selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self)
-                ?? color?.withAlphaComponent(HUDMetrics.remainingAlpha) ?? view.backgroundTintColor
+                    #selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self,
+                    policy: policy)
+                ?? remainingColor(from: color, policy: policy) ?? view.backgroundTintColor
         }
     }
 
     private static func barIndicator(_ view: TMBarProgressView) -> HUDIndicator {
-        HUDIndicator(view: view, receiveProgress: { view.progress = $0 }) { color in
+        HUDIndicator(view: view, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressColor =
-                appearanceColor(#selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self)
+                appearanceColor(
+                    #selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self, policy: policy)
                 ?? color ?? view.progressColor
             view.lineColor =
-                appearanceColor(#selector(getter: TMBarProgressView.lineColor), of: TMBarProgressView.self)
+                appearanceColor(
+                    #selector(getter: TMBarProgressView.lineColor), of: TMBarProgressView.self, policy: policy)
                 ?? color ?? view.lineColor
         }
     }
@@ -82,12 +92,25 @@ struct HUDIndicator {
         } else {
             receiveProgress = nil
         }
-        return HUDIndicator(view: view, receiveProgress: receiveProgress) { color in
+        return HUDIndicator(view: view, receiveProgress: receiveProgress) { color, _ in
             if let color { view.tintColor = color }
         }
     }
 
-    private static func appearanceColor(_ getter: Selector, of type: UIView.Type) -> UIColor? {
+    private static func remainingColor(from color: UIColor?, policy: ColorPolicy) -> UIColor? {
+        color.map { color in
+            if case .appearanceFirst = policy {
+                return color.withAlphaComponent(HUDMetrics.remainingAlpha)
+            }
+            return UIColor { traits in
+                let resolved = color.resolvedColor(with: traits)
+                return resolved.withAlphaComponent(resolved.cgColor.alpha * HUDMetrics.remainingAlpha)
+            }
+        }
+    }
+
+    private static func appearanceColor(_ getter: Selector, of type: UIView.Type, policy: ColorPolicy) -> UIColor? {
+        if case .explicit = policy { return nil }
         let proxy = type.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
         return proxy.perform(getter)?.takeUnretainedValue() as? UIColor
     }

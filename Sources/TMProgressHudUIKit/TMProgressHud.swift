@@ -34,16 +34,19 @@ open class TMProgressHud: UIView {
         }
     }
 
+    /// The default color for newly created indicators; changing it does not recolor existing content.
+    public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(HUDMetrics.contentAlpha)
+
     /// A bulk color for current content and newly created indicators.
     ///
     /// A different non-nil value recolors current content. Direct view customizations survive mode changes.
     /// Nil disables bulk coloring without clearing colors; use clear for transparency.
     /// Container UIAppearance settings take precedence over the bulk color.
     @objc open dynamic var contentColor: UIColor? {
-        get { storedContentColor }
+        get { defaultIndicatorColor }
         set {
-            guard storedContentColor != newValue else { return }
-            storedContentColor = newValue
+            guard defaultIndicatorColor != newValue else { return }
+            defaultIndicatorColor = newValue
             updateContentColor(contentColor)
         }
     }
@@ -161,7 +164,6 @@ open class TMProgressHud: UIView {
         static let bezelView = "TMProgressHud.bezelView"
     }
 
-    private var storedContentColor: UIColor? = UIColor.label.withAlphaComponent(HUDMetrics.contentAlpha)
     private var storedSquare = false
     private var storedMotionEffectsEnabled = false
     private let storedBezelView = TMBackgroundView()
