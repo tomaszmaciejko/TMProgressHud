@@ -22,6 +22,7 @@
 - Avoid a transient blur view for the solid HUD background and reuse the effect view when its blur material changes.
 - Use native CGFloat precision for circular angles and documented opacity values instead of preserving C float promotion.
 - Prevent duplicate owned backgrounds and blur effects when decoding views; retain caller-added subviews and document restoration with current defaults.
+- Request redraw when a standalone round style or bar border color changes; avoid redundant redraw requests for equal values.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

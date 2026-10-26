@@ -4,7 +4,7 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-/// The reference rounded horizontal progress bar.
+/// A rounded horizontal progress bar.
 @MainActor
 @objc(TMBarProgressView)
 open class TMBarProgressView: UIView {
@@ -16,9 +16,7 @@ open class TMBarProgressView: UIView {
     }
 
     /// The unnormalized progress value.
-
     ///
-
     /// A change requests redraw.
     @objc open dynamic var progress: Float = 0 {
         didSet {
@@ -27,13 +25,15 @@ open class TMBarProgressView: UIView {
     }
 
     /// The border color, initially white.
-
     ///
-
-    /// Setting it alone does not request redraw.
+    /// Changing the color requests redraw.
     @objc open dynamic var lineColor: UIColor {
         get { storedLineColor }
-        set { storedLineColor = newValue }
+        set {
+            let needsRedraw = storedLineColor != newValue
+            storedLineColor = newValue
+            if needsRedraw { setNeedsDisplay() }
+        }
     }
 
     private var storedLineColor: UIColor = .white
@@ -62,7 +62,7 @@ open class TMBarProgressView: UIView {
 
     private var storedProgressColor: UIColor = .white
 
-    /// Creates the reference 120-by-20-point default frame.
+    /// Creates a 120-by-20-point default frame.
     public convenience init() {
         self.init(frame: CGRect(origin: .zero, size: Geometry.defaultSize))
     }
@@ -88,10 +88,10 @@ open class TMBarProgressView: UIView {
         }
     }
 
-    /// The reference 120-by-10-point intrinsic content size.
+    /// The 120-by-10-point intrinsic content size.
     open override var intrinsicContentSize: CGSize { Geometry.intrinsicSize }
 
-    /// Draws the reference border and one of the three fill regions.
+    /// Draws the border and current progress fill.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         let border = Geometry.border

@@ -4,7 +4,7 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
-/// The reference circular progress indicator, supporting pie and annular drawing.
+/// A circular progress indicator with pie and ring styles.
 @MainActor
 @objc(TMRoundProgressView)
 open class TMRoundProgressView: UIView {
@@ -17,9 +17,7 @@ open class TMRoundProgressView: UIView {
     }
 
     /// The unnormalized progress value.
-
     ///
-
     /// A changed value requests drawing.
     @objc open dynamic var progress: Float = 0 {
         didSet {
@@ -52,13 +50,15 @@ open class TMRoundProgressView: UIView {
     private var storedBackgroundTintColor: UIColor = UIColor(white: 1, alpha: Geometry.backgroundAlpha)
 
     /// Whether to draw an annular indicator.
-
     ///
-
-    /// Changing this alone does not request redraw, matching the reference.
+    /// Changing the style requests redraw.
     @objc(annular) open dynamic var isAnnular: Bool {
         @objc(isAnnular) get { storedAnnular }
-        @objc(setAnnular:) set { storedAnnular = newValue }
+        @objc(setAnnular:) set {
+            guard storedAnnular != newValue else { return }
+            storedAnnular = newValue
+            setNeedsDisplay()
+        }
     }
 
     private var storedAnnular = false
@@ -89,10 +89,10 @@ open class TMRoundProgressView: UIView {
         }
     }
 
-    /// The reference 37-by-37-point intrinsic size.
+    /// The 37-by-37-point intrinsic size.
     open override var intrinsicContentSize: CGSize { Geometry.size }
 
-    /// Draws the current progress using the reference geometry.
+    /// Draws the current progress in the selected style.
     open override func draw(_ rect: CGRect) {
         guard let context = UIGraphicsGetCurrentContext() else { return }
         if isAnnular { drawRing() } else { drawPie(in: context) }

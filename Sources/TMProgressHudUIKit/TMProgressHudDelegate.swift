@@ -4,9 +4,9 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import Foundation
 
-/// Receives reference HUD lifecycle callbacks on the main actor.
+/// Receives HUD lifecycle callbacks on the main actor.
 @MainActor
 @objc(TMProgressHudDelegate) public protocol TMProgressHudDelegate: NSObjectProtocol {
-    /// Called after a hide sequence; repeated hides can notify repeatedly, matching the reference.
+    /// Called once after a presentation finishes hiding, following its completion block.
     @objc optional func hudWasHidden(_ hud: TMProgressHud)
 }

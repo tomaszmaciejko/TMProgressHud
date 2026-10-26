@@ -13,9 +13,9 @@
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
-    "sha256": "8259b993e56a6227e983ea8ea00518d873c0bd3f03901f59b84b17804c162e8d",
+    "sha256": "12605dd14b93ae658e23673ada7621b73598e44c6bb132b563329b062cf77601",
     "reason": "Protocol method declaration has no executable body; concrete optional callback delivery is tested in repeatedHideRetainsCallbackOrdering.",
-    "decision": "Reviewed after copyright/branding header update; declaration-only body unchanged, no executable-line exclusion."
+    "decision": "Declaration-only protocol; corrected stale documentation to the tested once-per-presentation callback contract. No executable body or line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",

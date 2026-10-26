@@ -299,6 +299,12 @@
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/ViewInvalidationTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
         }
       ]
     }

@@ -26,7 +26,6 @@ struct HUDIndicator {
             let annular = mode == .annularDeterminate
             if round.isAnnular != annular {
                 round.isAnnular = annular
-                round.setNeedsDisplay()
             }
             return roundIndicator(round)
         case .determinateHorizontalBar: return barIndicator(TMBarProgressView())
