@@ -16,7 +16,8 @@ extension TMProgressHud {
         if contentSelection.customView !== selection.customView {
             changedKeys.append(#keyPath(TMProgressHud.customView))
         }
-        guard !changedKeys.isEmpty else { return }
+        let policyChanged = contentSelection.allowsLegacyProgress != selection.allowsLegacyProgress
+        guard !changedKeys.isEmpty || policyChanged else { return }
         for key in changedKeys { willChangeValue(forKey: key) }
         contentSelection = selection
         updateIndicator()
@@ -66,7 +67,9 @@ extension TMProgressHud {
 
     func updateIndicator() {
         let previousIndicator = indicator
-        managedIndicator = HUDIndicator.make(mode: mode, customView: customView, reusing: previousIndicator)
+        managedIndicator = HUDIndicator.make(
+            mode: mode, customView: customView,
+            allowsLegacyProgress: contentSelection.allowsLegacyProgress, reusing: previousIndicator)
         if indicator !== previousIndicator {
             previousIndicator?.removeFromSuperview()
             if let indicator { bezelView.addSubview(indicator) }

@@ -21,7 +21,9 @@ struct HUDIndicator {
         receiveColor(color, policy)
     }
 
-    static func make(mode: TMProgressHudMode, customView: UIView?, reusing previous: UIView?) -> HUDIndicator? {
+    static func make(
+        mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool, reusing previous: UIView?
+    ) -> HUDIndicator? {
         switch mode {
         case .indeterminate:
             let spinner = previous as? UIActivityIndicatorView ?? UIActivityIndicatorView(style: .large)
@@ -38,7 +40,8 @@ struct HUDIndicator {
             }
             return roundIndicator(round)
         case .determinateHorizontalBar: return barIndicator(TMBarProgressView())
-        case .customView: return customView.map(customIndicator)
+        case .customView:
+            return customView.map { customIndicator($0, allowsLegacyProgress: allowsLegacyProgress) }
         case .text: return nil
         }
     }
@@ -80,14 +83,16 @@ struct HUDIndicator {
         }
     }
 
-    private static func customIndicator(_ view: UIView) -> HUDIndicator {
+    private static func customIndicator(_ view: UIView, allowsLegacyProgress: Bool) -> HUDIndicator {
         if let round = view as? TMRoundProgressView { return roundIndicator(round) }
         if let bar = view as? TMBarProgressView { return barIndicator(bar) }
         if let spinner = view as? UIActivityIndicatorView { return spinnerIndicator(spinner) }
         let receiveProgress: ((Float) -> Void)?
         if let reporting = view as? any TMProgressHudProgressReporting {
             receiveProgress = { reporting.progress = $0 }
-        } else if let adapter = HUDLegacyProgressAdapter(view: view) {
+        } else if let native = view as? UIProgressView {
+            receiveProgress = { native.progress = $0 }
+        } else if allowsLegacyProgress, let adapter = HUDLegacyProgressAdapter(view: view) {
             receiveProgress = { adapter.updateProgress($0) }
         } else {
             receiveProgress = nil

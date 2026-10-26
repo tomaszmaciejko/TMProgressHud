@@ -13,19 +13,28 @@ public enum TMProgressHudContent {
     case ring
     /// A horizontal progress bar.
     case bar
-    /// Caller-provided content; the view is required.
+    /// Custom content with typed progress support; Objective-C setter guessing is disabled.
     case custom(UIView)
+    /// Custom content that also opts into the legacy numeric Objective-C progress setter.
+    case legacyCustom(UIView)
     /// Labels and optional action without an indicator.
     case text
 
-    var selection: (mode: TMProgressHudMode, customView: UIView?) {
+    struct Selection {
+        var mode: TMProgressHudMode
+        var customView: UIView?
+        var allowsLegacyProgress = true
+    }
+
+    var selection: Selection {
         switch self {
-        case .activity: (.indeterminate, nil)
-        case .pie: (.determinate, nil)
-        case .ring: (.annularDeterminate, nil)
-        case .bar: (.determinateHorizontalBar, nil)
-        case .custom(let view): (.customView, view)
-        case .text: (.text, nil)
+        case .activity: .init(mode: .indeterminate, customView: nil)
+        case .pie: .init(mode: .determinate, customView: nil)
+        case .ring: .init(mode: .annularDeterminate, customView: nil)
+        case .bar: .init(mode: .determinateHorizontalBar, customView: nil)
+        case .custom(let view): .init(mode: .customView, customView: view, allowsLegacyProgress: false)
+        case .legacyCustom(let view): .init(mode: .customView, customView: view)
+        case .text: .init(mode: .text, customView: nil)
         }
     }
 }

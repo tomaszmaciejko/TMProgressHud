@@ -86,7 +86,9 @@ Execution on the new minimum iOS 17.0 or tvOS 17.0, physical Apple TV remote inp
 
 ## Custom progress views
 
-Adopt `TMProgressHudProgressReporting` on a custom `UIView` to receive unnormalized `progress` values in Swift. Built-in indicators use typed updates. Existing custom views exposing Objective-C `setProgress:` continue to work through a compatibility adapter; plain views are also supported without receiving progress.
+Use `setContent(.custom(view))` with `TMProgressHudProgressReporting` for typed, unnormalized progress. Native round/bar/spinner views and UIProgressView are recognized directly. Other custom views receive no automatic progress updates.
+
+Use `setContent(.legacyCustom(view))` to opt into the Objective-C compatibility adapter. Its numeric `setProgress:` must be KVC-compliant and accept Float-compatible values; the selector alone cannot establish that contract. Typed support takes precedence. The old customView/mode setters retain automatic legacy detection. Switching between custom and legacyCustom for the same view changes forwarding without replacing the view.
 
 ## View decoding
 

@@ -325,6 +325,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/CustomProgressMigrationTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/HUDBehaviorTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"

@@ -18,6 +18,7 @@ open class TMProgressHud: UIView {
         set {
             guard contentSelection.mode != newValue else { return }
             contentSelection.mode = newValue
+            contentSelection.allowsLegacyProgress = true
             updateIndicator()
         }
     }
@@ -30,6 +31,7 @@ open class TMProgressHud: UIView {
         set {
             guard contentSelection.customView !== newValue else { return }
             contentSelection.customView = newValue
+            contentSelection.allowsLegacyProgress = true
             if mode == .customView { updateIndicator() }
         }
     }
@@ -186,7 +188,7 @@ open class TMProgressHud: UIView {
     private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
 
     var layoutPreferences = HUDLayoutPreferences()
-    var contentSelection: (mode: TMProgressHudMode, customView: UIView?) = (.indeterminate, nil)
+    var contentSelection = TMProgressHudContent.Selection(mode: .indeterminate, customView: nil)
     lazy var motionSettings = HUDMotionSettings { [weak self] in self?.updateBezelMotionEffects() }
     var managedIndicator: HUDIndicator?
     var indicator: UIView? { managedIndicator?.view }

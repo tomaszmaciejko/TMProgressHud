@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Make custom content use typed progress by default; add explicit legacyCustom opt-in while keeping old property behavior.
+
 - Add explicit position and independent content/host insets, retaining compatibility layout properties and atomic KVO.
 
 - Simplify bar rendering to rounded paths and a proportional interior fill, including safe small-size and nonfinite-input behavior.
