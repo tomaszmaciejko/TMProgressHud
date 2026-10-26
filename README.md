@@ -1,6 +1,6 @@
 # TMProgressHud
 
-A Swift progress and status HUD for UIKit on iOS and tvOS, ported from [MBProgressHUD](https://github.com/jdg/MBProgressHUD/tree/4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781).
+A Swift progress and status HUD for UIKit on iOS and tvOS, originally ported from [MBProgressHUD](https://github.com/jdg/MBProgressHUD/tree/4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781).
 
 Display an activity indicator, pie, ring, horizontal bar, custom view or message, with an optional action button. You choose the host view and control the underlying operation.
 

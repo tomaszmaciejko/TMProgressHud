@@ -2,28 +2,15 @@
 
 ## 2.0.0 (Unreleased)
 
-- Raise the minimum iOS and tvOS versions to 17.0.
-- Use UIKit’s duration/bounce spring animations, with a perceived duration of 0.3 seconds and no bounce.
-- Refresh custom indicator drawing and action-button border colors when color appearance traits change.
-- Follow host resizing through UIKit layout instead of global status-bar orientation notifications.
-- Preserve app-added constraints during layout updates and reuse layout constraints when only parameters change.
-- Store maintained Xcode projects in the readable JSON format (Xcode 27+).
-- Replace the project-specific source linter with pinned SwiftLint; retain Apple’s swift-format.
-- Use typed, cancellable scheduled actions and monotonic timing; obsolete minimum/grace requests no longer affect a new presentation.
-- Give presentation phases and completion delivery a dedicated owner; ignore stale animation completions and duplicate hides after completion.
-- Observe Progress while presented in a window instead of polling by display link; stop on hide/detach and release removed HUDs.
-- Apply configured container-appearance colors to indicators instead of leaving factory defaults.
-- Preserve direct content colors when modes change; apply bulk color defaults only to newly created indicators unless contentColor is explicitly changed.
-- Respect overridden getters in indicator drawing, bulk color application and Progress observation; retain open classes and Objective-C/KVO integration.
-- Use typed indicator updates and add TMProgressHudProgressReporting for Swift custom views; retain legacy custom progress setters.
-- Restore pie drawing when reusing a ring indicator.
-- Make mode, animation and background-style values Sendable for checked transfer between Swift tasks.
-- Keep enabled motion effects across repeated presentations and preserve effects added by the caller.
-- Avoid a transient blur view for the solid HUD background and reuse the effect view when its blur material changes.
-- Use native CGFloat precision for circular angles and documented opacity values instead of preserving C float promotion.
-- Prevent duplicate owned backgrounds and blur effects when decoding views; retain caller-added subviews and document restoration with current defaults.
-- Request redraw when a standalone round style or bar border color changes; avoid redundant redraw requests for equal values.
-- Run GitHub Actions only when manually requested.
+- Require iOS 17+ and tvOS 17+. Package installation still supports Swift 6.0+; editing the bundled JSON Xcode projects requires Xcode 27+.
+- Give layout, presentation phases, scheduled actions, Progress observation and indicator updates explicit owners. Use monotonic timing and observe Progress only while presented in a window.
+- Ignore obsolete timing and animation completions; deliver completion callbacks once per presentation. Release detached HUDs instead of retaining them through progress polling.
+- Preserve app-added constraints, direct content colors and enabled motion effects across mode or presentation changes. Apply container-appearance colors correctly and respect overridden getters.
+- Refresh drawing and button borders when appearance changes. Standalone round-style and bar-border changes request redraw; reused rings switch back to pie correctly.
+- Use current UIKit spring animations, follow host resizing through layout, reuse blur effects and use native CGFloat precision. Enlarged circular drawings may have small antialiasing differences from 1.0.
+- Prevent duplicate owned views during decoding. Decoded views use current defaults and retain caller-added subviews; active presentation state is not restored.
+- Add `TMProgressHudProgressReporting` for Swift custom indicators and Sendable conformance for value enums. Retain legacy custom progress setters and Objective-C/KVO integration.
+- Use pinned SwiftLint with Apple’s swift-format, simplify local project/distribution checks and run GitHub Actions only when manually requested.
 
 ## 1.0.0
 

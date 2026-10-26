@@ -19,12 +19,12 @@ Use Apple’s `swift-format` and the pinned SwiftLint version; setup is in [Test
 
 Maintained Xcode projects use JSON (`project.xcproj`) and require Xcode 27+.
 
-If you add a Swift file, register it in `Tests/Host/TMProgressHudTestHost.xcodeproj`. Regenerate the production project with `python3 Scripts/project-factory.py framework TMProgressHud.xcodeproj`. The source-registry check catches missing files.
+After adding or removing Swift files, run `python3 Scripts/project-factory.py test-sources Tests/Host/TMProgressHudTestHost.xcodeproj` and regenerate the framework with `python3 Scripts/project-factory.py framework TMProgressHud.xcodeproj`. The source-registry check catches missing files.
 
 ## Code and tests
 
 - Favor clear names, small responsibilities and named constants. Follow the [code standards](Docs/CODE_STANDARDS.md).
-- Preserve the 1.0 behavior described in [compatibility notes](Docs/COMPATIBILITY.md). Compare fixes against the pinned reference.
+- Follow the development contract in [compatibility notes](Docs/COMPATIBILITY.md). Preserve unchanged behavior and document intentional differences; the pinned reference remains a comparison fixture.
 - Add meaningful regression tests. Production executable line coverage must remain 100%; do not weaken assertions or exclude UI code.
 - Document public API changes and update the changelog when behavior changes.
 

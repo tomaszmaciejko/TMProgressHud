@@ -10,11 +10,11 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 - Name domain, layout and timing constants with their meaning and units. Explain non-obvious formulas. Ordinary literals such as zero need no wrapper.
 - Default to private or internal. Public APIs need documentation, deliberate defaults and clear ownership.
 
-The 1.0 port retains the original public names and subclassing contract. Its facade is split into content, layout and lifecycle files while keeping shared presentation state together.
+The UIKit facade exposes views and configuration. Separate owners handle layout constraints, presentation phases, scheduled actions and Progress observation. Review each boundary for clear ownership and a concrete reason to exist.
 
 ## Safety
 
-Use Swift 6 isolation; UI state and callbacks belong to the main actor. Every timer and observer needs an explicit owner. Preserve the reference timing and callback behavior when changing this port.
+Use Swift 6 isolation; UI state and callbacks belong to the main actor. Scheduled actions and observers need explicit owners and cancellation. Preserve the documented timing and callback contracts unless an intentional change is described and covered by regression tests.
 
 No force unwraps, forced casts, force try or hidden concurrency escapes. Handle meaningful failures explicitly. Do not silence compiler warnings or add global mutable state. Discuss any necessary exception in the pull request with a specific safety argument.
 
