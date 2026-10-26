@@ -21,6 +21,7 @@
 - Keep enabled motion effects across repeated presentations and preserve effects added by the caller.
 - Avoid a transient blur view for the solid HUD background and reuse the effect view when its blur material changes.
 - Use native CGFloat precision for circular angles and documented opacity values instead of preserving C float promotion.
+- Prevent duplicate owned backgrounds and blur effects when decoding views; retain caller-added subviews and document restoration with current defaults.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

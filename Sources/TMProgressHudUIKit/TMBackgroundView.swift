@@ -8,6 +8,10 @@ import UIKit
 @MainActor
 @objc(TMBackgroundView)
 open class TMBackgroundView: UIView {
+    private enum ArchiveKeys {
+        static let effectView = "TMBackgroundView.effectView"
+    }
+
     private enum Defaults {
         #if os(tvOS)
             static let blurEffectStyle: UIBlurEffect.Style = .regular
@@ -71,8 +75,17 @@ open class TMBackgroundView: UIView {
     /// Decodes a background and applies the supported Swift background defaults.
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
+        if coder.containsValue(forKey: ArchiveKeys.effectView) {
+            effectView = coder.decodeObject(forKey: ArchiveKeys.effectView) as? UIVisualEffectView
+        }
         clipsToBounds = true
         updateBackground()
+    }
+
+    /// Encodes UIKit view state and identifies the owned effect view without persisting HUD configuration.
+    open override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(effectView, forKey: ArchiveKeys.effectView)
     }
 
     /// The smallest intrinsic size; surrounding content determines the final size.

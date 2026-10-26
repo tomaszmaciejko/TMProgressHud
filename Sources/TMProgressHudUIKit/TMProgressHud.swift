@@ -8,6 +8,11 @@ import UIKit
 @MainActor
 @objc(TMProgressHud)
 open class TMProgressHud: UIView {
+    private enum ArchiveKeys {
+        static let backgroundView = "TMProgressHud.backgroundView"
+        static let bezelView = "TMProgressHud.bezelView"
+    }
+
     /// The displayed indicator/content mode.
     ///
     /// Initially indeterminate.
@@ -143,7 +148,18 @@ open class TMProgressHud: UIView {
     /// Decodes a HUD and initializes the reference content hierarchy.
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
+        for key in [ArchiveKeys.backgroundView, ArchiveKeys.bezelView] {
+            guard coder.containsValue(forKey: key) else { continue }
+            (coder.decodeObject(forKey: key) as? UIView)?.removeFromSuperview()
+        }
         commonInit()
+    }
+
+    /// Encodes UIKit view state and identifies owned views for reconstruction with current defaults.
+    open override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(storedBackgroundView, forKey: ArchiveKeys.backgroundView)
+        coder.encode(storedBezelView, forKey: ArchiveKeys.bezelView)
     }
 
     /// Creates, attaches and shows a HUD that removes itself when hidden.

@@ -50,3 +50,7 @@ Execution on the new minimum iOS 17.0 or tvOS 17.0, physical Apple TV remote inp
 ## Custom progress views
 
 Adopt `TMProgressHudProgressReporting` on a custom `UIView` to receive unnormalized `progress` values in Swift. Built-in indicators use typed updates. Existing custom views exposing Objective-C `setProgress:` continue to work through a compatibility adapter; plain views are also supported without receiving progress.
+
+## View decoding
+
+`init(coder:)` restores a usable UIKit view with current library defaults. HUD text, styling, progress sources, presentation state and callbacks are not a saved-session format; configure them again in the app. Owned backgrounds and effects are reconstructed or reused without duplicating them, while caller-added subviews remain. Archives are not a versioned persistence format across library releases.
