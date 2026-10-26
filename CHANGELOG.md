@@ -18,6 +18,7 @@
 - Use typed indicator updates and add TMProgressHudProgressReporting for Swift custom views; retain legacy custom progress setters.
 - Restore pie drawing when reusing a ring indicator.
 - Make mode, animation and background-style values Sendable for checked transfer between Swift tasks.
+- Keep enabled motion effects across repeated presentations and preserve effects added by the caller.
 - Run GitHub Actions only when manually requested.
 
 ## 1.0.0

@@ -67,7 +67,8 @@ extension TMProgressHud {
     }
 
     func updateBezelMotionEffects() {
-        if areDefaultMotionEffectsEnabled && bezelMotionEffects == nil {
+        if areDefaultMotionEffectsEnabled {
+            guard bezelMotionEffects == nil else { return }
             let horizontal = motionEffect(key: "center.x", type: .tiltAlongHorizontalAxis)
             let vertical = motionEffect(key: "center.y", type: .tiltAlongVerticalAxis)
             let group = UIMotionEffectGroup()

@@ -141,7 +141,7 @@ struct HUDBehaviorTests {
         hud.hide(animated: false)
     }
 
-    @Test func frameLayoutAndMotionFollowReference() {
+    @Test func frameLayoutKeepsEnabledMotionAcrossShow() {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud.showAdded(to: host, animated: false)
         hud.label.text = "Loading"
@@ -165,10 +165,34 @@ struct HUDBehaviorTests {
         hud.areDefaultMotionEffectsEnabled = true
         #expect(hud.bezelView.motionEffects.count == 1)
         hud.show(animated: false)
-        #expect(hud.bezelView.motionEffects.isEmpty)
+        #expect(hud.bezelView.motionEffects.count == 1)
         hud.areDefaultMotionEffectsEnabled = false
         hud.areDefaultMotionEffectsEnabled = false
         #expect(hud.frame == host.bounds)
+        hud.hide(animated: false)
+    }
+
+    @Test func motionEffectsAreIdempotentAndPreserveClientEffects() throws {
+        let hud = TMProgressHud(frame: .zero)
+        let clientEffect = UIInterpolatingMotionEffect(keyPath: "alpha", type: .tiltAlongHorizontalAxis)
+        hud.bezelView.addMotionEffect(clientEffect)
+        hud.areDefaultMotionEffectsEnabled = true
+        let ownEffect = try #require(hud.bezelView.motionEffects.first { $0 !== clientEffect })
+        for _ in 0..<3 {
+            hud.areDefaultMotionEffectsEnabled = true
+            hud.show(animated: false)
+            #expect(hud.bezelView.motionEffects.count == 2)
+            #expect(hud.bezelView.motionEffects.contains { $0 === ownEffect })
+            #expect(hud.bezelView.motionEffects.contains { $0 === clientEffect })
+            hud.hide(animated: false)
+        }
+        hud.areDefaultMotionEffectsEnabled = false
+        hud.areDefaultMotionEffectsEnabled = false
+        hud.show(animated: false)
+        #expect(hud.bezelView.motionEffects.count == 1)
+        #expect(hud.bezelView.motionEffects.first === clientEffect)
+        hud.areDefaultMotionEffectsEnabled = true
+        #expect(hud.bezelView.motionEffects.count == 2)
         hud.hide(animated: false)
     }
 

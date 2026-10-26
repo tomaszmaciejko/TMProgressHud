@@ -67,7 +67,7 @@ open class TMProgressHud: UIView {
             setNeedsUpdateConstraints()
         }
     }
-    /// Enables the reference center tilt effects, initially false.
+    /// Enables center tilt effects, initially false; repeated presentations preserve the enabled effect.
     @objc(defaultMotionEffectsEnabled) open dynamic var areDefaultMotionEffectsEnabled: Bool {
         @objc(areDefaultMotionEffectsEnabled) get { storedMotionEffectsEnabled }
         @objc(setDefaultMotionEffectsEnabled:) set {
