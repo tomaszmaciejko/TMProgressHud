@@ -5,6 +5,24 @@
 import UIKit
 
 extension TMProgressHud {
+    /// Applies a complete content selection before notifying observers or updating the indicator.
+    ///
+    /// Non-custom selections release the retained custom view. Compatibility mode and customView getters
+    /// reflect the selection; their KVO notifications are delivered after both values have been updated.
+    public func setContent(_ content: TMProgressHudContent) {
+        let selection = content.selection
+        var changedKeys: [String] = []
+        if contentSelection.mode != selection.mode { changedKeys.append(#keyPath(TMProgressHud.mode)) }
+        if contentSelection.customView !== selection.customView {
+            changedKeys.append(#keyPath(TMProgressHud.customView))
+        }
+        guard !changedKeys.isEmpty else { return }
+        for key in changedKeys { willChangeValue(forKey: key) }
+        contentSelection = selection
+        updateIndicator()
+        for key in changedKeys.reversed() { didChangeValue(forKey: key) }
+    }
+
     func installContentViews() {
         backgroundView.frame = bounds
         backgroundView.style = .solidColor

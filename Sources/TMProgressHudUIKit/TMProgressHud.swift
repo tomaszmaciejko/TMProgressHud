@@ -10,21 +10,27 @@ import UIKit
 open class TMProgressHud: UIView {
     // MARK: - Content and appearance
 
-    /// The displayed indicator or content mode, initially indeterminate.
-    @objc open dynamic var mode: TMProgressHudMode = .indeterminate {
-        didSet {
-            if oldValue != mode {
-                updateIndicator()
-            }
+    /// The compatibility content mode.
+    ///
+    /// Prefer setContent(_:) for a complete selection.
+    @objc open dynamic var mode: TMProgressHudMode {
+        get { contentSelection.mode }
+        set {
+            guard contentSelection.mode != newValue else { return }
+            contentSelection.mode = newValue
+            updateIndicator()
         }
     }
 
-    /// The caller's custom content, used in customView mode.
+    /// Compatibility custom content.
+    ///
+    /// Prefer setContent(.custom(view)) to select it in one operation.
     @objc open dynamic var customView: UIView? {
-        didSet {
-            if oldValue !== customView && mode == .customView {
-                updateIndicator()
-            }
+        get { contentSelection.customView }
+        set {
+            guard contentSelection.customView !== newValue else { return }
+            contentSelection.customView = newValue
+            if mode == .customView { updateIndicator() }
         }
     }
 
@@ -167,6 +173,7 @@ open class TMProgressHud: UIView {
     private lazy var presentation = HUDPresentation(host: self)
     private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
 
+    var contentSelection: (mode: TMProgressHudMode, customView: UIView?) = (.indeterminate, nil)
     var managedIndicator: HUDIndicator?
     var indicator: UIView? { managedIndicator?.view }
     var bezelMotionEffects: UIMotionEffectGroup?

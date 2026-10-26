@@ -20,6 +20,12 @@ On tvOS the background uses `.regular` blur; iOS uses `.systemThickMaterial`. Th
 
 On both platforms the HUD follows its host size through UIKit autoresizing and synchronizes its frame when attached or reparented. Version 2.0 no longer observes global status-bar orientation notifications. Layout updates preserve constraints added by the caller.
 
+## Complete selections in 2.0
+
+Use `setContent(.custom(view))` to select custom content in one call, or `.activity`, `.pie`, `.ring`, `.bar` and `.text` for built-in content. Compatibility mode/customView getters reflect the completed selection. Non-custom selections clear the retained custom view. The old independent setters preserve their existing behavior.
+
+Use `setProgressSource(.manual(value))` to stop observation before assigning a value, or `.observed(progress)` to select Foundation Progress. The compatibility progress/progressObject setters remain available; their independent use can still combine manual updates with observation.
+
 ## Configuration
 
 The exposed views are the source of truth for text, fonts and individual colors. Mode changes preserve existing view customizations; a newly created indicator inherits `contentColor`. Setting a different non-nil `contentColor` explicitly recolors current content. Setting the same value does nothing.

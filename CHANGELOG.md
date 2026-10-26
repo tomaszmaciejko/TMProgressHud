@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Add complete content selections and explicit manual/observed progress sources while retaining compatibility properties.
+
 - Add one-shot per-request hide completions; consume compatibility callbacks and snapshot delegates before delivery.
 
 - Derive action-button borders and highlights from the active UIKit title color instead of setter order.

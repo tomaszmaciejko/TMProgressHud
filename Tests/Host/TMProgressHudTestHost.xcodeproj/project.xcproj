@@ -163,6 +163,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudContent.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -170,6 +176,12 @@
         },
         {
           "path": "../../Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/TMProgressHudProgressSource.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
           ]
@@ -224,6 +236,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/ConfigurationTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/ContentSelectionTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

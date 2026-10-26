@@ -9,8 +9,8 @@ All HUD presentation APIs are main-actor isolated. Supply the view that owns pre
 ```swift
 let hud = TMProgressHud.showAdded(to: view, animated: true)
 hud.label.text = "Loading"
-hud.mode = .annularDeterminate
-hud.progress = 0.5
+hud.setContent(.ring)
+hud.setProgressSource(.manual(0.5))
 // When the caller's operation completes:
 hud.hide(animated: true)
 ```
@@ -26,9 +26,8 @@ Use UIKit's system appearance through custom content. The HUD forwards progress 
 ```swift
 let progressView = UIProgressView(progressViewStyle: .default)
 progressView.widthAnchor.constraint(equalToConstant: 120).isActive = true
-hud.customView = progressView
-hud.mode = .customView
-hud.progress = 0.5
+hud.setContent(.custom(progressView))
+hud.setProgressSource(.manual(0.5))
 ```
 
 ## Topics

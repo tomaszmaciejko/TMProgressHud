@@ -21,28 +21,29 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
 
     private func verifyDistribution(in host: UIView, identifier: String) {
         var callbacks = 0
-        let modes: [TMProgressHudMode] = [
-            .indeterminate, .determinate, .annularDeterminate,
-            .determinateHorizontalBar, .customView, .text,
+        let scenarios: [(TMProgressHudContent, TMProgressHudMode)] = [
+            (.activity, .indeterminate), (.pie, .determinate), (.ring, .annularDeterminate),
+            (.bar, .determinateHorizontalBar),
+            (.custom(UIView(frame: CGRect(x: 0, y: 0, width: 37, height: 37))), .customView),
+            (.text, .text),
         ]
         var valid = true
-        for mode in modes {
+        for (content, expectedMode) in scenarios {
             let hud = TMProgressHud.showAdded(to: host, animated: false)
-            hud.customView = UIView(frame: CGRect(x: 0, y: 0, width: 37, height: 37))
-            hud.mode = mode
-            hud.progress = 0.5
+            hud.setContent(content)
+            hud.setProgressSource(.manual(0.5))
             hud.label.text = "Distribution verification"
             hud.button.setTitle("Continue", for: .normal)
             hud.button.addAction(UIAction { _ in callbacks += 1 }, for: .primaryActionTriggered)
             host.layoutIfNeeded()
-            valid = valid && hud.superview === host && hud.mode == mode && hud.progress == 0.5
+            valid = valid && hud.superview === host && hud.mode == expectedMode && hud.progress == 0.5
             hud.button.sendActions(for: .primaryActionTriggered)
             hud.hide(animated: false)
             valid = valid && hud.superview == nil
         }
         let receipt: [String: Any] = [
-            "identifier": identifier, "result": valid && callbacks == modes.count ? "passed" : "failed",
-            "modes": modes.count, "primaryActions": callbacks,
+            "identifier": identifier, "result": valid && callbacks == scenarios.count ? "passed" : "failed",
+            "modes": scenarios.count, "primaryActions": callbacks,
         ]
         do {
             let folder = try FileManager.default.url(
@@ -84,15 +85,17 @@ final class HUDDemoViewController: UIViewController {
         stack.axis = .vertical
         stack.spacing = Layout.spacing
         stack.translatesAutoresizingMaskIntoConstraints = false
-        let scenarios: [(String, TMProgressHudMode)] = [
-            ("Activity indicator", .indeterminate), ("Pie progress", .determinate),
-            ("Ring progress", .annularDeterminate), ("Horizontal progress", .determinateHorizontalBar),
-            ("Custom content", .customView), ("Text only", .text),
+        let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
+        let custom = UIImageView(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: configuration))
+        let scenarios: [(String, TMProgressHudContent)] = [
+            ("Activity indicator", .activity), ("Pie progress", .pie),
+            ("Ring progress", .ring), ("Horizontal progress", .bar),
+            ("Custom content", .custom(custom)), ("Text only", .text),
         ]
-        for (title, mode) in scenarios {
+        for (title, content) in scenarios {
             let button = UIButton(configuration: .tinted())
             button.setTitle(title, for: .normal)
-            button.addAction(UIAction { [weak self] _ in self?.show(mode: mode) }, for: .primaryActionTriggered)
+            button.addAction(UIAction { [weak self] _ in self?.show(content: content) }, for: .primaryActionTriggered)
             stack.addArrangedSubview(button)
         }
         view.addSubview(stack)
@@ -103,18 +106,13 @@ final class HUDDemoViewController: UIViewController {
         ])
     }
 
-    private func show(mode: TMProgressHudMode) {
+    private func show(content: TMProgressHudContent) {
         hud?.hide(animated: false)
         let presented = TMProgressHud.showAdded(to: view, animated: true)
-        presented.mode = mode
+        presented.setContent(content)
         presented.label.text = "Loading"
         presented.detailsLabel.text = "An example of the selected HUD style."
-        presented.progress = 0.5
-        if mode == .customView {
-            let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
-            presented.customView = UIImageView(
-                image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: configuration))
-        }
+        presented.setProgressSource(.manual(0.5))
         presented.button.setTitle("Close", for: .normal)
         presented.button.addAction(
             UIAction { [weak presented] _ in presented?.hide(animated: true) }, for: .primaryActionTriggered)

@@ -61,7 +61,7 @@ hud.detailsLabel.text = "Please wait."
 hud.hide(animated: true)
 ```
 
-In development version 2.0, use `hide(animated:completion:)` for a one-shot callback receiving the finished HUD; a superseding show cancels that request. Use the delegate for recurring dismissal notifications.
+Development version 2.0 offers complete selections with `setContent(.ring)` and `setProgressSource(.manual(0.5))`; custom content uses `setContent(.custom(view))`. Use `hide(animated:completion:)` for a one-shot callback receiving the finished HUD; a superseding show cancels that request. Use the delegate for recurring dismissal notifications.
 
 The helper attaches the HUD and removes it when hidden. Use `TMProgressHud(view:)` to configure it before attaching and showing it yourself.
 
