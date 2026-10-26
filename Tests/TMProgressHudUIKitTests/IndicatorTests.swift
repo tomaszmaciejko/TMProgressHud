@@ -109,7 +109,7 @@ struct IndicatorTests {
         #expect(hud.contentColor == UIColor.label.withAlphaComponent(0.7))
         let round = TMRoundProgressView()
         #expect(round.backgroundTintColor == UIColor(white: 1, alpha: 0.1))
-        hud.button.setTitleColor(.green, for: .selected)
+        hud.button.setTitleColor(.green, for: .highlighted)
         hud.button.isHighlighted = true
         #expect(hud.button.backgroundColor == UIColor.green.withAlphaComponent(0.1))
     }

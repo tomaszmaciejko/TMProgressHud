@@ -14,7 +14,7 @@ The published `v1.0.0` and maintenance branch `release/1.x` retain iOS/iPadOS 15
 - Switching between pie and ring updates the reused indicator in both directions.
 - Grace and delayed hide use cancellable, main-actor actions and a monotonic clock. Replacing a pending action cancels the old one. Progress uses KVO while the HUD is presented in a window, with buffered delivery to the main actor. Hiding, detaching or replacing the source ends the previous observation; showing reads the latest value.
 - Fonts have fixed reference sizes. Customize the exposed labels for your app's typography and accessibility needs.
-- The action button has zero intrinsic size until it has both a title and a registered event.
+- The action button has zero intrinsic size until it has both a title and a registered event. Its border and highlight use the active title color, including UIKit fallback when a state color is removed; configuring an inactive state does not recolor the active border.
 
 On tvOS the background uses `.regular` blur; iOS uses `.systemThickMaterial`. The caller manages focus; see the tvOS example.
 

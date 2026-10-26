@@ -98,11 +98,11 @@ struct ArchiveAndButtonTests {
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.green, for: .selected)
         button.isHighlighted = true
-        #expect(button.backgroundColor == UIColor.green.withAlphaComponent(0.1))
+        #expect(button.backgroundColor == UIColor.red.withAlphaComponent(0.1))
         button.isHighlighted = false
         #expect(button.backgroundColor == .clear)
         button.setTitleColor(nil, for: .normal)
-        #expect(button.layer.borderColor == nil)
+        #expect(button.layer.borderColor == UIColor.white.cgColor)
     }
 
     @Test(arguments: [CGFloat(17), 31])
@@ -146,6 +146,41 @@ struct ArchiveAndButtonTests {
         #expect(button.intrinsicContentSize == .zero)
         button.sendActions(for: .primaryActionTriggered)
         #expect(count == 1)
+    }
+
+    @Test func inactiveStateColorsDoNotReplaceTheActiveBorder() {
+        let button = HUDRoundedButtonView(type: .custom)
+        button.setTitleColor(.red, for: .normal)
+        button.setTitleColor(.gray, for: .disabled)
+        button.setTitleColor(.green, for: .selected)
+        button.setTitleColor(.blue, for: .highlighted)
+        #expect(button.currentTitleColor == .red)
+        #expect(button.layer.borderColor == UIColor.red.cgColor)
+        button.isSelected = true
+        #expect(button.layer.borderColor == UIColor.green.cgColor)
+        button.isSelected = false
+        button.isHighlighted = true
+        #expect(button.layer.borderColor == UIColor.blue.cgColor)
+        #expect(button.backgroundColor == UIColor.blue.withAlphaComponent(0.1))
+        button.isHighlighted = false
+        button.isEnabled = false
+        #expect(button.layer.borderColor == UIColor.gray.cgColor)
+        button.isEnabled = true
+        #expect(button.layer.borderColor == UIColor.red.cgColor)
+    }
+
+    @Test func removingAStateColorUsesUIKitFallback() {
+        let button = HUDRoundedButtonView(type: .custom)
+        button.setTitleColor(.red, for: .normal)
+        button.setTitleColor(.green, for: .selected)
+        button.isSelected = true
+        button.setTitleColor(nil, for: .selected)
+        #expect(button.currentTitleColor == .red)
+        #expect(button.layer.borderColor == UIColor.red.cgColor)
+        button.isSelected = false
+        button.setTitleColor(nil, for: .normal)
+        #expect(button.currentTitleColor == .white)
+        #expect(button.layer.borderColor == UIColor.white.cgColor)
     }
 
     private func decodeUnmarkedView<T: UIView>(as type: T.Type) throws -> T {

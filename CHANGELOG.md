@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Derive action-button borders and highlights from the active UIKit title color instead of setter order.
+
 - Draw horizontal bars consistently during partial updates and with shifted bounds.
 
 - Start a reused custom spinner when switching to indeterminate mode.

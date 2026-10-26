@@ -78,20 +78,25 @@ struct TraitAppearanceTests {
         #expect(button.layer.borderColor == archivedBorder)
     }
 
-    @Test func buttonBorderUsesLatestAssignedColorAndCanBeCleared() {
+    @Test func buttonBorderUsesActiveStateColorAndUIKitFallback() {
         let button = HUDRoundedButtonView(frame: .zero)
         button.traitOverrides.userInterfaceStyle = .light
         button.updateTraitsIfNeeded()
         button.setTitleColor(.green, for: .normal)
         button.setTitleColor(adaptiveColor(), for: .selected)
+        #expect(button.layer.borderColor == UIColor.green.cgColor)
+        button.isSelected = true
         button.traitOverrides.userInterfaceStyle = .dark
         button.updateTraitsIfNeeded()
         #expect(button.layer.borderColor == UIColor.white.cgColor)
 
+        button.setTitleColor(nil, for: .selected)
+        #expect(button.layer.borderColor == UIColor.green.cgColor)
+        button.isSelected = false
         button.setTitleColor(nil, for: .normal)
         button.traitOverrides.accessibilityContrast = .high
         button.updateTraitsIfNeeded()
-        #expect(button.layer.borderColor == nil)
+        #expect(button.layer.borderColor == UIColor.white.cgColor)
 
         button.setTitleColor(.blue, for: .normal)
         button.traitOverrides.userInterfaceStyle = .light

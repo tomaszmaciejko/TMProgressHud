@@ -12,8 +12,6 @@ final class HUDRoundedButtonView: UIButton {
         static let highlightAlpha: CGFloat = 0.1
     }
 
-    private var borderColorSource: UIColor?
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureBorder()
@@ -21,13 +19,13 @@ final class HUDRoundedButtonView: UIButton {
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        borderColorSource = layer.borderColor.map(UIColor.init(cgColor:))
         configureBorder()
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = ceil(bounds.height / 2)
+        updateStateAppearance()
     }
 
     override var intrinsicContentSize: CGSize {
@@ -39,29 +37,33 @@ final class HUDRoundedButtonView: UIButton {
 
     override func setTitleColor(_ color: UIColor?, for state: UIControl.State) {
         super.setTitleColor(color, for: state)
-        updateHighlight()
-        borderColorSource = color
-        updateBorderColor()
+        updateStateAppearance()
     }
 
     override var isHighlighted: Bool {
-        didSet { updateHighlight() }
+        didSet { updateStateAppearance() }
+    }
+
+    override var isSelected: Bool {
+        didSet { updateStateAppearance() }
+    }
+
+    override var isEnabled: Bool {
+        didSet { updateStateAppearance() }
     }
 
     private func configureBorder() {
         layer.borderWidth = Metrics.borderWidth
         registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
             (button: HUDRoundedButtonView, _) in
-            button.updateBorderColor()
+            button.updateStateAppearance()
         }
+        updateStateAppearance()
     }
 
-    private func updateBorderColor() {
-        layer.borderColor = borderColorSource?.resolvedColor(with: traitCollection).cgColor
-    }
-
-    private func updateHighlight() {
-        backgroundColor =
-            isHighlighted ? titleColor(for: .selected)?.withAlphaComponent(Metrics.highlightAlpha) : .clear
+    private func updateStateAppearance() {
+        let color = currentTitleColor
+        layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
+        backgroundColor = isHighlighted ? color.withAlphaComponent(Metrics.highlightAlpha) : .clear
     }
 }
