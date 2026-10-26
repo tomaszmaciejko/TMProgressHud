@@ -313,6 +313,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/ConsumerScenarioTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/ContentColorTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
