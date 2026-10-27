@@ -9,11 +9,11 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 - Avoid duplicated behavior, speculative abstractions and unnecessary state.
 - Name domain, layout and timing constants with their meaning and units. Explain non-obvious formulas. Ordinary literals such as zero need no wrapper.
 - Default to private or internal. Public APIs need documentation, deliberate defaults and clear ownership.
-- New customization uses composition and TMProgressHudProgressReporting. New facade methods are not subclass hooks; preserve the existing open surface only for compatibility.
+- New customization uses composition, TMProgressHudProgressReporting or an explicit main-actor progress function. New facade methods are not subclass hooks; preserve the existing open surface only for compatibility.
 
 The UIKit facade exposes views and configuration. Separate owners handle layout constraints, presentation phases, scheduled actions and Progress observation. Review each boundary for clear ownership and a concrete reason to exist.
 
-`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations and adapts arbitrary client views at an explicit boundary. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Selection context is explicit at facade call sites; view provenance does not itself grant legacy progress support.
+`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations and adapts arbitrary client views at an explicit boundary. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Selection context is explicit at facade call sites; reusing a client view preserves its resolved progress operation.
 
 ## Safety
 

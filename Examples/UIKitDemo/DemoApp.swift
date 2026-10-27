@@ -25,10 +25,20 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
 
     private func verifyDistribution(in host: UIView, identifier: String) async {
         var callbacks = 0
+        let customProgressView = UIProgressView(progressViewStyle: .default)
+        customProgressView.widthAnchor.constraint(equalToConstant: 120).isActive = true
+        var customUpdates: [Float] = []
         let scenarios: [(TMProgressHudContent, TMProgressHudMode)] = [
             (.activity, .indeterminate), (.outlinedCircle, .determinate), (.ring, .annularDeterminate),
             (.bar, .determinateHorizontalBar),
-            (.custom(UIView(frame: CGRect(x: 0, y: 0, width: 37, height: 37))), .customView),
+            (
+                .custom(
+                    customProgressView,
+                    updateProgress: {
+                        customUpdates.append($0)
+                        customProgressView.setProgress($0, animated: false)
+                    }), .customView
+            ),
             (.text, .text),
         ]
         var valid = true
@@ -45,6 +55,7 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
             hud.hide(animated: false)
             valid = valid && hud.superview == nil
         }
+        valid = valid && customUpdates == [0, 0.5] && customProgressView.progress == 0.5
         let demo = (window?.rootViewController as? UINavigationController)?.topViewController as? HUDDemoViewController
         let safeAreaLayouts = demo?.verifySafeAreaLayout() ?? 0
         let expectedSafeAreaLayouts = 6

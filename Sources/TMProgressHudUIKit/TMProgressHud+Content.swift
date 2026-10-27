@@ -15,11 +15,14 @@ extension TMProgressHud {
         updateIndicator(context: .compatibilityProperties)
     }
 
-    /// The current indicator selection, including compatibility getter overrides and custom progress policy.
+    /// The current indicator selection, including compatibility getter overrides and its custom progress function.
     ///
     /// Nil represents compatibility custom mode without a view. Text, colors and progress remain independent.
     public var contentConfiguration: TMProgressHudContent? {
-        .init(mode: mode, customView: customView, allowsLegacyProgress: contentSelection.allowsLegacyProgress)
+        let selectedMode = mode
+        let selectedView = customView
+        let updateProgress = selectedView === contentSelection.customView ? contentSelection.updateProgress : nil
+        return .init(mode: selectedMode, customView: selectedView, updateProgress: updateProgress)
     }
 
     /// Applies a complete content selection and updates the indicator.
@@ -35,9 +38,9 @@ extension TMProgressHud {
         if contentSelection.customView !== selection.customView {
             changedKeys.append(#keyPath(TMProgressHud.customView))
         }
-        let policyChanged = contentSelection.allowsLegacyProgress != selection.allowsLegacyProgress
+        let updatesProgressFunction = contentSelection.updateProgress != nil || selection.updateProgress != nil
         let replacesCustomIndicator = selection.mode != .customView && managedIndicator?.origin == .client
-        guard !changedKeys.isEmpty || policyChanged || replacesCustomIndicator else { return }
+        guard !changedKeys.isEmpty || updatesProgressFunction || replacesCustomIndicator else { return }
         for key in changedKeys { willChangeValue(forKey: key) }
         contentSelection = selection
         updateIndicator(context: .completeSelection)

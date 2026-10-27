@@ -3,8 +3,8 @@ import UIKit
 import TMProgressHudUIKit
 
 @MainActor
-private final class ReadbackLegacyView: UIView {
-    @objc var progress: Float = 0
+private final class ReadbackForeignView: UIView {
+    var progress: Double = 0
 }
 
 @MainActor
@@ -42,18 +42,21 @@ struct ContentReadbackTests {
     }
 
     @Test(arguments: [false, true])
-    func savedCustomContentRestoresIdentityAndForwardingPolicy(legacy: Bool) throws {
+    func savedCustomContentRestoresIdentityAndProgressFunction(explicitFunction: Bool) throws {
         let hud = TMProgressHud(frame: .zero)
-        let view = ReadbackLegacyView()
-        hud.setContent(legacy ? .legacyCustom(view) : .custom(view))
+        let view = ReadbackForeignView()
+        let updateProgress: (@MainActor (Float) -> Void)?
+        if explicitFunction {
+            updateProgress = { value in view.progress = Double(value) }
+        } else {
+            updateProgress = nil
+        }
+        hud.setContent(.custom(view, updateProgress: updateProgress))
         let saved = try #require(hud.contentConfiguration)
         switch saved {
-        case .custom(let selected):
-            #expect(!legacy)
+        case .custom(let selected, let callback):
             #expect(selected === view)
-        case .legacyCustom(let selected):
-            #expect(legacy)
-            #expect(selected === view)
+            #expect((callback != nil) == explicitFunction)
         default: Issue.record("Custom selection was not preserved")
         }
         hud.setContent(.text)
@@ -61,7 +64,7 @@ struct ContentReadbackTests {
         hud.setContent(saved)
         #expect(hud.customView === view)
         #expect(view.superview === hud.bezelView)
-        #expect(view.progress == (legacy ? 0.75 : 0))
+        #expect(view.progress == (explicitFunction ? 0.75 : 0))
     }
 
     @Test func emptyCompatibilityCustomModeHasNoCompleteSelection() {
@@ -79,10 +82,27 @@ struct ContentReadbackTests {
 
     @Test func contentReadbackRespectsPublicGetterOverrides() {
         let hud = ReadbackOverrideHud(frame: .zero)
-        guard case .legacyCustom(let selected)? = hud.contentConfiguration else {
+        guard case .custom(let selected, let callback)? = hud.contentConfiguration else {
             Issue.record("Compatibility getters must define the effective selection")
             return
         }
         #expect(selected === hud.suppliedView)
+        #expect(callback == nil)
+    }
+
+    @Test func anOverriddenViewDoesNotInheritAnotherViewsProgressFunction() {
+        let hud = ReadbackOverrideHud(frame: .zero)
+        let requestedView = ReadbackForeignView()
+        hud.setContent(.custom(requestedView, updateProgress: { requestedView.progress = Double($0) }))
+        hud.progress = 0.75
+        guard case .custom(let selected, let callback)? = hud.contentConfiguration else {
+            Issue.record("Expected the effective custom view")
+            return
+        }
+        #expect(selected === hud.suppliedView)
+        #expect(callback == nil)
+        #expect(requestedView.progress == 0)
+        #expect(requestedView.superview == nil)
+        #expect(hud.suppliedView.superview === hud.bezelView)
     }
 }

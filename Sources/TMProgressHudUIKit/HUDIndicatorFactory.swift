@@ -10,18 +10,13 @@ enum HUDIndicatorFactory {
         case compatibilityProperties
     }
 
-    private enum ClientProgressContract {
-        case typed
-        case legacyCompatible
-    }
-
     private enum ViewResolution<View: UIView> {
         case library(View)
-        case compatibilityClient(View)
+        case compatibilityClient(View, updateProgress: HUDIndicator.ProgressUpdater?)
 
         var view: View {
             switch self {
-            case .library(let view), .compatibilityClient(let view): view
+            case .library(let view), .compatibilityClient(let view, _): view
             }
         }
     }
@@ -43,8 +38,8 @@ enum HUDIndicatorFactory {
         case .outlinedCircle: return circularIndicator(reusing: previous, isAnnular: false)
         case .ring: return circularIndicator(reusing: previous, isAnnular: true)
         case .bar: return barIndicator()
-        case .custom(let view): return clientIndicator(for: view, contract: .typed)
-        case .legacyCustom(let view): return clientIndicator(for: view, contract: .legacyCompatible)
+        case .custom(let view, let updateProgress):
+            return clientIndicator(for: view, updateProgress: updateProgress)
         case .text: return nil
         }
     }
@@ -58,7 +53,7 @@ enum HUDIndicatorFactory {
             return .library(previous.view)
         case .client:
             guard context == .compatibilityProperties else { return nil }
-            return .compatibilityClient(previous.view)
+            return .compatibilityClient(previous.view, updateProgress: previous.progressUpdater)
         }
     }
 
@@ -70,7 +65,8 @@ enum HUDIndicatorFactory {
         }
         switch previous {
         case .library: return .library(view)
-        case .compatibilityClient: return .compatibilityClient(view)
+        case .compatibilityClient(_, let updateProgress):
+            return .compatibilityClient(view, updateProgress: updateProgress)
         }
     }
 
@@ -115,26 +111,27 @@ enum HUDIndicatorFactory {
         case .library(let view):
             return HUDIndicator(
                 view: view, origin: .library, progressUpdater: libraryProgressUpdater, colorUpdater: colorUpdater)
-        case .compatibilityClient(let view):
-            return clientIndicator(for: view, contract: .legacyCompatible, colorUpdater: colorUpdater)
+        case .compatibilityClient(let view, let updateProgress):
+            return HUDIndicator(
+                view: view, origin: .client, progressUpdater: updateProgress, colorUpdater: colorUpdater)
         }
     }
 
-    private static func clientIndicator(for view: UIView, contract: ClientProgressContract) -> HUDIndicator {
-        clientIndicator(for: view, contract: contract, colorUpdater: clientColorUpdater(for: view))
-    }
-
     private static func clientIndicator(
-        for view: UIView, contract: ClientProgressContract, colorUpdater: @escaping HUDIndicator.ColorUpdater
+        for view: UIView, updateProgress: HUDIndicator.ProgressUpdater?
     ) -> HUDIndicator {
-        HUDIndicator(
+        let progressUpdater: HUDIndicator.ProgressUpdater?
+        if let updateProgress {
+            progressUpdater = updateProgress
+        } else {
+            progressUpdater = clientProgressUpdater(for: view)
+        }
+        return HUDIndicator(
             view: view, origin: .client,
-            progressUpdater: clientProgressUpdater(for: view, contract: contract), colorUpdater: colorUpdater)
+            progressUpdater: progressUpdater, colorUpdater: clientColorUpdater(for: view))
     }
 
-    private static func clientProgressUpdater(
-        for view: UIView, contract: ClientProgressContract
-    ) -> HUDIndicator.ProgressUpdater? {
+    private static func clientProgressUpdater(for view: UIView) -> HUDIndicator.ProgressUpdater? {
         switch view {
         case let reportingView as any TMProgressHudProgressReporting:
             return { reportingView.progress = $0 }
@@ -145,15 +142,8 @@ enum HUDIndicatorFactory {
         case let nativeProgressView as UIProgressView:
             return { nativeProgressView.progress = $0 }
         default:
-            return legacyProgressUpdater(for: view, contract: contract)
+            return nil
         }
-    }
-
-    private static func legacyProgressUpdater(
-        for view: UIView, contract: ClientProgressContract
-    ) -> HUDIndicator.ProgressUpdater? {
-        guard contract == .legacyCompatible, let adapter = HUDLegacyProgressAdapter(view: view) else { return nil }
-        return { adapter.updateProgress($0) }
     }
 
     private static func clientColorUpdater(for view: UIView) -> HUDIndicator.ColorUpdater {

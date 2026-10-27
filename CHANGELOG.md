@@ -6,7 +6,7 @@
 
 - Require iOS/iPadOS 17+ and tvOS 17+, with Swift 6.0+. Bundled JSON Xcode projects require Xcode 27+.
 - Add complete content, progress-source and layout selections, including content readback, while retaining compatibility properties. Name the outlined circular selection `outlinedCircle`.
-- Add typed custom progress with explicit `legacyCustom` opt-in, separate future/current color operations and one-shot hide completions.
+- Add typed custom progress and explicit `updateProgress` functions for third-party views; remove automatic Objective-C progress setter discovery. Separate future/current color operations and add one-shot hide completions.
 
 ### Behavior and accessibility
 

@@ -4,7 +4,7 @@ import UIKit
 @testable import TMProgressHudUIKit
 
 @MainActor
-private final class CustomProgressView: UIView {
+private final class CustomProgressView: UIView, TMProgressHudProgressReporting {
     @objc dynamic var progress: Float = 0
     override var intrinsicContentSize: CGSize { CGSize(width: 37, height: 37) }
 }

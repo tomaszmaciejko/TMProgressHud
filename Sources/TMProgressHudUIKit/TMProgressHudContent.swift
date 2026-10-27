@@ -13,20 +13,22 @@ public enum TMProgressHudContent {
     case ring
     /// A horizontal progress bar.
     case bar
-    /// Custom content with progress support through the Swift protocol or a recognized native indicator.
-    case custom(UIView)
-    /// Custom content that also opts into the legacy numeric Objective-C progress setter.
-    case legacyCustom(UIView)
+    /// Custom content with an optional main-actor function receiving raw progress synchronously.
+    ///
+    /// The function takes precedence over TMProgressHudProgressReporting and recognized native indicators.
+    /// Without a function, those typed contracts are used. The HUD retains the view and function;
+    /// capture an owner weakly if it also owns the HUD. Selecting a function always reapplies current progress.
+    case custom(UIView, updateProgress: (@MainActor (Float) -> Void)? = nil)
     /// Labels and optional action without an indicator.
     case text
 
     struct Selection {
         var mode: TMProgressHudMode
         var customView: UIView?
-        var allowsLegacyProgress = true
+        var updateProgress: (@MainActor (Float) -> Void)?
     }
 
-    init?(mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool) {
+    init?(mode: TMProgressHudMode, customView: UIView?, updateProgress: (@MainActor (Float) -> Void)?) {
         switch mode {
         case .indeterminate: self = .activity
         case .determinate: self = .outlinedCircle
@@ -35,7 +37,7 @@ public enum TMProgressHudContent {
         case .text: self = .text
         case .customView:
             guard let customView else { return nil }
-            self = allowsLegacyProgress ? .legacyCustom(customView) : .custom(customView)
+            self = .custom(customView, updateProgress: updateProgress)
         }
     }
 
@@ -45,8 +47,8 @@ public enum TMProgressHudContent {
         case .outlinedCircle: .init(mode: .determinate, customView: nil)
         case .ring: .init(mode: .annularDeterminate, customView: nil)
         case .bar: .init(mode: .determinateHorizontalBar, customView: nil)
-        case .custom(let view): .init(mode: .customView, customView: view, allowsLegacyProgress: false)
-        case .legacyCustom(let view): .init(mode: .customView, customView: view)
+        case .custom(let view, let updateProgress):
+            .init(mode: .customView, customView: view, updateProgress: updateProgress)
         case .text: .init(mode: .text, customView: nil)
         }
     }

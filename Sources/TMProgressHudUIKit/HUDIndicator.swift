@@ -16,14 +16,15 @@ struct HUDIndicator {
         case explicit
     }
 
-    typealias ProgressUpdater = (Float) -> Void
+    typealias ProgressUpdater = @MainActor (Float) -> Void
     typealias ColorUpdater = (UIColor?, ColorPolicy) -> Void
 
     let view: UIView
 
     /// Tracks who supplied the view, even after compatibility setters change its mode.
     let origin: Origin
-    private let applyProgress: ProgressUpdater?
+    /// Preserves the resolved operation when compatibility setters reuse a client view.
+    let progressUpdater: ProgressUpdater?
     private let applyColor: ColorUpdater
 
     init(
@@ -32,12 +33,12 @@ struct HUDIndicator {
     ) {
         self.view = view
         self.origin = origin
-        applyProgress = progressUpdater
+        self.progressUpdater = progressUpdater
         applyColor = colorUpdater
     }
 
     func updateProgress(_ progress: Float) {
-        applyProgress?(progress)
+        progressUpdater?(progress)
     }
 
     func updateColor(_ color: UIColor?, policy: ColorPolicy = .compatibility) {

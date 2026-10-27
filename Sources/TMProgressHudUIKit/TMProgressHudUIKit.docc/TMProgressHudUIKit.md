@@ -76,6 +76,20 @@ hud.setContent(.custom(progressView))
 hud.setProgressSource(.manual(0.5))
 ```
 
+## Custom progress functions
+
+For your own views, adopt ``TMProgressHudProgressReporting``. To integrate a view without changing its type, pass a function using its own update API:
+
+```swift
+let progressView = UIProgressView(progressViewStyle: .default)
+progressView.widthAnchor.constraint(equalToConstant: 120).isActive = true
+hud.setContent(.custom(progressView, updateProgress: {
+    progressView.setProgress($0, animated: true)
+}))
+```
+
+The function runs synchronously on the main actor, receives raw progress and overrides protocol/native forwarding. Selecting it always forwards current progress, including when replacing a function on the same view. `.custom(view)` restores typed forwarding. No setter is discovered by name. Saved content retains its function; the HUD releases it when that custom content is replaced. Capture a controller weakly if it also owns the HUD.
+
 ## Accessible presentations
 
 The application chooses accessibility modal scope, focus movement and final-result announcements. Touch blocking and VoiceOver modal scope are independent: a visible HUD handles touches by default, even with a clear background. Setting `isUserInteractionEnabled = false` disables its touch handling, including the action button.

@@ -16,7 +16,9 @@ For the faithful iOS/tvOS 15 port, use [v1.0.0](https://github.com/tomaszmaciejk
 
 Read `contentConfiguration` or `layoutConfiguration` to save and restore those selections. Content readback is nil for compatibility custom mode without a view. Text, progress and individual view styling remain independent.
 
-Custom Swift progress views adopt `TMProgressHudProgressReporting`; native round/bar/spinner views and `UIProgressView` are recognized directly. `.legacyCustom(view)` explicitly opts into numeric, KVC-compliant `setProgress:` forwarding. The old customView/mode setters retain automatic legacy detection. The unreleased content name `.pie` became `.outlinedCircle`; compatibility mode `.determinate` is unchanged.
+Custom Swift progress views adopt `TMProgressHudProgressReporting`; native round/bar views and `UIProgressView` are recognized directly. Adapt other views with `.custom(view, updateProgress: { view.progress = Double($0) })`, using the setter and conversion your view needs. The function runs synchronously on the main actor and takes precedence over protocol/native forwarding. Automatic Objective-C `setProgress:` discovery and the unreleased `.legacyCustom` case are removed, including discovery through `customView`/`mode`.
+
+Content readback retains the function with its view. Selecting an explicit function reapplies current progress even for the same view; selecting `.custom(view)` removes it. Compatibility mode changes retain inactive custom content and its function; assigning a different `customView` clears the old function. The HUD retains custom content, so capture an owner weakly if it also owns the HUD. The unreleased content name `.pie` became `.outlinedCircle`; compatibility mode `.determinate` is unchanged.
 
 ## Intentional behavior changes
 

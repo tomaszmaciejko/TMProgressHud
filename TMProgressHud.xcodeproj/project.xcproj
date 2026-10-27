@@ -44,12 +44,6 @@
       ]
     },
     {
-      "path": "Sources/TMProgressHudUIKit/HUDLegacyProgressAdapter.swift",
-      "target-membership": [
-        "TMProgressHudUIKit/compile-sources"
-      ]
-    },
-    {
       "path": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
