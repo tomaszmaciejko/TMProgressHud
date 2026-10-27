@@ -2,9 +2,43 @@ import Testing
 import UIKit
 @testable import TMProgressHudUIKit
 
+@MainActor
+private final class ReentrantRoundView: TMRoundProgressView {
+    var onStyleChange: (() -> Void)?
+
+    override var isAnnular: Bool {
+        get { super.isAnnular }
+        set {
+            super.isAnnular = newValue
+            let callback = onStyleChange
+            onStyleChange = nil
+            callback?()
+        }
+    }
+}
+
 @Suite(.serialized)
 @MainActor
 struct ContentSelectionTests {
+    @Test(arguments: [false, true])
+    func styleCallbackCanReplaceTheInFlightSelection(selectBar: Bool) throws {
+        let hud = TMProgressHud(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        let custom = ReentrantRoundView()
+        hud.setContent(.custom(custom))
+        custom.onStyleChange = { hud.setContent(selectBar ? .bar : .text) }
+        hud.mode = .annularDeterminate
+        #expect(hud.mode == (selectBar ? .determinateHorizontalBar : .text))
+        #expect(hud.customView == nil)
+        #expect(custom.superview == nil)
+        if selectBar {
+            let bar = try #require(hud.indicator as? TMBarProgressView)
+            #expect(bar.superview === hud.bezelView)
+        } else {
+            try #require(hud.indicator == nil)
+        }
+        hud.layoutIfNeeded()
+    }
+
     @Test func completeSelectionsMapToCompatibilityModes() {
         let hud = TMProgressHud(frame: .zero)
         for (selection, mode) in [

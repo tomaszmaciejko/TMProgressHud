@@ -190,6 +190,7 @@ open class TMProgressHud: UIView {
     var layoutPreferences = HUDLayoutPreferences()
     var contentSelection = TMProgressHudContent.Selection(mode: .indeterminate, customView: nil)
     lazy var motionSettings = HUDMotionSettings { [weak self] in self?.updateBezelMotionEffects() }
+    var indicatorUpdateGeneration = UUID()
     var managedIndicator: HUDIndicator?
     var indicator: UIView? { managedIndicator?.view }
     var bezelMotionEffects: UIMotionEffectGroup?
