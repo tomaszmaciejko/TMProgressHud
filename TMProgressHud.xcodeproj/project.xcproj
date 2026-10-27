@@ -26,6 +26,18 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDClientIndicatorAdapter.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDIndicatorConstruction.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDIndicatorFactory.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"

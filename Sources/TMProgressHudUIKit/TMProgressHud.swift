@@ -18,7 +18,7 @@ open class TMProgressHud: UIView {
         set {
             guard contentSelection.mode != newValue else { return }
             contentSelection.mode = newValue
-            updateIndicator(context: .compatibilityProperties)
+            updateIndicator(reusePolicy: .includingClientViews)
         }
     }
 
@@ -31,7 +31,7 @@ open class TMProgressHud: UIView {
             guard contentSelection.customView !== newValue else { return }
             contentSelection.customView = newValue
             contentSelection.updateProgress = nil
-            if mode == .customView { updateIndicator(context: .compatibilityProperties) }
+            if mode == .customView { updateIndicator(reusePolicy: .includingClientViews) }
         }
     }
 
