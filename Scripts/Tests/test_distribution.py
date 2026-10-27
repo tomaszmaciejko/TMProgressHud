@@ -166,7 +166,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_runtime_requires_every_scenario_and_always_cleans_up(self):
         plan = self.plan("spm", "--platform", "ios", "--simulator-id", "chosen-device")
-        expected = {"result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3}
+        expected = {"result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3, "appearanceColors": 5}
         outcomes = [expected]
         for key in expected:
             missing = dict(expected)

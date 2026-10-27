@@ -19,7 +19,7 @@ POD_NAME = "TMProgressHudUIKit"
 RECEIPT_ATTEMPTS = 80
 RECEIPT_INTERVAL_SECONDS = 0.25
 EXPECTED_RUNTIME_SCENARIOS = {
-    "result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3,
+    "result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3, "appearanceColors": 5,
 }
 
 

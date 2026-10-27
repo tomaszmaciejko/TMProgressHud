@@ -50,13 +50,15 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
         let expectedSafeAreaLayouts = 6
         let operationPaths = await demo?.verifyOperationPaths() ?? 0
         let expectedOperationPaths = 3
+        let appearanceColors = verifyAppearanceColors()
+        let expectedAppearanceColors = 5
         let receipt: [String: Any] = [
             "identifier": identifier,
             "result": valid && callbacks == scenarios.count && safeAreaLayouts == expectedSafeAreaLayouts
-                && operationPaths == expectedOperationPaths
+                && operationPaths == expectedOperationPaths && appearanceColors == expectedAppearanceColors
                 ? "passed" : "failed",
             "modes": scenarios.count, "primaryActions": callbacks,
-            "safeAreaLayouts": safeAreaLayouts, "operationPaths": operationPaths,
+            "safeAreaLayouts": safeAreaLayouts, "operationPaths": operationPaths, "appearanceColors": appearanceColors,
         ]
         do {
             let folder = try FileManager.default.url(
@@ -66,6 +68,40 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
         } catch {
             NSLog("TMProgressHud distribution verification could not save its receipt: %@", error.localizedDescription)
         }
+    }
+
+    // Runs last in the disposable consumer process; no global appearance registration reaches other tests.
+    private func verifyAppearanceColors() -> Int {
+        UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [TMProgressHud.self]).color = .purple
+        let circleAppearance = TMRoundProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+        circleAppearance.progressTintColor = .red
+        circleAppearance.backgroundTintColor = .green
+        let barAppearance = TMBarProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+        barAppearance.progressColor = .blue
+        barAppearance.lineColor = .yellow
+
+        let hud = TMProgressHud(frame: .zero)
+        var checked = 0
+        if let spinner = hud.bezelView.subviews.compactMap({ $0 as? UIActivityIndicatorView }).first,
+            spinner.color == .purple
+        {
+            checked += 1
+        }
+        hud.setContent(.ring)
+        guard let circle = hud.bezelView.subviews.compactMap({ $0 as? TMRoundProgressView }).first else { return 0 }
+        if circle.progressTintColor == .red { checked += 1 }
+        if circle.backgroundTintColor == .green { checked += 1 }
+        hud.applyContentColor(.clear)
+        guard circle.progressTintColor == .clear,
+            circle.backgroundTintColor.resolvedColor(with: hud.traitCollection).cgColor.alpha == 0
+        else { return 0 }
+        hud.setContent(.bar)
+        guard let bar = hud.bezelView.subviews.compactMap({ $0 as? TMBarProgressView }).first else { return 0 }
+        if bar.progressColor == .blue { checked += 1 }
+        if bar.lineColor == .yellow { checked += 1 }
+        hud.applyContentColor(.clear)
+        guard bar.progressColor == .clear, bar.lineColor == .clear else { return 0 }
+        return checked
     }
 }
 

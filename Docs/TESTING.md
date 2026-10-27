@@ -45,9 +45,9 @@ Line coverage is a floor. The suites also check observable contracts independent
 | Long and localized text, Dynamic Type and traits | `TextReadabilityTests`, `TraitAppearanceTests` |
 | Timing, cancellation, repeated presentation and callbacks | `SchedulingTests`, `CompletionLifecycleTests`, `ConsumerScenarioTests` |
 | Reduced motion and progress announcements | `MotionPolicyTests`, `ProgressAccessibilityTests` |
-| Actual installed consumer | Six modes/actions, six safe-area layouts, operation success/failure/cancellation |
+| Actual installed consumer | Six modes/actions, six safe-area layouts, operation success/failure/cancellation and five registered appearance colors |
 
-The consumer uses the same example controller across distribution channels. Its scenario receipt must be complete before a runtime check passes. Resource bytes, deployment target and resource-bundle signability are checked separately; the signability dry run needs no certificate and does not modify the bundle.
+Appearance colors are registered last in a disposable consumer process to keep global UIKit state isolated from other tests. The consumer uses the same example controller across distribution channels. Its scenario receipt must be complete before a runtime check passes. Resource bytes, deployment target and resource-bundle signability are checked separately; the signability dry run needs no certificate and does not modify the bundle.
 
 VoiceOver navigation and focus, visual review and physical Apple TV behavior require separate manual checks. Automated accessibility property assertions do not qualify those experiences.
 

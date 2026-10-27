@@ -10,6 +10,8 @@
 
 ### Behavior and accessibility
 
+- Honor custom progress protocols on activity-indicator subclasses and keep newer content selections made during custom-view configuration.
+
 - Make presentation callbacks single-use, reject obsolete work, use monotonic timing and stop observing Progress when hidden or detached.
 - Preserve client constraints and customizations, keep caller-provided indicators separate from built-ins, and collapse hidden content.
 - Follow Dynamic Type, Reduce Motion and Reduce Transparency; expose localized progress values. Wrap status text and support attributed, image, state-specific and configuration-based action content.
