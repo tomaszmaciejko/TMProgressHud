@@ -5,6 +5,34 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct ContentColorTests {
+    @Test func disabledBulkColorPreservesCustomStylesAndUIKitDefault() {
+        let hud = TMProgressHud(frame: .zero)
+        hud.contentColor = nil
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.color = .purple
+        hud.setContent(.custom(spinner))
+        #expect(spinner.color == .purple)
+
+        let circle = TMRoundProgressView()
+        circle.progressTintColor = .blue
+        circle.backgroundTintColor = .green
+        hud.setContent(.custom(circle))
+        #expect(circle.progressTintColor == .blue)
+        #expect(circle.backgroundTintColor == .green)
+
+        let bar = TMBarProgressView()
+        bar.progressColor = .orange
+        bar.lineColor = .yellow
+        hud.setContent(.custom(bar))
+        #expect(bar.progressColor == .orange)
+        #expect(bar.lineColor == .yellow)
+
+        spinner.color = nil
+        let systemColor = spinner.color
+        hud.setContent(.custom(spinner))
+        #expect(spinner.color == systemColor)
+    }
+
     @Test func defaultsOnlyAffectNewIndicatorsAndExplicitApplicationCanBeRepeated() throws {
         let hud = TMProgressHud(frame: .zero)
         hud.label.textColor = .yellow

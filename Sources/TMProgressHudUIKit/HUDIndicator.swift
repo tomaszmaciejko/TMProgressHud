@@ -130,32 +130,57 @@ struct HUDIndicator {
 
     private static func activityColorUpdater(for view: UIActivityIndicatorView) -> ColorUpdater {
         { color, policy in
-            view.color =
-                registeredAppearanceColor(for: .activityColor, policy: policy)
-                ?? color ?? view.color
+            let selectedColor: UIColor?
+            if let preferredColor = preferredColor(for: .activityColor, policy: policy, suppliedColor: color) {
+                selectedColor = preferredColor
+            } else {
+                selectedColor = view.color
+            }
+            view.color = selectedColor
         }
     }
 
     private static func circularColorUpdater(for view: TMRoundProgressView) -> ColorUpdater {
         { color, policy in
-            view.progressTintColor =
-                registeredAppearanceColor(for: .circleProgressColor, policy: policy)
-                ?? color ?? view.progressTintColor
-            view.backgroundTintColor =
-                registeredAppearanceColor(for: .circleTrackColor, policy: policy)
-                ?? circularTrackColor(from: color, opacity: policy.trackOpacity) ?? view.backgroundTintColor
+            view.progressTintColor = resolveColor(
+                for: .circleProgressColor, policy: policy,
+                suppliedColor: color, fallback: view.progressTintColor)
+            view.backgroundTintColor = resolveColor(
+                for: .circleTrackColor, policy: policy,
+                suppliedColor: circularTrackColor(from: color, opacity: policy.trackOpacity),
+                fallback: view.backgroundTintColor)
         }
     }
 
     private static func barColorUpdater(for view: TMBarProgressView) -> ColorUpdater {
         { color, policy in
-            view.progressColor =
-                registeredAppearanceColor(for: .barProgressColor, policy: policy)
-                ?? color ?? view.progressColor
-            view.lineColor =
-                registeredAppearanceColor(for: .barOutlineColor, policy: policy)
-                ?? color ?? view.lineColor
+            view.progressColor = resolveColor(
+                for: .barProgressColor, policy: policy,
+                suppliedColor: color, fallback: view.progressColor)
+            view.lineColor = resolveColor(
+                for: .barOutlineColor, policy: policy,
+                suppliedColor: color, fallback: view.lineColor)
         }
+    }
+
+    // Evaluate supplied and current colors only when earlier sources provide no color.
+    private static func resolveColor(
+        for property: AppearanceProperty, policy: ColorPolicy,
+        suppliedColor: @autoclosure () -> UIColor?, fallback: @autoclosure () -> UIColor
+    ) -> UIColor {
+        if let preferredColor = preferredColor(for: property, policy: policy, suppliedColor: suppliedColor()) {
+            return preferredColor
+        }
+        return fallback()
+    }
+
+    private static func preferredColor(
+        for property: AppearanceProperty, policy: ColorPolicy, suppliedColor: @autoclosure () -> UIColor?
+    ) -> UIColor? {
+        if let appearanceColor = registeredAppearanceColor(for: property, policy: policy) {
+            return appearanceColor
+        }
+        return suppliedColor()
     }
 
     private static func progressUpdater(for view: UIView, allowsLegacyProgress: Bool) -> ProgressUpdater? {
