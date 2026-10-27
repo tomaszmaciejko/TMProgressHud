@@ -50,15 +50,37 @@ final class HUDRoundedButtonView: UIButton {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        layer.cornerRadius = ceil(bounds.height / 2)
+        layer.cornerRadius = configuration == nil ? ceil(bounds.height / 2) : 0
         updateStateAppearance()
     }
 
     override var intrinsicContentSize: CGSize {
-        guard !allControlEvents.isEmpty, !(title(for: .normal) ?? "").isEmpty else { return .zero }
+        guard !allControlEvents.isEmpty else { return .zero }
         var size = super.intrinsicContentSize
-        size.width += Metrics.horizontalPadding
+        let hasContent =
+            !(currentTitle ?? "").isEmpty || !(currentAttributedTitle?.string ?? "").isEmpty
+            || currentImage != nil || !(configuration?.title ?? "").isEmpty
+            || configuration?.image != nil || !(configuration?.subtitle ?? "").isEmpty
+            || configuration?.showsActivityIndicator == true
+        guard hasContent else { return .zero }
+        if configuration == nil { size.width += Metrics.horizontalPadding }
         return size
+    }
+
+    // UIKit may treat nil as unchanged after removing a configuration, but our empty size must refresh.
+    override func setTitle(_ title: String?, for state: UIControl.State) {
+        super.setTitle(title, for: state)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func setAttributedTitle(_ title: NSAttributedString?, for state: UIControl.State) {
+        super.setAttributedTitle(title, for: state)
+        invalidateIntrinsicContentSize()
+    }
+
+    override func setImage(_ image: UIImage?, for state: UIControl.State) {
+        super.setImage(image, for: state)
+        invalidateIntrinsicContentSize()
     }
 
     override func setTitleColor(_ color: UIColor?, for state: UIControl.State) {
@@ -66,20 +88,29 @@ final class HUDRoundedButtonView: UIButton {
         updateStateAppearance()
     }
 
+    override func updateConfiguration() {
+        super.updateConfiguration()
+        updateContentState()
+    }
+
     override var isHighlighted: Bool {
-        didSet { updateStateAppearance() }
+        didSet { updateContentState() }
     }
 
     override var isSelected: Bool {
-        didSet { updateStateAppearance() }
+        didSet { updateContentState() }
     }
 
     override var isEnabled: Bool {
-        didSet { updateStateAppearance() }
+        didSet { updateContentState() }
+    }
+
+    private func updateContentState() {
+        invalidateIntrinsicContentSize()
+        updateStateAppearance()
     }
 
     private func configureBorder() {
-        layer.borderWidth = Metrics.borderWidth
         registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
             (button: HUDRoundedButtonView, _) in
             button.updateStateAppearance()
@@ -88,6 +119,12 @@ final class HUDRoundedButtonView: UIButton {
     }
 
     private func updateStateAppearance() {
+        layer.borderWidth = configuration == nil ? Metrics.borderWidth : 0
+        guard configuration == nil else {
+            layer.borderColor = nil
+            backgroundColor = .clear
+            return
+        }
         let color = currentTitleColor
         layer.borderColor = color.resolvedColor(with: traitCollection).cgColor
         backgroundColor = isHighlighted ? color.withAlphaComponent(Metrics.highlightAlpha) : .clear

@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Support attributed, image and state-specific action content; respect caller-provided UIButton configurations.
+
 - Keep caller-provided custom indicators separate from built-in content in the new selection API.
 
 - Update an already displayed action button and its spacing when actions are registered or removed.
