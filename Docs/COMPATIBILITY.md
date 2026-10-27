@@ -23,7 +23,7 @@ On both platforms the HUD follows its host size through UIKit autoresizing and s
 
 ## Complete selections in 2.0
 
-Use `setContent(.custom(view))` to select custom content in one call, or `.activity`, `.pie`, `.ring`, `.bar` and `.text` for built-in content. Compatibility mode/customView getters reflect the completed selection. Non-custom selections clear the retained custom view. The old independent setters preserve their existing behavior.
+Use `setContent(.custom(view))` to select custom content in one call, or `.activity`, `.pie`, `.ring`, `.bar` and `.text` for built-in content. Compatibility mode/customView getters reflect the completed selection. Non-custom selections clear and detach custom content, including caller-provided native indicators. Only library-created indicators are reused by the new selection API. The old independent setters preserve their existing behavior.
 
 Use `setProgressSource(.manual(value))` to stop observation before assigning a value, or `.observed(progress)` to select Foundation Progress. The compatibility progress/progressObject setters remain available; their independent use can still combine manual updates with observation.
 

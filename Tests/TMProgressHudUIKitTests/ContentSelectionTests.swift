@@ -92,4 +92,76 @@ struct ContentSelectionTests {
         hud.setProgressSource(.observed(source))
         #expect(hud.progress == 0.9)
     }
+
+    @Test(arguments: [false, true])
+    func completeBuiltInSelectionDoesNotAdoptCustomIndicator(useSpinner: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        let custom: UIView
+        if useSpinner {
+            custom = UIActivityIndicatorView(style: .medium)
+        } else {
+            custom = TMRoundProgressView()
+        }
+        hud.setContent(.custom(custom))
+        hud.setContent(useSpinner ? .activity : .ring)
+        hud.updateConstraintsIfNeeded()
+        #expect(hud.customView == nil)
+        #expect(custom.superview == nil)
+        if let spinner = custom as? UIActivityIndicatorView {
+            #expect(!spinner.isAnimating)
+        } else if let round = custom as? TMRoundProgressView {
+            #expect(!round.isAnnular)
+        }
+    }
+
+    @Test(arguments: [false, true])
+    func completeBuiltInSelectionReleasesCustomNativeIndicator(useSpinner: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        weak var released: UIView?
+        autoreleasepool {
+            let custom: UIView = useSpinner ? UIActivityIndicatorView(style: .medium) : TMRoundProgressView()
+            released = custom
+            hud.setContent(.custom(custom))
+            hud.updateConstraintsIfNeeded()
+            hud.setContent(useSpinner ? .activity : .ring)
+            hud.updateConstraintsIfNeeded()
+        }
+        #expect(released == nil)
+    }
+
+    @Test func completeSelectionsReuseLibraryOwnedCircularIndicator() {
+        let hud = TMProgressHud(frame: .zero)
+        hud.setContent(.ring)
+        let round = hud.indicator as? TMRoundProgressView
+        round?.progressTintColor = .green
+        hud.setContent(.pie)
+        #expect(hud.indicator === round)
+        #expect(round?.isAnnular == false)
+        #expect(round?.progressTintColor == .green)
+    }
+
+    @Test func completeSelectionReleasesCustomIndicatorAfterCompatibilityReuse() {
+        let hud = TMProgressHud(frame: .zero)
+        let custom = TMRoundProgressView()
+        hud.setContent(.custom(custom))
+        hud.mode = .determinate
+        #expect(hud.indicator === custom)
+        hud.customView = nil
+        hud.setContent(.ring)
+        #expect(custom.superview == nil)
+        #expect(!custom.isAnnular)
+    }
+
+    @Test func equalSelectionEndsCompatibilityAdoptionOfCustomIndicator() {
+        let hud = TMProgressHud(frame: .zero)
+        let custom = TMRoundProgressView()
+        hud.setContent(.custom(custom))
+        hud.mode = .annularDeterminate
+        #expect(hud.indicator === custom)
+        hud.customView = nil
+        hud.setContent(.ring)
+        #expect(custom.superview == nil)
+        #expect(hud.indicator !== custom)
+    }
+
 }
