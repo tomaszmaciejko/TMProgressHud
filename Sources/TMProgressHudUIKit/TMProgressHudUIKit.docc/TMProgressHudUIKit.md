@@ -19,6 +19,24 @@ The convenience helper removes the HUD on hide. To configure grace time, create 
 
 Progress values are forwarded without clamping. A new show supersedes unfinished hiding; completion and delegate callbacks run once per completed presentation. A Progress source is observed only while the HUD is presented in a window. The caller can customize the exposed labels and custom UIView content.
 
+## Saving content and applying colors
+
+Read `contentConfiguration` to restore an indicator after temporarily displaying another selection. It is nil only for compatibility custom mode without a view. Message text and progress are independent.
+
+```swift
+let previousContent = hud.contentConfiguration
+hud.setContent(.text)
+// Restore when appropriate:
+if let previousContent { hud.setContent(previousContent) }
+```
+
+Set `defaultIndicatorColor` for future indicators and call `applyContentColor(_:)` to recolor current views. Individual view customizations remain available; there is no single color describing all customized content.
+
+```swift
+hud.defaultIndicatorColor = .systemBlue
+hud.applyContentColor(.systemBlue)
+```
+
 ## Position and spacing
 
 Select physical edges without numeric offsets. Insets refer to the host bounds; minimum size and square preference remain separate.

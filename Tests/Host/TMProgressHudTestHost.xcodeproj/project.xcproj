@@ -331,6 +331,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/ContentReadbackTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/ContentSelectionTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"

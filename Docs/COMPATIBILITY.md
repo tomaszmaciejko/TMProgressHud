@@ -25,7 +25,7 @@ On both platforms the HUD follows its host size through UIKit autoresizing and s
 
 The unreleased Swift content case formerly named `.pie` is now `.outlinedCircle`, matching its appearance. The compatibility mode remains `.determinate`.
 
-Use `setContent(.custom(view))` to select custom content in one call, or `.activity`, `.outlinedCircle`, `.ring`, `.bar` and `.text` for built-in content. Compatibility mode/customView getters reflect the completed selection. Non-custom selections clear and detach custom content, including caller-provided native indicators. Only library-created indicators are reused by the new selection API. The old independent setters preserve their existing behavior.
+Use `setContent(.custom(view))` to select custom content in one call, or `.activity`, `.outlinedCircle`, `.ring`, `.bar` and `.text` for built-in content. Compatibility mode/customView getters reflect the completed selection. Non-custom selections clear and detach custom content, including caller-provided native indicators. Only library-created indicators are reused by the new selection API. The old independent setters preserve their existing behavior. Read contentConfiguration to save and restore the current selection, including custom progress policy. It returns nil for compatibility custom mode without a view, and reads the public getter overrides. Text, colors and progress are configured independently.
 
 Use `setProgressSource(.manual(value))` to stop observation before assigning a value, or `.observed(progress)` to select Foundation Progress. The compatibility progress/progressObject setters remain available; their independent use can still combine manual updates with observation.
 

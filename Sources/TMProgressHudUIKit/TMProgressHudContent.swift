@@ -26,6 +26,19 @@ public enum TMProgressHudContent {
         var allowsLegacyProgress = true
     }
 
+    init?(mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool) {
+        switch mode {
+        case .indeterminate: self = .activity
+        case .determinate: self = .outlinedCircle
+        case .annularDeterminate: self = .ring
+        case .determinateHorizontalBar: self = .bar
+        case .text: self = .text
+        case .customView:
+            guard let customView else { return nil }
+            self = allowsLegacyProgress ? .legacyCustom(customView) : .custom(customView)
+        }
+    }
+
     var selection: Selection {
         switch self {
         case .activity: .init(mode: .indeterminate, customView: nil)

@@ -15,6 +15,13 @@ extension TMProgressHud {
         updateIndicator()
     }
 
+    /// The current indicator selection, including compatibility getter overrides and custom progress policy.
+    ///
+    /// Nil represents compatibility custom mode without a view. Text, colors and progress remain independent.
+    public var contentConfiguration: TMProgressHudContent? {
+        .init(mode: mode, customView: customView, allowsLegacyProgress: contentSelection.allowsLegacyProgress)
+    }
+
     /// Applies a complete content selection before notifying observers or updating the indicator.
     ///
     /// Non-custom selections release the retained custom view. Compatibility mode and customView getters
