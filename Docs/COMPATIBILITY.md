@@ -49,7 +49,7 @@ The compatibility `contentColor` property retains its earlier combined behavior 
 
 Built-in pie, ring and bar views expose a localized percentage as their accessibility value. Finite values are bounded to 0...100 percent for this description only; raw progress remains unchanged. Nonfinite values have no numeric description. No per-update announcements are posted.
 
-Set accessibilityLanguage, accessibilityLabel or an application-specific accessibilityValue when needed. Setting accessibilityValue back to nil restores the automatic percentage. Custom content keeps its own accessibility semantics; adopting the progress protocol does not replace its label, value or traits. Actual VoiceOver interaction remains a separate manual check.
+Set accessibilityLanguage, accessibilityLabel or an application-specific accessibilityValue when needed. Setting accessibilityValue back to nil restores the automatic percentage. Custom content keeps its own accessibility semantics; adopting the progress protocol does not replace its label, value or traits. The application owns accessibility modal scope, focus and final announcements; touch blocking does not set VoiceOver modal scope. See the DocC accessible-presentation guide and UIKit example. Actual VoiceOver interaction remains a separate manual check.
 
 ## Background accessibility in 2.0
 

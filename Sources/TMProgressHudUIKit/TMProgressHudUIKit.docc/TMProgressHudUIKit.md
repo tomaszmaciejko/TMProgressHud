@@ -76,6 +76,14 @@ hud.setContent(.custom(progressView))
 hud.setProgressSource(.manual(0.5))
 ```
 
+## Accessible presentations
+
+The application chooses accessibility modal scope, focus movement and final-result announcements. Touch blocking and VoiceOver modal scope are independent: a visible HUD handles touches by default, even with a clear background. Setting `isUserInteractionEnabled = false` disables its touch handling, including the action button.
+
+For blocking operations, opt into `accessibilityViewIsModal`. Post a screen-change notification when the HUD is visible, and restore the initiating control after the per-request hide completion. The UIKit example owns this policy: with VoiceOver running it uses zero-grace, nonanimated presentation and [`AccessibilityNotification.ScreenChanged`](https://developer.apple.com/documentation/accessibility/accessibilitynotification/screenchanged), available from iOS/tvOS 17. The library does not move focus automatically.
+
+Built-in progress views expose percentages without posting per-update announcements. Announce a meaningful final result once at the application level. Custom content retains its own accessibility labels, values and traits. An actual VoiceOver session remains a separate manual qualification step.
+
 ## Topics
 
 ### Presentation

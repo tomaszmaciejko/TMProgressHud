@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Clarify application-owned accessibility modal scope, focus and final announcements in the UIKit example.
+
 - Show adaptive safe-area placement in the UIKit example.
 
 - Read and restore the selected indicator through contentConfiguration, including typed or legacy custom forwarding.

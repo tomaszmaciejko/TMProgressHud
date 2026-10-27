@@ -1,3 +1,4 @@
+import Accessibility
 import TMProgressHudUIKit
 import UIKit
 
@@ -100,7 +101,10 @@ final class HUDDemoViewController: UIViewController {
         for (title, content) in scenarios {
             let button = UIButton(configuration: .tinted())
             button.setTitle(title, for: .normal)
-            button.addAction(UIAction { [weak self] _ in self?.show(content: content) }, for: .primaryActionTriggered)
+            button.addAction(
+                UIAction { [weak self, weak button] _ in
+                    self?.show(content: content, returnFocusTo: button)
+                }, for: .primaryActionTriggered)
             stack.addArrangedSubview(button)
         }
         let bottomExample = UIButton(configuration: .tinted())
@@ -135,11 +139,13 @@ final class HUDDemoViewController: UIViewController {
     }
 
     private func show(
-        content: TMProgressHudContent, position: TMProgressHudPosition = .init(), animated: Bool = true
+        content: TMProgressHudContent, position: TMProgressHudPosition = .init(), animated: Bool = true,
+        returnFocusTo source: UIView? = nil
     ) {
         hud?.hide(animated: false)
         let presented = TMProgressHud(view: view)
         presented.removeFromSuperViewOnHide = true
+        presented.accessibilityViewIsModal = true
         presented.setLayout(.init(position: position, hostInsets: safeAreaHostInsets))
         presented.setContent(content)
         presented.label.text = "Loading"
@@ -147,14 +153,31 @@ final class HUDDemoViewController: UIViewController {
         presented.setProgressSource(.manual(0.5))
         presented.button.setTitle("Close", for: .normal)
         presented.button.addAction(
-            UIAction { [weak presented] _ in presented?.hide(animated: true) }, for: .primaryActionTriggered)
+            UIAction { [weak self, weak presented, weak source] _ in
+                guard let presented else { return }
+                self?.dismiss(presented, returningFocusTo: source)
+            }, for: .primaryActionTriggered)
         view.addSubview(presented)
         hud = presented
-        presented.show(animated: animated)
+        let voiceOver = UIAccessibility.isVoiceOverRunning
+        presented.show(animated: animated && !voiceOver)
+        if voiceOver {
+            AccessibilityNotification.ScreenChanged(presented.button).post()
+        }
         #if os(tvOS)
             setNeedsFocusUpdate()
             updateFocusIfNeeded()
         #endif
+    }
+
+    private func dismiss(_ presented: TMProgressHud, returningFocusTo source: UIView?) {
+        presented.hide(animated: true) { [weak self, weak source] _ in
+            if UIAccessibility.isVoiceOverRunning {
+                AccessibilityNotification.ScreenChanged(source).post()
+            }
+            self?.setNeedsFocusUpdate()
+            self?.updateFocusIfNeeded()
+        }
     }
 
     // Invoked only by the distribution consumer's explicit verification mode.
