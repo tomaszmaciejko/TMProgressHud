@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Name the new circular content selection outlinedCircle to match its outline-and-arc appearance.
+
 - Wrap primary status messages at large text sizes and define tail truncation for default action titles.
 
 - Collapse hidden content without changing caller-owned constraints, restoring its layout when shown.

@@ -22,7 +22,7 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
     private func verifyDistribution(in host: UIView, identifier: String) {
         var callbacks = 0
         let scenarios: [(TMProgressHudContent, TMProgressHudMode)] = [
-            (.activity, .indeterminate), (.pie, .determinate), (.ring, .annularDeterminate),
+            (.activity, .indeterminate), (.outlinedCircle, .determinate), (.ring, .annularDeterminate),
             (.bar, .determinateHorizontalBar),
             (.custom(UIView(frame: CGRect(x: 0, y: 0, width: 37, height: 37))), .customView),
             (.text, .text),
@@ -88,7 +88,7 @@ final class HUDDemoViewController: UIViewController {
         let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
         let custom = UIImageView(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: configuration))
         let scenarios: [(String, TMProgressHudContent)] = [
-            ("Activity indicator", .activity), ("Circular progress", .pie),
+            ("Activity indicator", .activity), ("Circular progress", .outlinedCircle),
             ("Ring progress", .ring), ("Horizontal progress", .bar),
             ("Custom content", .custom(custom)), ("Text only", .text),
         ]

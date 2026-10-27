@@ -9,7 +9,7 @@ struct ContentSelectionTests {
         let hud = TMProgressHud(frame: .zero)
         for (selection, mode) in [
             (TMProgressHudContent.activity, TMProgressHudMode.indeterminate),
-            (.pie, .determinate), (.ring, .annularDeterminate),
+            (.outlinedCircle, .determinate), (.ring, .annularDeterminate),
             (.bar, .determinateHorizontalBar), (.text, .text),
         ] {
             hud.setContent(selection)
@@ -134,7 +134,7 @@ struct ContentSelectionTests {
         hud.setContent(.ring)
         let round = hud.indicator as? TMRoundProgressView
         round?.progressTintColor = .green
-        hud.setContent(.pie)
+        hud.setContent(.outlinedCircle)
         #expect(hud.indicator === round)
         #expect(round?.isAnnular == false)
         #expect(round?.progressTintColor == .green)

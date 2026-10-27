@@ -7,8 +7,8 @@ import UIKit
 public enum TMProgressHudContent {
     /// An animating activity indicator.
     case activity
-    /// An outlined circular progress indicator, historically called the pie style.
-    case pie
+    /// A circular outline with a progress arc.
+    case outlinedCircle
     /// A circular ring progress indicator.
     case ring
     /// A horizontal progress bar.
@@ -29,7 +29,7 @@ public enum TMProgressHudContent {
     var selection: Selection {
         switch self {
         case .activity: .init(mode: .indeterminate, customView: nil)
-        case .pie: .init(mode: .determinate, customView: nil)
+        case .outlinedCircle: .init(mode: .determinate, customView: nil)
         case .ring: .init(mode: .annularDeterminate, customView: nil)
         case .bar: .init(mode: .determinateHorizontalBar, customView: nil)
         case .custom(let view): .init(mode: .customView, customView: view, allowsLegacyProgress: false)

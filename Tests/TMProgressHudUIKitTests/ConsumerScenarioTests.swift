@@ -165,7 +165,7 @@ struct ConsumerScenarioTests {
     private func selection(for mode: TMProgressHudMode, custom: UIView) -> TMProgressHudContent {
         switch mode {
         case .indeterminate: .activity
-        case .determinate: .pie
+        case .determinate: .outlinedCircle
         case .annularDeterminate: .ring
         case .determinateHorizontalBar: .bar
         case .customView: .custom(custom)
