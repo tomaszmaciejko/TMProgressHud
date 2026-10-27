@@ -22,10 +22,12 @@ extension TMProgressHud {
         .init(mode: mode, customView: customView, allowsLegacyProgress: contentSelection.allowsLegacyProgress)
     }
 
-    /// Applies a complete content selection before notifying observers or updating the indicator.
+    /// Applies a complete content selection and updates the indicator.
     ///
     /// Non-custom selections release the retained custom view. Compatibility mode and customView getters
-    /// reflect the selection; their KVO notifications are delivered after both values have been updated.
+    /// reflect the selection. Prior KVO notifications see the previous selection; post notifications
+    /// see both updated values. A nested selection from a prior callback finishes before this write.
+    /// Use post notifications to select subsequent content.
     public func setContent(_ content: TMProgressHudContent) {
         let selection = content.selection
         var changedKeys: [String] = []

@@ -62,6 +62,75 @@ private final class ReentrantContentView: UIView, TMProgressHudProgressReporting
 @Suite(.serialized)
 @MainActor
 struct ContentSelectionTests {
+    @Test func priorObserversSeeTheOldSelectionAndPostObserversSeeTheCompleteSelection() {
+        let hud = TMProgressHud(frame: .zero)
+        let custom = UIView()
+        let recorder = HUDChangeRecorder()
+        var modeSnapshots: [TMProgressHudMode] = []
+        var customViewSnapshots: [Bool] = []
+        let modeObservation = recorder.observe(hud, \.mode, options: [.prior, .new]) { observed in
+            modeSnapshots.append(observed.mode)
+            #expect((observed.mode == .customView) == (observed.customView === custom))
+        }
+        let viewObservation = recorder.observe(hud, \.customView, options: [.prior, .new]) { observed in
+            customViewSnapshots.append(observed.customView === custom)
+            #expect((observed.mode == .customView) == (observed.customView === custom))
+        }
+        defer {
+            modeObservation.invalidate()
+            viewObservation.invalidate()
+        }
+        hud.setContent(.custom(custom))
+        #expect(modeSnapshots == [.indeterminate, .customView])
+        #expect(customViewSnapshots == [false, true])
+        #expect(recorder.count == 4)
+        hud.setContent(.custom(custom))
+        #expect(recorder.count == 4)
+    }
+
+    @Test func postObserverCanSelectTheNextContentWithoutBeingOverwritten() throws {
+        let hud = TMProgressHud(frame: .zero)
+        let custom = UIView()
+        let recorder = HUDChangeRecorder()
+        let observation = recorder.observe(hud, \.customView) { observed in
+            if observed.customView === custom { observed.setContent(.bar) }
+        }
+        defer { observation.invalidate() }
+        hud.progress = 0.5
+        hud.setContent(.custom(custom))
+        let bar = try #require(hud.indicator as? TMBarProgressView)
+        #expect(hud.mode == .determinateHorizontalBar)
+        #expect(hud.customView == nil)
+        #expect(custom.superview == nil)
+        #expect(bar.superview === hud.bezelView)
+        #expect(bar.progress == 0.5)
+        hud.setContent(.text)
+        #expect(hud.indicator == nil)
+        hud.setContent(.custom(custom))
+        #expect(hud.mode == .determinateHorizontalBar)
+        #expect(hud.indicator is TMBarProgressView)
+    }
+
+    @Test func nestedSelectionFromAPriorObserverCompletesBeforeTheOuterWrite() {
+        let hud = TMProgressHud(frame: .zero)
+        let custom = UIView()
+        let recorder = HUDChangeRecorder()
+        var requestedNestedSelection = false
+        let observation = recorder.observe(hud, \.mode, options: [.prior]) { observed in
+            guard !requestedNestedSelection else { return }
+            requestedNestedSelection = true
+            observed.setContent(.bar)
+            #expect(observed.mode == .determinateHorizontalBar)
+        }
+        defer { observation.invalidate() }
+        hud.setContent(.custom(custom))
+        #expect(requestedNestedSelection)
+        #expect(hud.mode == .customView)
+        #expect(hud.customView === custom)
+        #expect(hud.indicator === custom)
+        #expect(custom.superview === hud.bezelView)
+    }
+
     @Test(arguments: [false, true])
     func contentCallbackKeepsTheLatestSelection(onProgress: Bool) {
         let hud = TMProgressHud(frame: .zero)
