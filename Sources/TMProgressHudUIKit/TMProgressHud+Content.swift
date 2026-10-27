@@ -87,7 +87,7 @@ extension TMProgressHud {
     func updateIndicator(reusePolicy: HUDIndicator.ReusePolicy = .includingClientViews) {
         let previousIndicator = indicator
         managedIndicator = HUDIndicator.make(
-            for: contentConfiguration, reusing: managedIndicator, policy: reusePolicy)
+            for: contentConfiguration, reusing: managedIndicator, reusePolicy: reusePolicy)
         if indicator !== previousIndicator {
             previousIndicator?.removeFromSuperview()
             if let indicator { bezelView.addSubview(indicator) }

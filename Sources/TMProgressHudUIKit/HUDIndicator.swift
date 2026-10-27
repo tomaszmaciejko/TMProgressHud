@@ -2,7 +2,7 @@
 // Copyright 2026 Tomasz Maciejko and TMProgressHud contributors.
 import UIKit
 
-/// Owns the view and the operations supported by one selected indicator.
+/// Retains an indicator view and adapts its progress and color updates.
 @MainActor
 struct HUDIndicator {
     enum Origin {
@@ -42,25 +42,28 @@ struct HUDIndicator {
     }
 
     let view: UIView
-    /// The view keeps its origin when compatibility setters reuse it in a built-in mode.
+
+    /// Tracks who supplied the view, even after compatibility setters change its mode.
     let origin: Origin
-    private let receiveProgress: ((Float) -> Void)?
-    private let receiveColor: (UIColor?, ColorPolicy) -> Void
+    private let applyProgress: ((Float) -> Void)?
+    private let applyColor: (UIColor?, ColorPolicy) -> Void
 
     func updateProgress(_ progress: Float) {
-        receiveProgress?(progress)
-    }
-    func updateColor(_ color: UIColor?, policy: ColorPolicy = .compatibility) {
-        receiveColor(color, policy)
+        applyProgress?(progress)
     }
 
+    func updateColor(_ color: UIColor?, policy: ColorPolicy = .compatibility) {
+        applyColor(color, policy)
+    }
+
+    /// Text and compatibility custom content without a view produce no indicator.
     static func make(
-        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, policy: ReusePolicy
+        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, reusePolicy: ReusePolicy
     ) -> HUDIndicator? {
         guard let content else { return nil }
         let selection = content.selection
         let reusable: UIView?
-        if let previous, policy == .includingClientViews || previous.origin == .library {
+        if let previous, reusePolicy == .includingClientViews || previous.origin == .library {
             reusable = previous.view
         } else {
             reusable = nil
@@ -103,31 +106,31 @@ struct HUDIndicator {
     }
 
     private static func spinnerIndicator(_ view: UIActivityIndicatorView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, receiveProgress: nil) { color, policy in
+        HUDIndicator(view: view, origin: origin, applyProgress: nil) { color, policy in
             view.color =
-                appearanceColor(for: .activityColor, policy: policy)
+                registeredAppearanceColor(for: .activityColor, policy: policy)
                 ?? color ?? view.color
         }
     }
 
     private static func roundIndicator(_ view: TMRoundProgressView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
+        HUDIndicator(view: view, origin: origin, applyProgress: { view.progress = $0 }) { color, policy in
             view.progressTintColor =
-                appearanceColor(for: .circleProgressColor, policy: policy)
+                registeredAppearanceColor(for: .circleProgressColor, policy: policy)
                 ?? color ?? view.progressTintColor
             view.backgroundTintColor =
-                appearanceColor(for: .circleTrackColor, policy: policy)
-                ?? trackColor(from: color, opacity: policy.trackOpacity) ?? view.backgroundTintColor
+                registeredAppearanceColor(for: .circleTrackColor, policy: policy)
+                ?? circularTrackColor(from: color, opacity: policy.trackOpacity) ?? view.backgroundTintColor
         }
     }
 
     private static func barIndicator(_ view: TMBarProgressView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
+        HUDIndicator(view: view, origin: origin, applyProgress: { view.progress = $0 }) { color, policy in
             view.progressColor =
-                appearanceColor(for: .barProgressColor, policy: policy)
+                registeredAppearanceColor(for: .barProgressColor, policy: policy)
                 ?? color ?? view.progressColor
             view.lineColor =
-                appearanceColor(for: .barOutlineColor, policy: policy)
+                registeredAppearanceColor(for: .barOutlineColor, policy: policy)
                 ?? color ?? view.lineColor
         }
     }
@@ -138,22 +141,22 @@ struct HUDIndicator {
         if let round = view as? TMRoundProgressView { return roundIndicator(round, origin: origin) }
         if let bar = view as? TMBarProgressView { return barIndicator(bar, origin: origin) }
         if let spinner = view as? UIActivityIndicatorView { return spinnerIndicator(spinner, origin: origin) }
-        let receiveProgress: ((Float) -> Void)?
+        let applyProgress: ((Float) -> Void)?
         if let reporting = view as? any TMProgressHudProgressReporting {
-            receiveProgress = { reporting.progress = $0 }
+            applyProgress = { reporting.progress = $0 }
         } else if let native = view as? UIProgressView {
-            receiveProgress = { native.progress = $0 }
+            applyProgress = { native.progress = $0 }
         } else if allowsLegacyProgress, let adapter = HUDLegacyProgressAdapter(view: view) {
-            receiveProgress = { adapter.updateProgress($0) }
+            applyProgress = { adapter.updateProgress($0) }
         } else {
-            receiveProgress = nil
+            applyProgress = nil
         }
-        return HUDIndicator(view: view, origin: origin, receiveProgress: receiveProgress) { color, _ in
+        return HUDIndicator(view: view, origin: origin, applyProgress: applyProgress) { color, _ in
             if let color { view.tintColor = color }
         }
     }
 
-    private static func trackColor(from color: UIColor?, opacity: TrackOpacity) -> UIColor? {
+    private static func circularTrackColor(from color: UIColor?, opacity: TrackOpacity) -> UIColor? {
         color.map { color in
             if case .fixed = opacity {
                 return color.withAlphaComponent(HUDMetrics.remainingAlpha)
@@ -165,7 +168,7 @@ struct HUDIndicator {
         }
     }
 
-    private static func appearanceColor(for property: AppearanceProperty, policy: ColorPolicy) -> UIColor? {
+    private static func registeredAppearanceColor(for property: AppearanceProperty, policy: ColorPolicy) -> UIColor? {
         if case .explicit = policy { return nil }
         let proxy: UIView
         let getter: Selector
