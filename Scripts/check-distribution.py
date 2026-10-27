@@ -8,7 +8,9 @@ import importlib.util
 import json
 from pathlib import Path
 import re
+import shutil
 import subprocess
+import tempfile
 import time
 import uuid
 
@@ -16,7 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 POD_NAME = "TMProgressHudUIKit"
 RECEIPT_ATTEMPTS = 80
 RECEIPT_INTERVAL_SECONDS = 0.25
-EXPECTED_MODE_COUNT = 6
+EXPECTED_RUNTIME_SCENARIOS = {
+    "result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3,
+}
 
 
 @dataclass(frozen=True)
@@ -132,6 +136,17 @@ def verify_resources_and_minimum(plan):
         matches = list(plan.app.rglob(filename))
         if not matches or any(path.read_bytes() != canonical.read_bytes() for path in matches):
             raise ValueError(f"Missing or stale resource in {plan.kind}/{plan.platform}: {filename}")
+    for bundle in sorted(plan.app.rglob("*.bundle")):
+        # Even codesign --dryrun can create signature placeholders. Probe a disposable copy.
+        with tempfile.TemporaryDirectory(prefix="tmhud-signability-") as directory:
+            probe = Path(directory) / bundle.name
+            shutil.copytree(bundle, probe, symlinks=True)
+            signing = subprocess.run([
+                "/usr/bin/codesign", "--dryrun", "--force", "--sign", "-", "--timestamp=none",
+                "--generate-entitlement-der", str(probe),
+            ], capture_output=True, text=True, check=False)
+            if signing.returncode != 0:
+                raise ValueError(f"Resource bundle cannot be signed: {bundle}: {signing.stderr.strip()}")
     metadata = subprocess.check_output(["xcrun", "vtool", "-show-build", str(plan.app / "TMProgressHudConsumer")], text=True)
     minimum = re.search(r"\bminos\s+(\S+)", metadata)
     if minimum is None or minimum.group(1) != plan.minimum_os:
@@ -184,9 +199,9 @@ def verify_runtime(plan):
             "xcrun", "simctl", "get_app_container", plan.simulator_id, bundle, "data",
         ], text=True).strip())
         outcome = wait_for_receipt(container / "Documents/TMProgressHud-verification.json", identifier)
-        if outcome.get("result") != "passed" or outcome.get("modes") != EXPECTED_MODE_COUNT or outcome.get("primaryActions") != EXPECTED_MODE_COUNT:
+        if any(outcome.get(key) != expected for key, expected in EXPECTED_RUNTIME_SCENARIOS.items()):
             raise ValueError(f"Consumer runtime verification failed: {outcome}")
-        return {key: outcome[key] for key in ["result", "modes", "primaryActions"]}
+        return {key: outcome[key] for key in EXPECTED_RUNTIME_SCENARIOS}
     finally:
         subprocess.run(terminate, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
 

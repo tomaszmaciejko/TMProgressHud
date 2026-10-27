@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import plistlib
 from pathlib import Path
 import subprocess
 import sys
@@ -134,6 +135,54 @@ class DistributionTests(unittest.TestCase):
             with self.subTest(output=output), mock.patch("subprocess.check_output", return_value=output):
                 with self.assertRaisesRegex(ValueError, "expected minimum OS"):
                     distribution.verify_resources_and_minimum(plan)
+
+    def test_resource_bundle_must_be_signable_without_changing_its_contents(self):
+        plan = self.plan()
+        bundle = plan.app / "Library.bundle"
+        bundle.mkdir(parents=True)
+        (bundle / "Info.plist").write_bytes(plistlib.dumps({
+            "CFBundleIdentifier": "test.Library", "CFBundlePackageType": "BNDL",
+            "CFBundleName": "Library", "CFBundleVersion": "1",
+        }))
+        resources = bundle / "Licenses"
+        resources.mkdir()
+        sources = self.root / "Sources/TMProgressHudUIKit"
+        sources.mkdir(parents=True)
+        for filename, canonical in (
+            ("PrivacyInfo.xcprivacy", sources / "PrivacyInfo.xcprivacy"),
+            ("TMProgressHud-LICENSE.txt", self.root / "LICENSE"),
+            ("TMProgressHud-NOTICES.txt", self.root / "THIRD_PARTY_NOTICES.md"),
+        ):
+            canonical.write_text(filename)
+            (resources / filename).write_text(filename)
+        original = {path.relative_to(bundle): path.read_bytes() for path in bundle.rglob("*") if path.is_file()}
+        with mock.patch("subprocess.check_output", return_value="minos 17.0"):
+            distribution.verify_resources_and_minimum(plan)
+            self.assertEqual(original, {path.relative_to(bundle): path.read_bytes() for path in bundle.rglob("*") if path.is_file()})
+            # A top-level Resources directory makes this flat SwiftPM bundle invalid to codesign.
+            resources.rename(bundle / "Resources")
+            with self.assertRaisesRegex(ValueError, "Resource bundle cannot be signed"):
+                distribution.verify_resources_and_minimum(plan)
+
+    def test_runtime_requires_every_scenario_and_always_cleans_up(self):
+        plan = self.plan("spm", "--platform", "ios", "--simulator-id", "chosen-device")
+        expected = {"result": "passed", "modes": 6, "primaryActions": 6, "safeAreaLayouts": 6, "operationPaths": 3}
+        outcomes = [expected]
+        for key in expected:
+            missing = dict(expected)
+            del missing[key]
+            wrong = {**expected, key: "failed" if key == "result" else 0}
+            outcomes.extend([missing, wrong])
+        for outcome in outcomes:
+            with self.subTest(outcome=outcome), mock.patch("subprocess.run") as run, \
+                    mock.patch("subprocess.check_output", return_value=str(self.root)), \
+                    mock.patch.object(distribution, "wait_for_receipt", return_value={"identifier": "current", **outcome}):
+                if outcome == expected:
+                    self.assertEqual(distribution.verify_runtime(plan), expected)
+                else:
+                    with self.assertRaisesRegex(ValueError, "runtime verification failed"):
+                        distribution.verify_runtime(plan)
+                self.assertEqual(run.call_args.args[0], ["xcrun", "simctl", "terminate", "chosen-device", "com.github.tomaszmaciejko.TMProgressHudConsumer"])
 
     def test_receipt_rejects_stale_identifier_and_partial_json(self):
         receipt = self.root / "receipt.json"

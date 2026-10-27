@@ -335,6 +335,9 @@ final class HUDDemoViewController: UIViewController {
                 case .left: horizontalDifference = frame.minX - view.bounds.minX - safe.left - spacing.left
                 case .center: horizontalDifference = frame.midX - view.bounds.midX
                 case .right: horizontalDifference = frame.maxX - view.bounds.maxX + safe.right + spacing.right
+                @unknown default:
+                    NSLog("Safe area verification does not cover this horizontal position")
+                    return checked
                 }
                 guard abs(horizontalDifference) <= precisionInPoints else {
                     NSLog(

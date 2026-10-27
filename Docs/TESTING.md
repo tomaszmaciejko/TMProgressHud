@@ -33,6 +33,24 @@ The scripts boot the selected simulator, run tests and enforce 100% executable p
 
 Regression tests cover the development contract and compare preserved behavior with the pinned Objective-C implementation. Circular drawing remains byte-identical at the default size; enlarged-image comparisons bound the sparse antialiasing changes caused by native CGFloat precision. `Scripts/verify-reference.py` checks its checksums and the API inventory in `Tests/ReferenceAPI/api-inventory.json`. The reference is never linked into the shipped library.
 
+## Scenario coverage
+
+Line coverage is a floor. The suites also check observable contracts independently of the reference implementation:
+
+| Contract | Automated checks |
+| --- | --- |
+| Indicator selection, ownership and configuration readback | `ContentSelectionTests`, `IndicatorContractTests`, `ContentReadbackTests` |
+| Action content and changes after presentation | `ActionContentTests`, `LateActionLayoutTests` |
+| Hidden content, client constraints and host geometry | `VisibilityLayoutTests`, `HostLayoutTests`, `LayoutContractTests` |
+| Long and localized text, Dynamic Type and traits | `TextReadabilityTests`, `TraitAppearanceTests` |
+| Timing, cancellation, repeated presentation and callbacks | `SchedulingTests`, `CompletionLifecycleTests`, `ConsumerScenarioTests` |
+| Reduced motion and progress announcements | `MotionPolicyTests`, `ProgressAccessibilityTests` |
+| Actual installed consumer | Six modes/actions, six safe-area layouts, operation success/failure/cancellation |
+
+The consumer uses the same example controller across distribution channels. Its scenario receipt must be complete before a runtime check passes. Resource bytes, deployment target and resource-bundle signability are checked separately; the signability dry run needs no certificate and does not modify the bundle.
+
+VoiceOver navigation and focus, visual review and physical Apple TV behavior require separate manual checks. Automated accessibility property assertions do not qualify those experiences.
+
 ## Packaging checks
 
 ```sh
@@ -52,7 +70,7 @@ python3 Scripts/check-distribution.py binary --platform ios --artifact Artifacts
 python3 Scripts/check-distribution.py carthage --platform ios --artifact Carthage/Build/TMProgressHudUIKit.xcframework
 ```
 
-Repeat with `--platform tvos`. Add `--simulator-id <UUID>` to install and run a consumer's mode/action checks. SPM and CocoaPods also accept `--source-url <Git URL> --revision <full commit>` to test a remote checkout. Reports record the checked local/artifact input or exact remote commit; they make no claim about release publication. A new execution invalidates its previous success report, and writes `validation.json` only after verification succeeds.
+Repeat with `--platform tvos`. Add `--simulator-id <UUID>` to install and run a consumer's mode/action, safe-area and operation checks. SPM and CocoaPods also accept `--source-url <Git URL> --revision <full commit>` to test a remote checkout. Reports record the checked local/artifact input or exact remote commit; they make no claim about release publication. A new execution invalidates its previous success report, and writes `validation.json` only after verification succeeds.
 
 For a signed release, verify its signature against the published certificate fingerprint:
 
