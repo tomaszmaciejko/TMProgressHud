@@ -16,8 +16,21 @@ struct HUDIndicator {
     }
 
     enum ColorPolicy {
-        case appearanceFirst
+        /// Preserves appearance precedence and the historical fixed track opacity.
+        case compatibility
         case explicit
+
+        var trackOpacity: TrackOpacity {
+            switch self {
+            case .compatibility: .fixed
+            case .explicit: .relativeToSource
+            }
+        }
+    }
+
+    enum TrackOpacity {
+        case fixed
+        case relativeToSource
     }
 
     let view: UIView
@@ -29,7 +42,7 @@ struct HUDIndicator {
     func updateProgress(_ progress: Float) {
         receiveProgress?(progress)
     }
-    func updateColor(_ color: UIColor?, policy: ColorPolicy = .appearanceFirst) {
+    func updateColor(_ color: UIColor?, policy: ColorPolicy = .compatibility) {
         receiveColor(color, policy)
     }
 
@@ -101,7 +114,7 @@ struct HUDIndicator {
                 appearanceColor(
                     #selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self,
                     policy: policy)
-                ?? remainingColor(from: color, policy: policy) ?? view.backgroundTintColor
+                ?? trackColor(from: color, opacity: policy.trackOpacity) ?? view.backgroundTintColor
         }
     }
 
@@ -139,9 +152,9 @@ struct HUDIndicator {
         }
     }
 
-    private static func remainingColor(from color: UIColor?, policy: ColorPolicy) -> UIColor? {
+    private static func trackColor(from color: UIColor?, opacity: TrackOpacity) -> UIColor? {
         color.map { color in
-            if case .appearanceFirst = policy {
+            if case .fixed = opacity {
                 return color.withAlphaComponent(HUDMetrics.remainingAlpha)
             }
             return UIColor { traits in

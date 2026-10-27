@@ -45,6 +45,24 @@ struct ContentColorTests {
         #expect(hud.defaultIndicatorColor == .blue)
     }
 
+    @Test func compatibilityRingTrackKeepsItsFixedOpacityForTransparentAndDynamicColors() throws {
+        let hud = TMProgressHud(frame: .zero)
+        hud.setContent(.ring)
+        let ring = try #require(hud.indicator as? TMRoundProgressView)
+        let adaptive = UIColor { traits in
+            traits.userInterfaceStyle == .dark ? UIColor.white.withAlphaComponent(0.5) : .black
+        }
+        let expectedTrackOpacity: CGFloat = 0.1
+        for color in [UIColor.clear, UIColor.red.withAlphaComponent(0.5), adaptive] {
+            hud.contentColor = color
+            #expect(ring.progressTintColor == color)
+            for style in [UIUserInterfaceStyle.light, .dark] {
+                let traits = UITraitCollection(userInterfaceStyle: style)
+                #expect(ring.backgroundTintColor.resolvedColor(with: traits).cgColor.alpha == expectedTrackOpacity)
+            }
+        }
+    }
+
     @Test func explicitRingColorPreservesTransparencyAndDynamicAlpha() throws {
         let hud = TMProgressHud(frame: .zero)
         hud.setContent(.ring)

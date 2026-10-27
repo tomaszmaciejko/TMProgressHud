@@ -114,7 +114,7 @@ extension TMProgressHud {
 
     func updateContentColor(_ color: UIColor?) {
         guard let color else { return }
-        applyContentColor(color, policy: .appearanceFirst)
+        applyContentColor(color, policy: .compatibility)
     }
 
     private func applyContentColor(_ color: UIColor, policy: HUDIndicator.ColorPolicy) {
