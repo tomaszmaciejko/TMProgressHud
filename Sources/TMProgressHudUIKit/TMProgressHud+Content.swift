@@ -38,7 +38,7 @@ extension TMProgressHud {
         guard !changedKeys.isEmpty || policyChanged || replacesCustomIndicator else { return }
         for key in changedKeys { willChangeValue(forKey: key) }
         contentSelection = selection
-        updateIndicator(reusingCustomContent: false)
+        updateIndicator(reusePolicy: .libraryViewsOnly)
         for key in changedKeys.reversed() { didChangeValue(forKey: key) }
     }
 
@@ -84,12 +84,10 @@ extension TMProgressHud {
         button.setTitleColor(contentColor, for: .normal)
     }
 
-    func updateIndicator(reusingCustomContent: Bool = true) {
+    func updateIndicator(reusePolicy: HUDIndicator.ReusePolicy = .includingClientViews) {
         let previousIndicator = indicator
         managedIndicator = HUDIndicator.make(
-            mode: mode, customView: customView,
-            allowsLegacyProgress: contentSelection.allowsLegacyProgress,
-            reusing: managedIndicator, reusingCustomContent: reusingCustomContent)
+            for: contentConfiguration, reusing: managedIndicator, policy: reusePolicy)
         if indicator !== previousIndicator {
             previousIndicator?.removeFromSuperview()
             if let indicator { bezelView.addSubview(indicator) }

@@ -10,6 +10,11 @@ struct HUDIndicator {
         case client
     }
 
+    enum ReusePolicy {
+        case libraryViewsOnly
+        case includingClientViews
+    }
+
     enum ColorPolicy {
         case appearanceFirst
         case explicit
@@ -29,31 +34,32 @@ struct HUDIndicator {
     }
 
     static func make(
-        mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool,
-        reusing previous: HUDIndicator?, reusingCustomContent: Bool
+        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, policy: ReusePolicy
     ) -> HUDIndicator? {
+        guard let content else { return nil }
+        let selection = content.selection
         let reusable: UIView?
-        if let previous, reusingCustomContent || previous.origin == .library {
+        if let previous, policy == .includingClientViews || previous.origin == .library {
             reusable = previous.view
         } else {
             reusable = nil
         }
-        guard let view = makeView(mode: mode, customView: customView, reusing: reusable) else { return nil }
+        guard let view = makeView(for: selection, reusing: reusable) else { return nil }
         let origin: Origin
-        if mode == .customView {
+        if selection.mode == .customView {
             origin = .client
         } else if let previous, view === previous.view {
             origin = previous.origin
         } else {
             origin = .library
         }
-        return indicator(for: view, origin: origin, allowsLegacyProgress: allowsLegacyProgress)
+        return indicator(for: view, origin: origin, allowsLegacyProgress: selection.allowsLegacyProgress)
     }
 
     private static func makeView(
-        mode: TMProgressHudMode, customView: UIView?, reusing previous: UIView?
+        for selection: TMProgressHudContent.Selection, reusing previous: UIView?
     ) -> UIView? {
-        switch mode {
+        switch selection.mode {
         case .indeterminate:
             let spinner = previous as? UIActivityIndicatorView ?? UIActivityIndicatorView(style: .large)
             if spinner !== previous {
@@ -63,14 +69,14 @@ struct HUDIndicator {
             return spinner
         case .determinate, .annularDeterminate:
             let round = previous as? TMRoundProgressView ?? TMRoundProgressView()
-            let annular = mode == .annularDeterminate
+            let annular = selection.mode == .annularDeterminate
             if round.isAnnular != annular {
                 round.isAnnular = annular
             }
             return round
         case .determinateHorizontalBar: return TMBarProgressView()
         case .customView:
-            return customView
+            return selection.customView
         case .text: return nil
         }
     }
