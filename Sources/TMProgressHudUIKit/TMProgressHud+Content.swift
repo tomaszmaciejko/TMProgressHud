@@ -34,7 +34,7 @@ extension TMProgressHud {
             changedKeys.append(#keyPath(TMProgressHud.customView))
         }
         let policyChanged = contentSelection.allowsLegacyProgress != selection.allowsLegacyProgress
-        let replacesCustomIndicator = selection.mode != .customView && managedIndicator?.isCustomContent == true
+        let replacesCustomIndicator = selection.mode != .customView && managedIndicator?.origin == .client
         guard !changedKeys.isEmpty || policyChanged || replacesCustomIndicator else { return }
         for key in changedKeys { willChangeValue(forKey: key) }
         contentSelection = selection

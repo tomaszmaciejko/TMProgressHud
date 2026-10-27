@@ -5,13 +5,19 @@ import UIKit
 /// Owns the view and the operations supported by one selected indicator.
 @MainActor
 struct HUDIndicator {
+    enum Origin {
+        case library
+        case client
+    }
+
     enum ColorPolicy {
         case appearanceFirst
         case explicit
     }
 
     let view: UIView
-    private(set) var isCustomContent: Bool
+    /// The view keeps its origin when compatibility setters reuse it in a built-in mode.
+    let origin: Origin
     private let receiveProgress: ((Float) -> Void)?
     private let receiveColor: (UIColor?, ColorPolicy) -> Void
 
@@ -26,19 +32,27 @@ struct HUDIndicator {
         mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool,
         reusing previous: HUDIndicator?, reusingCustomContent: Bool
     ) -> HUDIndicator? {
-        let reusable = reusingCustomContent || previous?.isCustomContent != true ? previous?.view : nil
-        var result = makeView(
-            mode: mode, customView: customView, allowsLegacyProgress: allowsLegacyProgress, reusing: reusable)
-        if let previous, result?.view === previous.view {
-            result?.isCustomContent = previous.isCustomContent
+        let reusable: UIView?
+        if let previous, reusingCustomContent || previous.origin == .library {
+            reusable = previous.view
+        } else {
+            reusable = nil
         }
-        if mode == .customView { result?.isCustomContent = true }
-        return result
+        guard let view = makeView(mode: mode, customView: customView, reusing: reusable) else { return nil }
+        let origin: Origin
+        if mode == .customView {
+            origin = .client
+        } else if let previous, view === previous.view {
+            origin = previous.origin
+        } else {
+            origin = .library
+        }
+        return indicator(for: view, origin: origin, allowsLegacyProgress: allowsLegacyProgress)
     }
 
     private static func makeView(
-        mode: TMProgressHudMode, customView: UIView?, allowsLegacyProgress: Bool, reusing previous: UIView?
-    ) -> HUDIndicator? {
+        mode: TMProgressHudMode, customView: UIView?, reusing previous: UIView?
+    ) -> UIView? {
         switch mode {
         case .indeterminate:
             let spinner = previous as? UIActivityIndicatorView ?? UIActivityIndicatorView(style: .large)
@@ -46,23 +60,23 @@ struct HUDIndicator {
                 spinner.color = .white
             }
             spinner.startAnimating()
-            return spinnerIndicator(spinner)
+            return spinner
         case .determinate, .annularDeterminate:
             let round = previous as? TMRoundProgressView ?? TMRoundProgressView()
             let annular = mode == .annularDeterminate
             if round.isAnnular != annular {
                 round.isAnnular = annular
             }
-            return roundIndicator(round)
-        case .determinateHorizontalBar: return barIndicator(TMBarProgressView())
+            return round
+        case .determinateHorizontalBar: return TMBarProgressView()
         case .customView:
-            return customView.map { customIndicator($0, allowsLegacyProgress: allowsLegacyProgress) }
+            return customView
         case .text: return nil
         }
     }
 
-    private static func spinnerIndicator(_ view: UIActivityIndicatorView) -> HUDIndicator {
-        HUDIndicator(view: view, isCustomContent: false, receiveProgress: nil) { color, policy in
+    private static func spinnerIndicator(_ view: UIActivityIndicatorView, origin: Origin) -> HUDIndicator {
+        HUDIndicator(view: view, origin: origin, receiveProgress: nil) { color, policy in
             view.color =
                 appearanceColor(
                     #selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self, policy: policy)
@@ -70,8 +84,8 @@ struct HUDIndicator {
         }
     }
 
-    private static func roundIndicator(_ view: TMRoundProgressView) -> HUDIndicator {
-        HUDIndicator(view: view, isCustomContent: false, receiveProgress: { view.progress = $0 }) { color, policy in
+    private static func roundIndicator(_ view: TMRoundProgressView, origin: Origin) -> HUDIndicator {
+        HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressTintColor =
                 appearanceColor(
                     #selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self,
@@ -85,8 +99,8 @@ struct HUDIndicator {
         }
     }
 
-    private static func barIndicator(_ view: TMBarProgressView) -> HUDIndicator {
-        HUDIndicator(view: view, isCustomContent: false, receiveProgress: { view.progress = $0 }) { color, policy in
+    private static func barIndicator(_ view: TMBarProgressView, origin: Origin) -> HUDIndicator {
+        HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressColor =
                 appearanceColor(
                     #selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self, policy: policy)
@@ -98,10 +112,12 @@ struct HUDIndicator {
         }
     }
 
-    private static func customIndicator(_ view: UIView, allowsLegacyProgress: Bool) -> HUDIndicator {
-        if let round = view as? TMRoundProgressView { return roundIndicator(round) }
-        if let bar = view as? TMBarProgressView { return barIndicator(bar) }
-        if let spinner = view as? UIActivityIndicatorView { return spinnerIndicator(spinner) }
+    private static func indicator(
+        for view: UIView, origin: Origin, allowsLegacyProgress: Bool
+    ) -> HUDIndicator {
+        if let round = view as? TMRoundProgressView { return roundIndicator(round, origin: origin) }
+        if let bar = view as? TMBarProgressView { return barIndicator(bar, origin: origin) }
+        if let spinner = view as? UIActivityIndicatorView { return spinnerIndicator(spinner, origin: origin) }
         let receiveProgress: ((Float) -> Void)?
         if let reporting = view as? any TMProgressHudProgressReporting {
             receiveProgress = { reporting.progress = $0 }
@@ -112,7 +128,7 @@ struct HUDIndicator {
         } else {
             receiveProgress = nil
         }
-        return HUDIndicator(view: view, isCustomContent: false, receiveProgress: receiveProgress) { color, _ in
+        return HUDIndicator(view: view, origin: origin, receiveProgress: receiveProgress) { color, _ in
             if let color { view.tintColor = color }
         }
     }
