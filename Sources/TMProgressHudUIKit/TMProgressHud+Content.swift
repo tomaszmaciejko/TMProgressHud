@@ -84,11 +84,11 @@ extension TMProgressHud {
         button.setTitleColor(contentColor, for: .normal)
     }
 
-    func updateIndicator(reusePolicy: HUDIndicator.ReusePolicy = .includingClientViews) {
+    func updateIndicator(reusePolicy: HUDIndicatorFactory.ReusePolicy = .includingClientViews) {
         let generation = UUID()
         indicatorUpdateGeneration = generation
         let previousIndicator = indicator
-        let replacement = HUDIndicator.make(
+        let replacement = HUDIndicatorFactory.make(
             for: contentConfiguration, reusing: managedIndicator, reusePolicy: reusePolicy)
         // A client view setter can select new content while the factory configures the previous selection.
         guard generation == indicatorUpdateGeneration else { return }

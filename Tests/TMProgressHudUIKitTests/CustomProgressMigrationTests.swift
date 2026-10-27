@@ -45,6 +45,25 @@ struct CustomProgressMigrationTests {
         #expect(spinner.progress == 0.75)
     }
 
+    @Test func declaredSpinnerProgressSurvivesCompatibilityAdoptionUntilCompleteSelection() {
+        let hud = TMProgressHud(frame: .zero)
+        let spinner = ReportingSpinnerView(style: .medium)
+        hud.setContent(.custom(spinner))
+        hud.progress = 0.25
+        hud.mode = .indeterminate
+        #expect(spinner.superview === hud.bezelView)
+        #expect(spinner.isAnimating)
+        hud.progress = 0.75
+        #expect(spinner.progress == 0.75)
+        hud.applyContentColor(.green)
+        #expect(spinner.color == .green)
+
+        hud.setContent(.activity)
+        #expect(spinner.superview == nil)
+        hud.progress = 1
+        #expect(spinner.progress == 0.75)
+    }
+
     @Test func compatibilityReuseKeepsTheSpinnersLegacyProgressContract() {
         let hud = TMProgressHud(frame: .zero)
         let spinner = LegacySpinnerView(style: .medium)

@@ -20,6 +20,18 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDIndicatorColoring.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDIndicatorFactory.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDLayout.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
@@ -231,7 +243,7 @@
   "targets": [
     {
       "name": "TMProgressHudUIKit",
-      "id": "00000000000000000000004E",
+      "id": "000000000000000000000052",
       "product": "Products/TMProgressHudUIKit.framework",
       "product-type": "framework",
       "dependencies": [],

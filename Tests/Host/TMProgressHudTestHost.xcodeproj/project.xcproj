@@ -85,6 +85,18 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDIndicatorColoring.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
+          "path": "../../Sources/TMProgressHudUIKit/HUDIndicatorFactory.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDLayout.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"

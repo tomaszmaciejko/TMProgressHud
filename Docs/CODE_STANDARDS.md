@@ -13,6 +13,8 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 
 The UIKit facade exposes views and configuration. Separate owners handle layout constraints, presentation phases, scheduled actions and Progress observation. Review each boundary for clear ownership and a concrete reason to exist.
 
+`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations and adapts arbitrary client views at an explicit boundary. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse.
+
 ## Safety
 
 Use Swift 6 isolation; UI state and callbacks belong to the main actor. Scheduled actions and observers need explicit owners and cancellation. Preserve the documented timing and callback contracts unless an intentional change is described and covered by regression tests.
