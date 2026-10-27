@@ -184,36 +184,35 @@ struct HUDIndicator {
     }
 
     private static func progressUpdater(for view: UIView, allowsLegacyProgress: Bool) -> ProgressUpdater? {
-        if let reportingView = view as? any TMProgressHudProgressReporting {
+        switch view {
+        case let reportingView as any TMProgressHudProgressReporting:
             return { reportingView.progress = $0 }
-        }
-        if let circle = view as? TMRoundProgressView {
+        case let circle as TMRoundProgressView:
             return { circle.progress = $0 }
-        }
-        if let bar = view as? TMBarProgressView {
+        case let bar as TMBarProgressView:
             return { bar.progress = $0 }
-        }
-        if let nativeProgressView = view as? UIProgressView {
+        case let nativeProgressView as UIProgressView:
             return { nativeProgressView.progress = $0 }
-        }
-        if allowsLegacyProgress, let legacyAdapter = HUDLegacyProgressAdapter(view: view) {
+        default:
+            guard allowsLegacyProgress, let legacyAdapter = HUDLegacyProgressAdapter(view: view) else {
+                return nil
+            }
             return { legacyAdapter.updateProgress($0) }
         }
-        return nil
     }
 
     private static func colorUpdater(for view: UIView) -> ColorUpdater {
-        if let circle = view as? TMRoundProgressView {
+        switch view {
+        case let circle as TMRoundProgressView:
             return circularColorUpdater(for: circle)
-        }
-        if let bar = view as? TMBarProgressView {
+        case let bar as TMBarProgressView:
             return barColorUpdater(for: bar)
-        }
-        if let spinner = view as? UIActivityIndicatorView {
+        case let spinner as UIActivityIndicatorView:
             return activityColorUpdater(for: spinner)
-        }
-        return { color, _ in
-            if let color { view.tintColor = color }
+        default:
+            return { color, _ in
+                if let color { view.tintColor = color }
+            }
         }
     }
 
