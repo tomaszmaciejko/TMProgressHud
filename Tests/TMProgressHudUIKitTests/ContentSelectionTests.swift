@@ -129,6 +129,40 @@ struct ContentSelectionTests {
         #expect(released == nil)
     }
 
+    @Test func repeatedBarSelectionPreservesItsViewAndClientStyling() throws {
+        let hud = TMProgressHud(frame: .zero)
+        hud.setContent(.bar)
+        let bar = try #require(hud.indicator as? TMBarProgressView)
+        bar.progressColor = .green
+        hud.progress = 0.5
+        hud.setContent(.bar)
+        hud.mode = .determinateHorizontalBar
+        #expect(hud.indicator === bar)
+        #expect(bar.progressColor == .green)
+        #expect(bar.progress == 0.5)
+    }
+
+    @Test(arguments: [false, true])
+    func builtInBarDoesNotAdoptACustomBar(useTypedSelection: Bool) throws {
+        let hud = TMProgressHud(frame: .zero)
+        hud.defaultIndicatorColor = .red
+        let custom = TMBarProgressView()
+        hud.setContent(.custom(custom))
+        custom.progressColor = .green
+        hud.progress = 0.5
+        if useTypedSelection {
+            hud.setContent(.bar)
+        } else {
+            hud.mode = .determinateHorizontalBar
+        }
+        let bar = try #require(hud.indicator as? TMBarProgressView)
+        #expect(bar !== custom)
+        #expect(custom.superview == nil)
+        #expect(custom.progressColor == .green)
+        #expect(bar.progressColor == .red)
+        #expect(bar.progress == 0.5)
+    }
+
     @Test func completeSelectionsReuseLibraryOwnedCircularIndicator() {
         let hud = TMProgressHud(frame: .zero)
         hud.setContent(.ring)
