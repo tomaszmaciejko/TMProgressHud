@@ -39,14 +39,31 @@ hud.applyContentColor(.systemBlue)
 
 ## Position and spacing
 
-Select physical edges without numeric offsets. Insets refer to the host bounds; minimum size and square preference remain separate.
+Positions and insets use physical host edges; left/right do not mirror in RTL. The host bounds are the reference area, and minimum size and square preference remain separate.
+
+For a bottom HUD, configure before attaching and showing it:
 
 ```swift
-hud.setLayout(.init(
-    position: .init(vertical: .bottom),
-    contentInsets: .init(top: 12, left: 16, bottom: 12, right: 16),
-    hostInsets: .init(top: 24, left: 24, bottom: 40, right: 24)))
+hud.setLayout(.init(position: .init(vertical: .bottom)))
 ```
+
+In the host view controller, update outer insets when the safe area changes. Add spacing to the actual host's safe area, rather than using a fixed home-indicator height:
+
+```swift
+override func viewSafeAreaInsetsDidChange() {
+    super.viewSafeAreaInsetsDidChange()
+    guard let hud else { return }
+    let safe = view.safeAreaInsets
+    let spacing = TMProgressHudLayout.defaultInsets
+    var layout = hud.layoutConfiguration
+    layout.hostInsets = .init(
+        top: safe.top + spacing.top, left: safe.left + spacing.left,
+        bottom: safe.bottom + spacing.bottom, right: safe.right + spacing.right)
+    hud.setLayout(layout)
+}
+```
+
+Apply the same calculation when creating the HUD. The UIKit demo includes a bottom-placement example and handles changes through this callback. Use insets from the view hosting the HUD, not an unrelated application window.
 
 ## System progress bar
 

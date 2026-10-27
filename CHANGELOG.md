@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Show adaptive safe-area placement in the UIKit example.
+
 - Read and restore the selected indicator through contentConfiguration, including typed or legacy custom forwarding.
 
 - Name the new circular content selection outlinedCircle to match its outline-and-arc appearance.

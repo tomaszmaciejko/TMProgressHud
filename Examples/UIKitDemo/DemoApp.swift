@@ -41,9 +41,14 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
             hud.hide(animated: false)
             valid = valid && hud.superview == nil
         }
+        let demo = (window?.rootViewController as? UINavigationController)?.topViewController as? HUDDemoViewController
+        let safeAreaLayouts = demo?.verifySafeAreaLayout() ?? 0
+        let expectedSafeAreaLayouts = 6
         let receipt: [String: Any] = [
-            "identifier": identifier, "result": valid && callbacks == scenarios.count ? "passed" : "failed",
-            "modes": scenarios.count, "primaryActions": callbacks,
+            "identifier": identifier,
+            "result": valid && callbacks == scenarios.count && safeAreaLayouts == expectedSafeAreaLayouts
+                ? "passed" : "failed",
+            "modes": scenarios.count, "primaryActions": callbacks, "safeAreaLayouts": safeAreaLayouts,
         ]
         do {
             let folder = try FileManager.default.url(
@@ -98,6 +103,13 @@ final class HUDDemoViewController: UIViewController {
             button.addAction(UIAction { [weak self] _ in self?.show(content: content) }, for: .primaryActionTriggered)
             stack.addArrangedSubview(button)
         }
+        let bottomExample = UIButton(configuration: .tinted())
+        bottomExample.setTitle("Bottom placement", for: .normal)
+        bottomExample.addAction(
+            UIAction { [weak self] _ in
+                self?.show(content: .text, position: .init(vertical: .bottom))
+            }, for: .primaryActionTriggered)
+        stack.addArrangedSubview(bottomExample)
         view.addSubview(stack)
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Layout.margin),
@@ -106,9 +118,29 @@ final class HUDDemoViewController: UIViewController {
         ])
     }
 
-    private func show(content: TMProgressHudContent) {
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        guard let hud else { return }
+        var layout = hud.layoutConfiguration
+        layout.hostInsets = safeAreaHostInsets
+        hud.setLayout(layout)
+    }
+
+    private var safeAreaHostInsets: UIEdgeInsets {
+        let safe = view.safeAreaInsets
+        let spacing = TMProgressHudLayout.defaultInsets
+        return UIEdgeInsets(
+            top: safe.top + spacing.top, left: safe.left + spacing.left,
+            bottom: safe.bottom + spacing.bottom, right: safe.right + spacing.right)
+    }
+
+    private func show(
+        content: TMProgressHudContent, position: TMProgressHudPosition = .init(), animated: Bool = true
+    ) {
         hud?.hide(animated: false)
-        let presented = TMProgressHud.showAdded(to: view, animated: true)
+        let presented = TMProgressHud(view: view)
+        presented.removeFromSuperViewOnHide = true
+        presented.setLayout(.init(position: position, hostInsets: safeAreaHostInsets))
         presented.setContent(content)
         presented.label.text = "Loading"
         presented.detailsLabel.text = "An example of the selected HUD style."
@@ -116,10 +148,64 @@ final class HUDDemoViewController: UIViewController {
         presented.button.setTitle("Close", for: .normal)
         presented.button.addAction(
             UIAction { [weak presented] _ in presented?.hide(animated: true) }, for: .primaryActionTriggered)
+        view.addSubview(presented)
         hud = presented
+        presented.show(animated: animated)
         #if os(tvOS)
             setNeedsFocusUpdate()
             updateFocusIfNeeded()
         #endif
     }
+
+    // Invoked only by the distribution consumer's explicit verification mode.
+    func verifySafeAreaLayout() -> Int {
+        let originalInsets = additionalSafeAreaInsets
+        let originalDirection = view.semanticContentAttribute
+        defer {
+            hud?.hide(animated: false)
+            additionalSafeAreaInsets = originalInsets
+            view.semanticContentAttribute = originalDirection
+        }
+        let extraInsets: [UIEdgeInsets] = [.zero, .init(top: 24, left: 12, bottom: 40, right: 16)]
+        let alignments: [TMProgressHudPosition.Horizontal] = [.left, .center, .right]
+        // Centering an odd pixel width can shift the rounded frame by half a physical pixel.
+        let pixelRoundingInPoints = 0.5 / view.traitCollection.displayScale
+        let floatingPointToleranceInPoints: CGFloat = 0.001
+        let precisionInPoints = pixelRoundingInPoints + floatingPointToleranceInPoints
+        var checked = 0
+        for horizontal in alignments {
+            show(content: .text, position: .init(horizontal: horizontal, vertical: .bottom), animated: false)
+            for insets in extraInsets {
+                additionalSafeAreaInsets = insets
+                view.semanticContentAttribute = insets == .zero ? .forceLeftToRight : .forceRightToLeft
+                view.window?.layoutIfNeeded()
+                guard let hud else { return checked }
+                let frame = hud.bezelView.frame
+                let safe = view.safeAreaInsets
+                let spacing = TMProgressHudLayout.defaultInsets
+                let expectedBottom = view.bounds.maxY - safe.bottom - spacing.bottom
+                guard abs(frame.maxY - expectedBottom) <= precisionInPoints else {
+                    NSLog(
+                        "Safe area bottom mismatch at \(checked): frame=\(frame), expected=\(expectedBottom), safe=\(safe)"
+                    )
+                    return checked
+                }
+                let horizontalDifference: CGFloat
+                switch horizontal {
+                case .left: horizontalDifference = frame.minX - view.bounds.minX - safe.left - spacing.left
+                case .center: horizontalDifference = frame.midX - view.bounds.midX
+                case .right: horizontalDifference = frame.maxX - view.bounds.maxX + safe.right + spacing.right
+                }
+                guard abs(horizontalDifference) <= precisionInPoints else {
+                    NSLog(
+                        "Safe area horizontal mismatch at \(checked): frame=\(frame), delta=\(horizontalDifference), bounds=\(view.bounds)"
+                    )
+                    return checked
+                }
+                checked += 1
+            }
+        }
+        return checked
+    }
+
 }
