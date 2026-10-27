@@ -20,6 +20,11 @@ private final class ReportingSpinnerView: UIActivityIndicatorView, TMProgressHud
     var progress: Float = 0
 }
 
+@MainActor
+private final class LegacySpinnerView: UIActivityIndicatorView {
+    @objc dynamic var progress: Float = 0
+}
+
 @Suite(.serialized)
 @MainActor
 struct CustomProgressMigrationTests {
@@ -36,6 +41,23 @@ struct CustomProgressMigrationTests {
         #expect(spinner.color == .orange)
         #expect(!spinner.isAnimating)
         hud.setContent(.text)
+        hud.progress = 1
+        #expect(spinner.progress == 0.75)
+    }
+
+    @Test func compatibilityReuseKeepsTheSpinnersLegacyProgressContract() {
+        let hud = TMProgressHud(frame: .zero)
+        let spinner = LegacySpinnerView(style: .medium)
+        hud.customView = spinner
+        hud.mode = .customView
+        hud.progress = 0.25
+        #expect(spinner.progress == 0.25)
+        hud.mode = .indeterminate
+        #expect(spinner.isAnimating)
+        hud.progress = 0.75
+        #expect(spinner.progress == 0.75)
+        hud.setContent(.activity)
+        #expect(spinner.superview == nil)
         hud.progress = 1
         #expect(spinner.progress == 0.75)
     }

@@ -61,48 +61,46 @@ struct HUDIndicator {
         for content: TMProgressHudContent?, reusing previous: HUDIndicator?, reusePolicy: ReusePolicy
     ) -> HUDIndicator? {
         guard let content else { return nil }
-        let selection = content.selection
         let reusable: UIView?
         if let previous, reusePolicy == .includingClientViews || previous.origin == .library {
             reusable = previous.view
         } else {
             reusable = nil
         }
-        guard let view = makeView(for: selection, reusing: reusable) else { return nil }
+        guard let view = makeView(for: content, reusing: reusable) else { return nil }
         let origin: Origin
-        if selection.mode == .customView {
+        switch content {
+        case .custom, .legacyCustom:
             origin = .client
-        } else if let previous, view === previous.view {
-            origin = previous.origin
-        } else {
-            origin = .library
+        default:
+            if let previous, view === previous.view {
+                origin = previous.origin
+            } else {
+                origin = .library
+            }
         }
-        return indicator(for: view, origin: origin, allowsLegacyProgress: selection.allowsLegacyProgress)
+        return indicator(for: view, origin: origin, allowsLegacyProgress: content.allowsLegacyProgress)
     }
 
-    private static func makeView(
-        for selection: TMProgressHudContent.Selection, reusing previous: UIView?
-    ) -> UIView? {
-        switch selection.mode {
-        case .indeterminate:
+    private static func makeView(for content: TMProgressHudContent, reusing previous: UIView?) -> UIView? {
+        switch content {
+        case .activity:
             let spinner = previous as? UIActivityIndicatorView ?? UIActivityIndicatorView(style: .large)
-            if spinner !== previous {
-                spinner.color = .white
-            }
+            if spinner !== previous { spinner.color = .white }
             spinner.startAnimating()
             return spinner
-        case .determinate, .annularDeterminate:
-            let round = previous as? TMRoundProgressView ?? TMRoundProgressView()
-            let annular = selection.mode == .annularDeterminate
-            if round.isAnnular != annular {
-                round.isAnnular = annular
-            }
-            return round
-        case .determinateHorizontalBar: return TMBarProgressView()
-        case .customView:
-            return selection.customView
+        case .outlinedCircle: return circularView(reusing: previous, annular: false)
+        case .ring: return circularView(reusing: previous, annular: true)
+        case .bar: return TMBarProgressView()
+        case .custom(let view), .legacyCustom(let view): return view
         case .text: return nil
         }
+    }
+
+    private static func circularView(reusing previous: UIView?, annular: Bool) -> TMRoundProgressView {
+        let round = previous as? TMRoundProgressView ?? TMRoundProgressView()
+        if round.isAnnular != annular { round.isAnnular = annular }
+        return round
     }
 
     private static func spinnerColors(_ view: UIActivityIndicatorView) -> (UIColor?, ColorPolicy) -> Void {
