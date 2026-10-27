@@ -57,6 +57,7 @@ extension TMProgressHud {
 
     private func configureLabels() {
         for item in [label, detailsLabel] {
+            item.numberOfLines = 0
             item.adjustsFontSizeToFitWidth = false
             item.adjustsFontForContentSizeCategory = true
             item.textAlignment = .center
@@ -68,8 +69,8 @@ extension TMProgressHud {
             for: .boldSystemFont(ofSize: HUDMetrics.titleFontSize), compatibleWith: label.traitCollection)
         detailsLabel.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
             for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: detailsLabel.traitCollection)
-        detailsLabel.numberOfLines = 0
         button.titleLabel?.textAlignment = .center
+        button.titleLabel?.lineBreakMode = .byTruncatingTail
         button.titleLabel?.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
             for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: button.traitCollection)
         button.titleLabel?.adjustsFontForContentSizeCategory = true

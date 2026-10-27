@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Wrap primary status messages at large text sizes and define tail truncation for default action titles.
+
 - Collapse hidden content without changing caller-owned constraints, restoring its layout when shown.
 
 - Support attributed, image and state-specific action content; respect caller-provided UIButton configurations.

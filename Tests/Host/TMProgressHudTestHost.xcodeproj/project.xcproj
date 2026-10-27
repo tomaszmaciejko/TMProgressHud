@@ -469,6 +469,12 @@
           ]
         },
         {
+          "path": "../TMProgressHudUIKitTests/TextReadabilityTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
           "path": "../TMProgressHudUIKitTests/TraitAppearanceTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
