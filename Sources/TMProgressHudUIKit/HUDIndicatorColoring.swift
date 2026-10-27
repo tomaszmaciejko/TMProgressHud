@@ -7,11 +7,6 @@ import UIKit
 enum HUDIndicatorColoring {
     private typealias ColorPolicy = HUDIndicator.ColorPolicy
 
-    private enum TrackOpacity {
-        case fixed
-        case relativeToSource
-    }
-
     private enum AppearanceProperty {
         case activityColor
         case circleProgressColor
@@ -39,7 +34,7 @@ enum HUDIndicatorColoring {
                 suppliedColor: color, fallback: view.progressTintColor)
             view.backgroundTintColor = resolveColor(
                 for: .circleTrackColor, policy: policy,
-                suppliedColor: circularTrackColor(from: color, opacity: trackOpacity(for: policy)),
+                suppliedColor: circularTrackColor(from: color, policy: policy),
                 fallback: view.backgroundTintColor)
         }
     }
@@ -81,19 +76,12 @@ enum HUDIndicatorColoring {
         }
     }
 
-    private static func trackOpacity(for policy: ColorPolicy) -> TrackOpacity {
-        switch policy {
-        case .compatibility: .fixed
-        case .explicit: .relativeToSource
-        }
-    }
-
-    private static func circularTrackColor(from color: UIColor?, opacity: TrackOpacity) -> UIColor? {
+    private static func circularTrackColor(from color: UIColor?, policy: ColorPolicy) -> UIColor? {
         guard let color else { return nil }
-        switch opacity {
-        case .fixed:
+        switch policy {
+        case .compatibility:
             return color.withAlphaComponent(HUDMetrics.remainingAlpha)
-        case .relativeToSource:
+        case .explicit:
             return UIColor { traits in
                 let resolvedColor = color.resolvedColor(with: traits)
                 let trackAlpha = resolvedColor.cgColor.alpha * HUDMetrics.remainingAlpha

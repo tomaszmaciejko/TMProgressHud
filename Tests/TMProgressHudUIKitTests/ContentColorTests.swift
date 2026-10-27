@@ -5,6 +5,40 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct ContentColorTests {
+    @Test func circleColorsFollowEachApplicationPolicyAndAppearance() throws {
+        let adaptive = UIColor { traits in
+            if traits.userInterfaceStyle == .dark { return UIColor.blue.withAlphaComponent(0.8) }
+            return UIColor.red.withAlphaComponent(0.4)
+        }
+        let expectedTrackOpacity: CGFloat = 0.1
+        let alphaTolerance: CGFloat = 0.000_001
+        for content in [TMProgressHudContent.outlinedCircle, .ring] {
+            let hud = TMProgressHud(frame: .zero)
+            hud.setContent(content)
+            let circle = try #require(hud.indicator as? TMRoundProgressView)
+            for usesExplicitColor in [false, true, false] {
+                if usesExplicitColor {
+                    hud.applyContentColor(adaptive)
+                } else {
+                    hud.contentColor = .clear
+                    hud.contentColor = adaptive
+                }
+                #expect(hud.indicator === circle)
+                for style in [UIUserInterfaceStyle.light, .dark] {
+                    let traits = UITraitCollection(userInterfaceStyle: style)
+                    let source = adaptive.resolvedColor(with: traits)
+                    let progress = circle.progressTintColor.resolvedColor(with: traits)
+                    let track = circle.backgroundTintColor.resolvedColor(with: traits)
+                    let expectedAlpha =
+                        usesExplicitColor ? source.cgColor.alpha * expectedTrackOpacity : expectedTrackOpacity
+                    #expect(progress == source)
+                    #expect(track.withAlphaComponent(1) == source.withAlphaComponent(1))
+                    #expect(abs(track.cgColor.alpha - expectedAlpha) < alphaTolerance)
+                }
+            }
+        }
+    }
+
     @Test func disabledBulkColorPreservesCustomStylesAndUIKitDefault() {
         let hud = TMProgressHud(frame: .zero)
         hud.contentColor = nil
