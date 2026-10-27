@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.iOS(.v17), .tvOS(.v17)],
     products: [.library(name: "TMProgressHudUIKit", targets: ["TMProgressHudUIKit"])],
     targets: [
-        .target(name: "TMProgressHudUIKit", resources: [.copy("PrivacyInfo.xcprivacy"), .copy("Resources")]),
+        .target(name: "TMProgressHudUIKit", resources: [.copy("PrivacyInfo.xcprivacy"), .process("Resources")]),
         .target(
             name: "MBProgressHUDReference",
             path: "Reference/MBProgressHUD",
