@@ -90,19 +90,26 @@ extension TMProgressHud {
         let previousIndicator = indicator
         let replacement = HUDIndicatorFactory.make(
             for: contentConfiguration, reusing: managedIndicator, context: context)
-        // A client view setter can select new content while the factory configures the previous selection.
+        // Client callbacks can select newer content during construction, installation or coloring.
         guard generation == indicatorUpdateGeneration else { return }
         managedIndicator = replacement
-        if indicator !== previousIndicator {
-            previousIndicator?.removeFromSuperview()
-            if let indicator { bezelView.addSubview(indicator) }
-            managedIndicator?.updateColor(contentColor)
-        }
-        indicator?.translatesAutoresizingMaskIntoConstraints = false
-        forwardProgress()
-        indicator?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .horizontal)
-        indicator?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
+        guard installIndicator(replacement, replacing: previousIndicator, generation: generation) else { return }
+        let view = replacement?.view
+        view?.translatesAutoresizingMaskIntoConstraints = false
+        view?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .horizontal)
+        view?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
         setNeedsUpdateConstraints()
+        if view !== previousIndicator { replacement?.updateColor(contentColor) }
+        guard generation == indicatorUpdateGeneration else { return }
+        replacement?.updateProgress(progress)
+    }
+
+    private func installIndicator(_ replacement: HUDIndicator?, replacing previous: UIView?, generation: UUID) -> Bool {
+        guard replacement?.view !== previous else { return true }
+        previous?.removeFromSuperview()
+        guard generation == indicatorUpdateGeneration else { return false }
+        if let view = replacement?.view { bezelView.addSubview(view) }
+        return generation == indicatorUpdateGeneration
     }
 
     func forwardProgress() {

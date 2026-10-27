@@ -10,7 +10,7 @@
 
 ### Behavior and accessibility
 
-- Honor custom progress protocols on activity-indicator subclasses and keep newer content selections made during custom-view configuration.
+- Honor custom progress protocols on activity-indicator subclasses and keep newer content selections made during custom-view configuration, attachment, removal or coloring.
 
 - Make presentation callbacks single-use, reject obsolete work, use monotonic timing and stop observing Progress when hidden or detached.
 - Preserve client constraints and customizations, keep caller-provided indicators separate from built-ins, and collapse hidden content.

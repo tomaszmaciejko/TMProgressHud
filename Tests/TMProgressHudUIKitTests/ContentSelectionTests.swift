@@ -17,9 +17,93 @@ private final class ReentrantRoundView: TMRoundProgressView {
     }
 }
 
+@MainActor
+private final class ReentrantContentView: UIView, TMProgressHudProgressReporting {
+    var onAttachment: (() -> Void)?
+    var onRemoval: (() -> Void)?
+    var onColor: (() -> Void)?
+    var onProgress: (() -> Void)?
+    private(set) var attachments = 0
+    private(set) var receivedProgress: [Float] = []
+    var progress: Float = 0 {
+        didSet {
+            receivedProgress.append(progress)
+            let callback = onProgress
+            onProgress = nil
+            callback?()
+        }
+    }
+
+    override var tintColor: UIColor! {
+        get { super.tintColor }
+        set {
+            super.tintColor = newValue
+            let callback = onColor
+            onColor = nil
+            callback?()
+        }
+    }
+
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        let callback: (() -> Void)?
+        if superview == nil {
+            callback = onRemoval
+            onRemoval = nil
+        } else {
+            attachments += 1
+            callback = onAttachment
+            onAttachment = nil
+        }
+        callback?()
+    }
+}
+
 @Suite(.serialized)
 @MainActor
 struct ContentSelectionTests {
+    @Test(arguments: [false, true])
+    func contentCallbackKeepsTheLatestSelection(onProgress: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        hud.progress = 0.5
+        let triggeringView = ReentrantContentView()
+        let latestView = ReentrantContentView()
+        if onProgress {
+            triggeringView.onProgress = { hud.setContent(.custom(latestView)) }
+        } else {
+            triggeringView.onColor = { hud.setContent(.custom(latestView)) }
+        }
+        hud.setContent(.custom(triggeringView))
+        #expect(hud.indicator === latestView)
+        #expect(latestView.superview === hud.bezelView)
+        #expect(latestView.attachments == 1)
+        #expect(latestView.receivedProgress == [0.5])
+        #expect(triggeringView.receivedProgress == (onProgress ? [0.5] : []))
+        #expect(triggeringView.superview == nil)
+    }
+
+    @Test(arguments: [false, true])
+    func hierarchyCallbackEndsTheSupersededIndicatorUpdate(onRemoval: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        hud.progress = 0.5
+        let triggeringView = ReentrantContentView()
+        let latestView = ReentrantContentView()
+        if onRemoval {
+            hud.setContent(.custom(triggeringView))
+            triggeringView.onRemoval = { hud.setContent(.custom(latestView)) }
+            hud.setContent(.bar)
+        } else {
+            triggeringView.onAttachment = { hud.setContent(.custom(latestView)) }
+            hud.setContent(.custom(triggeringView))
+        }
+        #expect(hud.indicator === latestView)
+        #expect(hud.customView === latestView)
+        #expect(latestView.superview === hud.bezelView)
+        #expect(latestView.attachments == 1)
+        #expect(latestView.receivedProgress == [0.5])
+        #expect(triggeringView.superview == nil)
+    }
+
     @Test(arguments: [false, true])
     func styleCallbackCanReplaceTheInFlightSelection(selectBar: Bool) throws {
         let hud = TMProgressHud(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
