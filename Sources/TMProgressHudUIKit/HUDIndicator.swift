@@ -33,6 +33,14 @@ struct HUDIndicator {
         case relativeToSource
     }
 
+    private enum AppearanceProperty {
+        case activityColor
+        case circleProgressColor
+        case circleTrackColor
+        case barProgressColor
+        case barOutlineColor
+    }
+
     let view: UIView
     /// The view keeps its origin when compatibility setters reuse it in a built-in mode.
     let origin: Origin
@@ -97,8 +105,7 @@ struct HUDIndicator {
     private static func spinnerIndicator(_ view: UIActivityIndicatorView, origin: Origin) -> HUDIndicator {
         HUDIndicator(view: view, origin: origin, receiveProgress: nil) { color, policy in
             view.color =
-                appearanceColor(
-                    #selector(getter: UIActivityIndicatorView.color), of: UIActivityIndicatorView.self, policy: policy)
+                appearanceColor(for: .activityColor, policy: policy)
                 ?? color ?? view.color
         }
     }
@@ -106,14 +113,10 @@ struct HUDIndicator {
     private static func roundIndicator(_ view: TMRoundProgressView, origin: Origin) -> HUDIndicator {
         HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressTintColor =
-                appearanceColor(
-                    #selector(getter: TMRoundProgressView.progressTintColor), of: TMRoundProgressView.self,
-                    policy: policy)
+                appearanceColor(for: .circleProgressColor, policy: policy)
                 ?? color ?? view.progressTintColor
             view.backgroundTintColor =
-                appearanceColor(
-                    #selector(getter: TMRoundProgressView.backgroundTintColor), of: TMRoundProgressView.self,
-                    policy: policy)
+                appearanceColor(for: .circleTrackColor, policy: policy)
                 ?? trackColor(from: color, opacity: policy.trackOpacity) ?? view.backgroundTintColor
         }
     }
@@ -121,12 +124,10 @@ struct HUDIndicator {
     private static func barIndicator(_ view: TMBarProgressView, origin: Origin) -> HUDIndicator {
         HUDIndicator(view: view, origin: origin, receiveProgress: { view.progress = $0 }) { color, policy in
             view.progressColor =
-                appearanceColor(
-                    #selector(getter: TMBarProgressView.progressColor), of: TMBarProgressView.self, policy: policy)
+                appearanceColor(for: .barProgressColor, policy: policy)
                 ?? color ?? view.progressColor
             view.lineColor =
-                appearanceColor(
-                    #selector(getter: TMBarProgressView.lineColor), of: TMBarProgressView.self, policy: policy)
+                appearanceColor(for: .barOutlineColor, policy: policy)
                 ?? color ?? view.lineColor
         }
     }
@@ -164,9 +165,28 @@ struct HUDIndicator {
         }
     }
 
-    private static func appearanceColor(_ getter: Selector, of type: UIView.Type, policy: ColorPolicy) -> UIColor? {
+    private static func appearanceColor(for property: AppearanceProperty, policy: ColorPolicy) -> UIColor? {
         if case .explicit = policy { return nil }
-        let proxy = type.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+        let proxy: UIView
+        let getter: Selector
+        switch property {
+        case .activityColor:
+            proxy = UIActivityIndicatorView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+            getter = #selector(getter: UIActivityIndicatorView.color)
+        case .circleProgressColor:
+            proxy = TMRoundProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+            getter = #selector(getter: TMRoundProgressView.progressTintColor)
+        case .circleTrackColor:
+            proxy = TMRoundProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+            getter = #selector(getter: TMRoundProgressView.backgroundTintColor)
+        case .barProgressColor:
+            proxy = TMBarProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+            getter = #selector(getter: TMBarProgressView.progressColor)
+        case .barOutlineColor:
+            proxy = TMBarProgressView.appearance(whenContainedInInstancesOf: [TMProgressHud.self])
+            getter = #selector(getter: TMBarProgressView.lineColor)
+        }
+        // Registration can be absent even when the instance property is nonoptional.
         return proxy.perform(getter)?.takeUnretainedValue() as? UIColor
     }
 }
