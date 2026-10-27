@@ -2,6 +2,8 @@
 
 ## 2.0.0 (Unreleased)
 
+- Collapse hidden content without changing caller-owned constraints, restoring its layout when shown.
+
 - Support attributed, image and state-specific action content; respect caller-provided UIButton configurations.
 
 - Keep caller-provided custom indicators separate from built-in content in the new selection API.

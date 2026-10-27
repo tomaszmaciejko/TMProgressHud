@@ -160,7 +160,7 @@ struct LayoutContractTests {
         }
     }
 
-    @Test func liveTextAndVisibilityChangesReuseConstraintsAndMatchGeometry() {
+    @Test func liveTextChangesReuseConstraintsAndMatchGeometry() {
         let host = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
         let hud = TMProgressHud(view: host)
         let reference = MBProgressHUD(view: host)
@@ -172,20 +172,18 @@ struct LayoutContractTests {
         reference.button.addAction(UIAction { _ in }, for: .primaryActionTriggered)
         host.layoutIfNeeded()
         let constraintIDs = Set((hud.constraints + hud.bezelView.constraints).map(ObjectIdentifier.init))
-        let scenarios: [(title: String?, details: String?, hidden: Bool, action: String?)] = [
-            ("Loading", "Please wait", false, "Cancel"),
-            ("Loading", nil, false, "Cancel"),
-            ("Loading", nil, true, nil),
-            (nil, "Retry", false, "Retry"),
-            ("Done", nil, false, nil),
+        let scenarios: [(title: String?, details: String?, action: String?)] = [
+            ("Loading", "Please wait", "Cancel"),
+            ("Loading", nil, "Cancel"),
+            ("Loading", nil, nil),
+            (nil, "Retry", "Retry"),
+            ("Done", nil, nil),
         ]
         for scenario in scenarios {
             hud.label.text = scenario.title
             reference.label.text = scenario.title
             hud.detailsLabel.text = scenario.details
             reference.detailsLabel.text = scenario.details
-            hud.detailsLabel.isHidden = scenario.hidden
-            reference.detailsLabel.isHidden = scenario.hidden
             hud.button.setTitle(scenario.action, for: .normal)
             reference.button.setTitle(scenario.action, for: .normal)
             host.layoutIfNeeded()

@@ -111,6 +111,8 @@ final class HUDLayout {
     private var contentRightConstraints: [NSLayoutConstraint] = []
     private var contentCenterConstraints: [NSLayoutConstraint] = []
     private var gaps: [Gap] = []
+    private var observedContent: [UIView] = []
+    private var visibilityObservations: [NSKeyValueObservation] = []
 
     init() {
         for spacer in [topSpacer, bottomSpacer] {
@@ -120,8 +122,9 @@ final class HUDLayout {
     }
 
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
-        let views = [topSpacer] + content + [bottomSpacer]
-        let sameContent = arrangedViews.count == views.count && zip(arrangedViews, views).allSatisfy { $0.0 === $0.1 }
+        observeVisibility(of: content, in: container)
+        let views = visibleViews(in: content)
+        let sameContent = hasSameViews(views)
         let constraints: BezelConstraints
         if installedContainer === container, installedBezel === bezel, sameContent, let existing = bezelConstraints {
             constraints = existing
@@ -131,6 +134,30 @@ final class HUDLayout {
         constraints.update(configuration)
         updateContentInsets(configuration.layout.contentInsets)
         updatePadding()
+    }
+
+    private func observeVisibility(of content: [UIView], in container: UIView) {
+        let sameContent =
+            observedContent.count == content.count
+            && zip(observedContent, content).allSatisfy { $0.0 === $0.1 }
+        guard !sameContent else { return }
+        for observation in visibilityObservations { observation.invalidate() }
+        observedContent = content
+        visibilityObservations = content.map { view in
+            view.observe(\.isHidden) { [weak container] _, _ in
+                // KVO is synchronous with UIKit's main-actor-only isHidden setter.
+                // Verify that executor before invalidating constraints; never defer the layout request.
+                MainActor.assumeIsolated { container?.setNeedsUpdateConstraints() }
+            }
+        }
+    }
+
+    private func visibleViews(in content: [UIView]) -> [UIView] {
+        [topSpacer] + content.filter { !$0.isHidden } + [bottomSpacer]
+    }
+
+    private func hasSameViews(_ views: [UIView]) -> Bool {
+        arrangedViews.count == views.count && zip(arrangedViews, views).allSatisfy { $0.0 === $0.1 }
     }
 
     func updatePadding() {

@@ -304,17 +304,14 @@ open class TMProgressHud: UIView {
 
     /// Updates owned constraints for the current content and layout configuration.
     open override func updateConstraints() {
-        var content = [label, detailsLabel, button]
-        if let indicator {
-            content.insert(indicator, at: 0)
-        }
+        let content = layoutContentViews
         hudLayout.update(
             container: self, bezel: bezelView, content: content,
             configuration: .init(layout: layoutConfiguration, minimumSize: minSize, isSquare: isSquare))
         super.updateConstraints()
     }
 
-    /// Updates content padding when constraints do not require rebuilding.
+    /// Updates hidden content and padding while preserving client constraints.
     open override func layoutSubviews() {
         if !needsUpdateConstraints() {
             hudLayout.updatePadding()
@@ -338,13 +335,4 @@ open class TMProgressHud: UIView {
         }
     }
 
-    private func configureView() {
-        isOpaque = false
-        backgroundColor = .clear
-        alpha = 0
-        autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        layer.allowsGroupOpacity = false
-        installContentViews()
-        updateIndicator()
-    }
 }

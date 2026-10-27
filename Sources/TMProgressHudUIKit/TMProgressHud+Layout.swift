@@ -3,6 +3,12 @@
 import UIKit
 
 extension TMProgressHud {
+    var layoutContentViews: [UIView] {
+        var views = [label, detailsLabel, button]
+        if let indicator { views.insert(indicator, at: 0) }
+        return views
+    }
+
     /// The effective position and insets, including compatibility getter overrides.
     public var layoutConfiguration: TMProgressHudLayout {
         layoutPreferences.resolved(offset: offset, margin: margin)

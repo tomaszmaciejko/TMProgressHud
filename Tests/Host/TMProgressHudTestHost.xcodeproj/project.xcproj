@@ -485,6 +485,12 @@
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/VisibilityLayoutTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
         }
       ]
     }

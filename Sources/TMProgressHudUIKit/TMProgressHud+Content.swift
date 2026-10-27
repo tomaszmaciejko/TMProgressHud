@@ -5,6 +5,16 @@
 import UIKit
 
 extension TMProgressHud {
+    func configureView() {
+        isOpaque = false
+        backgroundColor = .clear
+        alpha = 0
+        autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        layer.allowsGroupOpacity = false
+        installContentViews()
+        updateIndicator()
+    }
+
     /// Applies a complete content selection before notifying observers or updating the indicator.
     ///
     /// Non-custom selections release the retained custom view. Compatibility mode and customView getters
