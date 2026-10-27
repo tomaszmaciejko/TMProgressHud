@@ -15,9 +15,31 @@ private final class TypedProgressView: UIView, TMProgressHudProgressReporting {
     var progress: Float = 0
 }
 
+@MainActor
+private final class ReportingSpinnerView: UIActivityIndicatorView, TMProgressHudProgressReporting {
+    var progress: Float = 0
+}
+
 @Suite(.serialized)
 @MainActor
 struct CustomProgressMigrationTests {
+    @Test(arguments: [false, true])
+    func spinnerSubclassReceivesItsDeclaredProgressAndKeepsSpinnerColoring(useLegacySelection: Bool) {
+        let hud = TMProgressHud(frame: .zero)
+        let spinner = ReportingSpinnerView(style: .medium)
+        hud.progress = 0.25
+        hud.setContent(useLegacySelection ? .legacyCustom(spinner) : .custom(spinner))
+        #expect(spinner.progress == 0.25)
+        hud.progress = 0.75
+        #expect(spinner.progress == 0.75)
+        hud.applyContentColor(.orange)
+        #expect(spinner.color == .orange)
+        #expect(!spinner.isAnimating)
+        hud.setContent(.text)
+        hud.progress = 1
+        #expect(spinner.progress == 0.75)
+    }
+
     @Test func customContentDoesNotGuessAnObjectiveCProgressContract() {
         let hud = TMProgressHud(frame: .zero)
         let custom = LegacyProgressView()

@@ -105,16 +105,16 @@ struct HUDIndicator {
         }
     }
 
-    private static func spinnerIndicator(_ view: UIActivityIndicatorView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, applyProgress: nil) { color, policy in
+    private static func spinnerColors(_ view: UIActivityIndicatorView) -> (UIColor?, ColorPolicy) -> Void {
+        { color, policy in
             view.color =
                 registeredAppearanceColor(for: .activityColor, policy: policy)
                 ?? color ?? view.color
         }
     }
 
-    private static func roundIndicator(_ view: TMRoundProgressView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, applyProgress: { view.progress = $0 }) { color, policy in
+    private static func roundColors(_ view: TMRoundProgressView) -> (UIColor?, ColorPolicy) -> Void {
+        { color, policy in
             view.progressTintColor =
                 registeredAppearanceColor(for: .circleProgressColor, policy: policy)
                 ?? color ?? view.progressTintColor
@@ -124,8 +124,8 @@ struct HUDIndicator {
         }
     }
 
-    private static func barIndicator(_ view: TMBarProgressView, origin: Origin) -> HUDIndicator {
-        HUDIndicator(view: view, origin: origin, applyProgress: { view.progress = $0 }) { color, policy in
+    private static func barColors(_ view: TMBarProgressView) -> (UIColor?, ColorPolicy) -> Void {
+        { color, policy in
             view.progressColor =
                 registeredAppearanceColor(for: .barProgressColor, policy: policy)
                 ?? color ?? view.progressColor
@@ -138,20 +138,30 @@ struct HUDIndicator {
     private static func indicator(
         for view: UIView, origin: Origin, allowsLegacyProgress: Bool
     ) -> HUDIndicator {
-        if let round = view as? TMRoundProgressView { return roundIndicator(round, origin: origin) }
-        if let bar = view as? TMBarProgressView { return barIndicator(bar, origin: origin) }
-        if let spinner = view as? UIActivityIndicatorView { return spinnerIndicator(spinner, origin: origin) }
-        let applyProgress: ((Float) -> Void)?
+        HUDIndicator(
+            view: view, origin: origin,
+            applyProgress: progressUpdater(for: view, allowsLegacyProgress: allowsLegacyProgress),
+            applyColor: colorUpdater(for: view))
+    }
+
+    private static func progressUpdater(for view: UIView, allowsLegacyProgress: Bool) -> ((Float) -> Void)? {
         if let reporting = view as? any TMProgressHudProgressReporting {
-            applyProgress = { reporting.progress = $0 }
-        } else if let native = view as? UIProgressView {
-            applyProgress = { native.progress = $0 }
-        } else if allowsLegacyProgress, let adapter = HUDLegacyProgressAdapter(view: view) {
-            applyProgress = { adapter.updateProgress($0) }
-        } else {
-            applyProgress = nil
+            return { reporting.progress = $0 }
         }
-        return HUDIndicator(view: view, origin: origin, applyProgress: applyProgress) { color, _ in
+        if let round = view as? TMRoundProgressView { return { round.progress = $0 } }
+        if let bar = view as? TMBarProgressView { return { bar.progress = $0 } }
+        if let native = view as? UIProgressView { return { native.progress = $0 } }
+        if allowsLegacyProgress, let adapter = HUDLegacyProgressAdapter(view: view) {
+            return { adapter.updateProgress($0) }
+        }
+        return nil
+    }
+
+    private static func colorUpdater(for view: UIView) -> (UIColor?, ColorPolicy) -> Void {
+        if let round = view as? TMRoundProgressView { return roundColors(round) }
+        if let bar = view as? TMBarProgressView { return barColors(bar) }
+        if let spinner = view as? UIActivityIndicatorView { return spinnerColors(spinner) }
+        return { color, _ in
             if let color { view.tintColor = color }
         }
     }
