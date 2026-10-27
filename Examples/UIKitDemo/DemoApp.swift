@@ -16,11 +16,14 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         let arguments = ProcessInfo.processInfo.arguments
         if let index = arguments.firstIndex(of: "--tmhud-check-id"), arguments.indices.contains(index + 1) {
-            verifyDistribution(in: window.rootViewController?.view ?? window, identifier: arguments[index + 1])
+            let identifier = arguments[index + 1]
+            Task { [weak self] in
+                await self?.verifyDistribution(in: window.rootViewController?.view ?? window, identifier: identifier)
+            }
         }
     }
 
-    private func verifyDistribution(in host: UIView, identifier: String) {
+    private func verifyDistribution(in host: UIView, identifier: String) async {
         var callbacks = 0
         let scenarios: [(TMProgressHudContent, TMProgressHudMode)] = [
             (.activity, .indeterminate), (.outlinedCircle, .determinate), (.ring, .annularDeterminate),
@@ -45,11 +48,15 @@ final class DemoScene: UIResponder, UIWindowSceneDelegate {
         let demo = (window?.rootViewController as? UINavigationController)?.topViewController as? HUDDemoViewController
         let safeAreaLayouts = demo?.verifySafeAreaLayout() ?? 0
         let expectedSafeAreaLayouts = 6
+        let operationPaths = await demo?.verifyOperationPaths() ?? 0
+        let expectedOperationPaths = 3
         let receipt: [String: Any] = [
             "identifier": identifier,
             "result": valid && callbacks == scenarios.count && safeAreaLayouts == expectedSafeAreaLayouts
+                && operationPaths == expectedOperationPaths
                 ? "passed" : "failed",
-            "modes": scenarios.count, "primaryActions": callbacks, "safeAreaLayouts": safeAreaLayouts,
+            "modes": scenarios.count, "primaryActions": callbacks,
+            "safeAreaLayouts": safeAreaLayouts, "operationPaths": operationPaths,
         ]
         do {
             let folder = try FileManager.default.url(
@@ -69,7 +76,17 @@ final class HUDDemoViewController: UIViewController {
         static let symbolSize: CGFloat = 37
     }
 
+    private enum ExampleOperation {
+        static let totalSteps = 10
+        static let stepDelay: Duration = .milliseconds(200)
+        enum Failure: Error { case requested }
+    }
+
     private weak var hud: TMProgressHud?
+    private var operationTask: Task<Void, Never>?
+    private let operationResultLabel = UILabel()
+
+    deinit { operationTask?.cancel() }
 
     #if os(tvOS)
         override var preferredFocusEnvironments: [any UIFocusEnvironment] {
@@ -91,6 +108,17 @@ final class HUDDemoViewController: UIViewController {
         stack.axis = .vertical
         stack.spacing = Layout.spacing
         stack.translatesAutoresizingMaskIntoConstraints = false
+        addModeButtons(to: stack)
+        addOperationButtons(to: stack)
+        view.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Layout.margin),
+            stack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Layout.margin),
+            stack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+        ])
+    }
+
+    private func addModeButtons(to stack: UIStackView) {
         let configuration = UIImage.SymbolConfiguration(pointSize: Layout.symbolSize)
         let custom = UIImageView(image: UIImage(systemName: "checkmark.circle.fill", withConfiguration: configuration))
         let scenarios: [(String, TMProgressHudContent)] = [
@@ -107,19 +135,36 @@ final class HUDDemoViewController: UIViewController {
                 }, for: .primaryActionTriggered)
             stack.addArrangedSubview(button)
         }
-        let bottomExample = UIButton(configuration: .tinted())
-        bottomExample.setTitle("Bottom placement", for: .normal)
-        bottomExample.addAction(
-            UIAction { [weak self] _ in
-                self?.show(content: .text, position: .init(vertical: .bottom))
+        let bottom = UIButton(configuration: .tinted())
+        bottom.setTitle("Bottom placement", for: .normal)
+        bottom.addAction(
+            UIAction { [weak self, weak bottom] _ in
+                self?.show(content: .text, position: .init(vertical: .bottom), returnFocusTo: bottom)
             }, for: .primaryActionTriggered)
-        stack.addArrangedSubview(bottomExample)
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Layout.margin),
-            stack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Layout.margin),
-            stack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-        ])
+        stack.addArrangedSubview(bottom)
+    }
+
+    private func addOperationButtons(to stack: UIStackView) {
+        for (title, failure) in [("Operation: success", false), ("Operation: failure", true)] {
+            let button = UIButton(configuration: .tinted())
+            button.setTitle(title, for: .normal)
+            button.addAction(
+                UIAction { [weak self, weak button] _ in
+                    self?.startOperation(shouldFail: failure, source: button)
+                }, for: .primaryActionTriggered)
+            stack.addArrangedSubview(button)
+        }
+        operationResultLabel.textAlignment = .center
+        operationResultLabel.numberOfLines = 0
+        operationResultLabel.font = .preferredFont(forTextStyle: .footnote)
+        operationResultLabel.adjustsFontForContentSizeCategory = true
+        stack.addArrangedSubview(operationResultLabel)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        operationTask?.cancel()
+        hud?.hide(animated: false)
     }
 
     override func viewSafeAreaInsetsDidChange() {
@@ -138,10 +183,8 @@ final class HUDDemoViewController: UIViewController {
             bottom: safe.bottom + spacing.bottom, right: safe.right + spacing.right)
     }
 
-    private func show(
-        content: TMProgressHudContent, position: TMProgressHudPosition = .init(), animated: Bool = true,
-        returnFocusTo source: UIView? = nil
-    ) {
+    private func makeHUD(content: TMProgressHudContent, position: TMProgressHudPosition = .init()) -> TMProgressHud {
+        operationTask?.cancel()
         hud?.hide(animated: false)
         let presented = TMProgressHud(view: view)
         presented.removeFromSuperViewOnHide = true
@@ -151,33 +194,107 @@ final class HUDDemoViewController: UIViewController {
         presented.label.text = "Loading"
         presented.detailsLabel.text = "An example of the selected HUD style."
         presented.setProgressSource(.manual(0.5))
-        presented.button.setTitle("Close", for: .normal)
-        presented.button.addAction(
-            UIAction { [weak self, weak presented, weak source] _ in
-                guard let presented else { return }
-                self?.dismiss(presented, returningFocusTo: source)
-            }, for: .primaryActionTriggered)
+        return presented
+    }
+
+    private func presentHUD(_ presented: TMProgressHud, animated: Bool) {
         view.addSubview(presented)
         hud = presented
         let voiceOver = UIAccessibility.isVoiceOverRunning
         presented.show(animated: animated && !voiceOver)
-        if voiceOver {
-            AccessibilityNotification.ScreenChanged(presented.button).post()
-        }
+        if voiceOver { AccessibilityNotification.ScreenChanged(presented.button).post() }
         #if os(tvOS)
             setNeedsFocusUpdate()
             updateFocusIfNeeded()
         #endif
     }
 
-    private func dismiss(_ presented: TMProgressHud, returningFocusTo source: UIView?) {
-        presented.hide(animated: true) { [weak self, weak source] _ in
+    private func show(
+        content: TMProgressHudContent, position: TMProgressHudPosition = .init(), animated: Bool = true,
+        returnFocusTo source: UIView? = nil
+    ) {
+        let presented = makeHUD(content: content, position: position)
+        presented.button.setTitle("Close", for: .normal)
+        presented.button.addAction(
+            UIAction { [weak self, weak presented, weak source] _ in
+                guard let presented else { return }
+                self?.dismiss(presented, returningFocusTo: source)
+            }, for: .primaryActionTriggered)
+        presentHUD(presented, animated: animated)
+    }
+
+    private func dismiss(
+        _ presented: TMProgressHud, returningFocusTo source: UIView?, result: String? = nil, animated: Bool = true
+    ) {
+        presented.hide(animated: animated) { [weak self, weak presented, weak source] _ in
+            // An older request must not replace a newer result or move its accessibility focus.
+            guard let self, self.hud === presented else { return }
+            self.hud = nil
+            if let result { self.operationResultLabel.text = result }
+            guard self.viewIfLoaded?.window != nil else { return }
             if UIAccessibility.isVoiceOverRunning {
-                AccessibilityNotification.ScreenChanged(source).post()
+                AccessibilityNotification.ScreenChanged(result == nil ? source : self.operationResultLabel).post()
             }
-            self?.setNeedsFocusUpdate()
-            self?.updateFocusIfNeeded()
+            self.setNeedsFocusUpdate()
+            self.updateFocusIfNeeded()
         }
+    }
+
+    @discardableResult
+    private func startOperation(
+        shouldFail: Bool, source: UIView? = nil, animated: Bool = true,
+        stepDelay: Duration = ExampleOperation.stepDelay
+    ) -> Task<Void, Never> {
+        let presented = makeHUD(content: .ring)
+        presented.label.text = "Example operation"
+        presented.detailsLabel.text = "The application owns this task and its cancellation."
+        presented.setProgressSource(.manual(0))
+        presented.button.setTitle("Cancel", for: .normal)
+        presented.button.addAction(
+            UIAction { [weak self] _ in self?.operationTask?.cancel() }, for: .primaryActionTriggered)
+        presentHUD(presented, animated: animated)
+        let task = Task { [weak self, weak source] in
+            var result = "Operation cancelled"
+            defer {
+                if let self {
+                    self.dismiss(presented, returningFocusTo: source, result: result, animated: animated)
+                } else {
+                    presented.hide(animated: false)
+                }
+            }
+            do {
+                for step in 1...ExampleOperation.totalSteps {
+                    try await Task.sleep(for: stepDelay)
+                    presented.setProgressSource(.manual(Float(step) / Float(ExampleOperation.totalSteps)))
+                }
+                if shouldFail { throw ExampleOperation.Failure.requested }
+                result = "Operation finished"
+            } catch is CancellationError {
+                result = "Operation cancelled"
+            } catch {
+                result = "Example operation failed"
+            }
+        }
+        operationTask = task
+        return task
+    }
+
+    func verifyOperationPaths() async -> Int {
+        let cases = [
+            (false, false, "Operation finished"), (true, false, "Example operation failed"),
+            (false, true, "Operation cancelled"),
+        ]
+        var checked = 0
+        for (failure, cancel, expected) in cases {
+            let task = startOperation(shouldFail: failure, animated: false, stepDelay: .zero)
+            if cancel { hud?.button.sendActions(for: .primaryActionTriggered) }
+            await task.value
+            guard operationResultLabel.text == expected, hud == nil,
+                !view.subviews.contains(where: { $0 is TMProgressHud })
+            else { return checked }
+            checked += 1
+        }
+        return checked
     }
 
     // Invoked only by the distribution consumer's explicit verification mode.

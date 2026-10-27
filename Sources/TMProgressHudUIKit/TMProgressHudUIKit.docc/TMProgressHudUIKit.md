@@ -84,6 +84,12 @@ For blocking operations, opt into `accessibilityViewIsModal`. Post a screen-chan
 
 Built-in progress views expose percentages without posting per-update announcements. Announce a meaningful final result once at the application level. Custom content retains its own accessibility labels, values and traits. An actual VoiceOver session remains a separate manual qualification step.
 
+## Owning an operation
+
+Keep the Task in your view controller. Wire Cancel to that task, and use `defer` to hide the HUD on success, error or cancellation. Handle cancellation separately from failure; a weak controller capture and per-request HUD ownership prevent old cleanup from hiding a newer presentation.
+
+The UIKit example contains a complete implementation and automated checks for all three outcomes. It also cancels work when the controller disappears. The HUD never starts or cancels the application's operation itself.
+
 ## Topics
 
 ### Presentation

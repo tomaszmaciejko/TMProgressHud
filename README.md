@@ -1,95 +1,73 @@
 # TMProgressHud
 
-A Swift progress and status HUD for UIKit on iOS and tvOS, originally ported from [MBProgressHUD](https://github.com/jdg/MBProgressHUD/tree/4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781).
+A Swift progress and status HUD for UIKit. Show activity, circular progress, a ring, a bar, a message or your own view, with an optional action button.
 
-Display an activity indicator, circular progress, ring, horizontal bar, custom view or message, with an optional action button. You choose the host view and control the underlying operation.
+**This branch contains unreleased 2.0:** iOS/iPadOS 17+, tvOS 17+, Swift 6.0+. For the published version supporting iOS/tvOS 15, use the [1.0.0 documentation](https://github.com/tomaszmaciejko/TMProgressHud/tree/v1.0.0). Mac Catalyst is not supported.
 
-**Development requirements:** iOS 17+ or tvOS 17+, Swift 6.0+. Mac Catalyst is not supported. This branch is preparing **2.0.0**, which has not been released. The bundled JSON Xcode projects, including Carthage source builds, require Xcode 27+. SwiftPM and CocoaPods source installation retain Swift 6.0+ support.
+## Try 2.0
 
-The published [1.0.0](https://github.com/tomaszmaciejko/TMProgressHud/tree/v1.0.0) supports iOS 15+ and tvOS 15+.
-
-## Installation
-
-The instructions below install the published **1.0.0**. To try development version 2.0, add this checkout as a local Swift package in Xcode; it requires iOS 17+ or tvOS 17+.
-
-All methods provide the **TMProgressHudUIKit** module. Choose one per app target.
+All installation methods provide `TMProgressHudUIKit`. Choose one per app target. The examples below use the development API.
 
 ### Swift Package Manager
 
-Add `https://github.com/tomaszmaciejko/TMProgressHud.git` in Xcode, choose version **1.0.0** and select `TMProgressHudUIKit`. In a package manifest, add:
+Add `https://github.com/tomaszmaciejko/TMProgressHud.git` in Xcode, select branch **main** and link `TMProgressHudUIKit`. In a package manifest:
 
 ```swift
-.package(url: "https://github.com/tomaszmaciejko/TMProgressHud.git", exact: "1.0.0")
+.package(url: "https://github.com/tomaszmaciejko/TMProgressHud.git", branch: "main")
 ```
-
-Link the `TMProgressHudUIKit` product to your application target.
 
 ### CocoaPods
 
 ```ruby
-platform :ios, '15.0' # Use :tvos for Apple TV.
+platform :ios, '17.0' # Use :tvos for Apple TV.
 use_frameworks!
-pod 'TMProgressHudUIKit', :git => 'https://github.com/tomaszmaciejko/TMProgressHud.git', :tag => 'v1.0.0'
+pod 'TMProgressHudUIKit', :git => 'https://github.com/tomaszmaciejko/TMProgressHud.git', :branch => 'main'
 ```
 
 ### XCFramework
 
-Download `TMProgressHudUIKit.xcframework.zip` and `SHA256SUMS` from the matching [GitHub release](https://github.com/tomaszmaciejko/TMProgressHud/releases). In the download folder, run `shasum -a 256 -c SHA256SUMS`, then unpack and add the framework to your app with **Embed & Sign**. Keep its bundled privacy and license resources.
+Build from this checkout into a fresh output folder:
 
-The XCFramework uses a self-issued signing certificate. Compare the certificate's SHA-256 fingerprint shown by Xcode with the [published fingerprint](Certificates/TMProgressHud-signing.fingerprint). The [public certificate](Certificates/TMProgressHud-signing.pem) is included for verification; you do not need to install it as a trusted system certificate.
+```sh
+TMHUD_ARTIFACT_DIR=.build/LocalFramework ./Scripts/build-xcframework.sh
+```
+
+Add the resulting framework to your app with **Embed & Sign**, keeping its privacy and license resources. Local builds are unsigned unless you explicitly configure signing. Published binaries and their verification files live in [GitHub releases](https://github.com/tomaszmaciejko/TMProgressHud/releases); use the documentation matching that release.
 
 ### Carthage
 
 ```text
-github "tomaszmaciejko/TMProgressHud" ~> 1.0
+github "tomaszmaciejko/TMProgressHud" "main"
 ```
 
-Run `carthage update --use-xcframeworks --platform iOS,tvOS` and add the resulting XCFramework with **Embed & Sign**.
+Run `carthage update --use-xcframeworks --platform iOS,tvOS` and add the framework with **Embed & Sign**. Bundled JSON Xcode projects, including Carthage source builds, require **Xcode 27+**. SwiftPM and CocoaPods source installation retain the Swift 6.0 requirement.
 
 ## Usage
 
-Call the API on the main actor:
+Call the API on the main actor, for example from a view controller:
 
 ```swift
 import TMProgressHudUIKit
 
 let hud = TMProgressHud.showAdded(to: view, animated: true)
-hud.label.text = "Loading"
-hud.detailsLabel.text = "Please wait."
+hud.label.text = "Downloading"
+hud.setContent(.ring)
+hud.setProgressSource(.manual(0.5))
 
 // When your operation finishes:
 hud.hide(animated: true)
 ```
 
-For development version 2.0, prefer `setContent(.ring)` and `setProgressSource(.manual(0.5))`. See the [2.0 API and migration notes](Docs/COMPATIBILITY.md) for explicit layout, colors, completions, accessibility and custom progress.
+The helper removes the HUD when hidden. Use `TMProgressHud(view:)` to configure it before attaching and showing it yourself. Your application owns the operation and cancellation.
 
-The helper attaches the HUD and removes it when hidden. Use `TMProgressHud(view:)` to configure it before attaching and showing it yourself.
+Use `.observed(progress)` for a Foundation `Progress`, and `.activity`, `.outlinedCircle`, `.bar`, `.text` or `.custom(view)` for other content. The [API guide](Sources/TMProgressHudUIKit/TMProgressHudUIKit.docc/TMProgressHudUIKit.md) covers layout, colors, custom progress and accessibility. Existing properties remain supported; see [migration from 1.0](Docs/COMPATIBILITY.md).
 
-```swift
-hud.mode = .annularDeterminate
-hud.progress = 0.5
-// Alternatively: hud.progressObject = yourFoundationProgress
+## Example and contributing
 
-hud.button.setTitle("Cancel", for: .normal)
-hud.button.addAction(UIAction { _ in
-    // Cancel your operation and hide the HUD as appropriate.
-}, for: .primaryActionTriggered)
-```
+The [UIKit example](Examples/README.md) demonstrates every mode, safe-area placement and an application-owned task with success, failure and cancellation. There are no third-party runtime dependencies.
 
-Other modes: `.indeterminate`, `.determinate`, `.determinateHorizontalBar`, `.customView` and `.text`. Set `customView` to supply your own content. Labels, bezel and background are customizable.
-
-On tvOS, direct focus to the HUD's action button in your own view controller. The [example app](Examples/README.md) shows how.
-
-## Compatibility
-
-Version 1.0 preserves the original behavior, including unclamped progress, fixed font sizes and repeated callbacks on repeated hides. See the [1.0 compatibility notes](https://github.com/tomaszmaciejko/TMProgressHud/blob/v1.0.0/Docs/COMPATIBILITY.md) for these details and Swift API differences.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests and review guidelines. There are no third-party runtime dependencies.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and tests. Exact minimum-OS runtime checks, the oldest-compiler qualification, physical Apple TV input and a manual VoiceOver session remain separate verification steps for unreleased 2.0.
 
 ## License
 
-[MIT](LICENSE). Swift port maintained by Tomasz Maciejko and contributors.
-
-Based on MBProgressHUD by Matej Bukovinski. Original copyright and permission notices are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The Objective-C reference is used only by tests.
+[MIT](LICENSE). Swift port maintained by Tomasz Maciejko and contributors. Based on MBProgressHUD by Matej Bukovinski; original notices are preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The Objective-C reference is used only by tests.

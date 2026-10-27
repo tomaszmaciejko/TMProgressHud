@@ -2,7 +2,7 @@
 // Copyright 2026 Tomasz Maciejko and TMProgressHud contributors.
 import UIKit
 
-/// A complete content selection, applied with TMProgressHud.setContent(_:).
+/// An indicator selection, applied with TMProgressHud.setContent(_:).
 @MainActor
 public enum TMProgressHudContent {
     /// An animating activity indicator.
@@ -13,7 +13,7 @@ public enum TMProgressHudContent {
     case ring
     /// A horizontal progress bar.
     case bar
-    /// Custom content with typed progress support; Objective-C setter guessing is disabled.
+    /// Custom content with progress support through the Swift protocol or a recognized native indicator.
     case custom(UIView)
     /// Custom content that also opts into the legacy numeric Objective-C progress setter.
     case legacyCustom(UIView)

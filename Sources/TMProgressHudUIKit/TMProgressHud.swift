@@ -53,7 +53,7 @@ open class TMProgressHud: UIView {
         }
     }
 
-    /// The mutable short-message label.
+    /// The primary message label, multiline and scaled with Dynamic Type by default.
     @objc open dynamic var label: UILabel { storedLabel }
 
     /// The mutable multiline detail label.
