@@ -12,7 +12,7 @@ extension TMProgressHud {
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
         layer.allowsGroupOpacity = false
         installContentViews()
-        updateIndicator()
+        updateIndicator(context: .compatibilityProperties)
     }
 
     /// The current indicator selection, including compatibility getter overrides and custom progress policy.
@@ -38,7 +38,7 @@ extension TMProgressHud {
         guard !changedKeys.isEmpty || policyChanged || replacesCustomIndicator else { return }
         for key in changedKeys { willChangeValue(forKey: key) }
         contentSelection = selection
-        updateIndicator(reusePolicy: .libraryViewsOnly)
+        updateIndicator(context: .completeSelection)
         for key in changedKeys.reversed() { didChangeValue(forKey: key) }
     }
 
@@ -84,12 +84,12 @@ extension TMProgressHud {
         button.setTitleColor(contentColor, for: .normal)
     }
 
-    func updateIndicator(reusePolicy: HUDIndicatorFactory.ReusePolicy = .includingClientViews) {
+    func updateIndicator(context: HUDIndicatorFactory.SelectionContext) {
         let generation = UUID()
         indicatorUpdateGeneration = generation
         let previousIndicator = indicator
         let replacement = HUDIndicatorFactory.make(
-            for: contentConfiguration, reusing: managedIndicator, reusePolicy: reusePolicy)
+            for: contentConfiguration, reusing: managedIndicator, context: context)
         // A client view setter can select new content while the factory configures the previous selection.
         guard generation == indicatorUpdateGeneration else { return }
         managedIndicator = replacement

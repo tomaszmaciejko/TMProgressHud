@@ -13,7 +13,7 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 
 The UIKit facade exposes views and configuration. Separate owners handle layout constraints, presentation phases, scheduled actions and Progress observation. Review each boundary for clear ownership and a concrete reason to exist.
 
-`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations and adapts arbitrary client views at an explicit boundary. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse.
+`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations and adapts arbitrary client views at an explicit boundary. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Selection context is explicit at facade call sites; view provenance does not itself grant legacy progress support.
 
 ## Safety
 

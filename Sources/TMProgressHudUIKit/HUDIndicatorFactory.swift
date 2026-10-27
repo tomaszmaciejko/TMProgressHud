@@ -5,71 +5,98 @@ import UIKit
 /// Builds complete indicators, keeping runtime capability detection at the client-view boundary.
 @MainActor
 enum HUDIndicatorFactory {
-    enum ReusePolicy {
-        case libraryViewsOnly
-        case includingClientViews
+    enum SelectionContext {
+        case completeSelection
+        case compatibilityProperties
+    }
 
-        func allowsReuse(of origin: HUDIndicator.Origin) -> Bool {
+    private enum ClientProgressContract {
+        case typed
+        case legacyCompatible
+    }
+
+    private enum ViewResolution<View: UIView> {
+        case library(View)
+        case compatibilityClient(View)
+
+        var view: View {
             switch self {
-            case .libraryViewsOnly: origin == .library
-            case .includingClientViews: true
+            case .library(let view), .compatibilityClient(let view): view
             }
         }
     }
 
     /// A nil selection represents compatibility custom content without a view.
     static func make(
-        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, reusePolicy: ReusePolicy
+        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, context: SelectionContext
     ) -> HUDIndicator? {
         guard let content else { return nil }
-        let reusable = reusableIndicator(from: previous, policy: reusePolicy)
+        let reusable = reusableView(from: previous, context: context)
+        return buildIndicator(for: content, reusing: reusable)
+    }
+
+    private static func buildIndicator(
+        for content: TMProgressHudContent, reusing previous: ViewResolution<UIView>?
+    ) -> HUDIndicator? {
         switch content {
-        case .activity: return activityIndicator(reusing: reusable)
-        case .outlinedCircle: return circularIndicator(reusing: reusable, isAnnular: false)
-        case .ring: return circularIndicator(reusing: reusable, isAnnular: true)
+        case .activity: return activityIndicator(reusing: previous)
+        case .outlinedCircle: return circularIndicator(reusing: previous, isAnnular: false)
+        case .ring: return circularIndicator(reusing: previous, isAnnular: true)
         case .bar: return barIndicator()
-        case .custom(let view), .legacyCustom(let view):
-            return clientIndicator(for: view, allowsLegacyProgress: content.allowsLegacyProgress)
+        case .custom(let view): return clientIndicator(for: view, contract: .typed)
+        case .legacyCustom(let view): return clientIndicator(for: view, contract: .legacyCompatible)
         case .text: return nil
         }
     }
 
-    private static func reusableIndicator(from previous: HUDIndicator?, policy: ReusePolicy) -> HUDIndicator? {
-        guard let previous, policy.allowsReuse(of: previous.origin) else { return nil }
-        return previous
+    private static func reusableView(
+        from previous: HUDIndicator?, context: SelectionContext
+    ) -> ViewResolution<UIView>? {
+        guard let previous else { return nil }
+        switch previous.origin {
+        case .library:
+            return .library(previous.view)
+        case .client:
+            guard context == .compatibilityProperties else { return nil }
+            return .compatibilityClient(previous.view)
+        }
     }
 
     private static func makeOrReuse<View: UIView>(
-        from previous: HUDIndicator?, createView: () -> View
-    ) -> (view: View, origin: HUDIndicator.Origin) {
-        if let previous, let view = previous.view as? View {
-            return (view, previous.origin)
+        from previous: ViewResolution<UIView>?, createView: () -> View
+    ) -> ViewResolution<View> {
+        guard let previous, let view = previous.view as? View else {
+            return .library(createView())
         }
-        return (createView(), .library)
+        switch previous {
+        case .library: return .library(view)
+        case .compatibilityClient: return .compatibilityClient(view)
+        }
     }
 
-    private static func activityIndicator(reusing previous: HUDIndicator?) -> HUDIndicator {
-        let (spinner, origin) = makeOrReuse(from: previous) { () -> UIActivityIndicatorView in
+    private static func activityIndicator(reusing previous: ViewResolution<UIView>?) -> HUDIndicator {
+        let resolved = makeOrReuse(from: previous) { () -> UIActivityIndicatorView in
             let spinner = UIActivityIndicatorView(style: .large)
             spinner.color = .white
             return spinner
         }
+        let spinner = resolved.view
         spinner.startAnimating()
-        return HUDIndicator(
-            view: spinner, origin: origin,
-            progressUpdater: builtInProgressUpdater(for: spinner, origin: origin, libraryUpdater: nil),
+        return indicator(
+            from: resolved, libraryProgressUpdater: nil,
             colorUpdater: HUDIndicatorColoring.activityUpdater(for: spinner))
     }
 
-    private static func circularIndicator(reusing previous: HUDIndicator?, isAnnular: Bool) -> HUDIndicator {
-        let (circle, origin) = makeOrReuse(from: previous) { TMRoundProgressView() }
+    private static func circularIndicator(
+        reusing previous: ViewResolution<UIView>?, isAnnular: Bool
+    ) -> HUDIndicator {
+        let resolved = makeOrReuse(from: previous) { TMRoundProgressView() }
+        let circle = resolved.view
         if circle.isAnnular != isAnnular {
             circle.isAnnular = isAnnular
         }
-        return HUDIndicator(
-            view: circle, origin: origin,
-            progressUpdater: builtInProgressUpdater(
-                for: circle, origin: origin, libraryUpdater: { circle.progress = $0 }),
+        return indicator(
+            from: resolved, libraryProgressUpdater: { circle.progress = $0 },
             colorUpdater: HUDIndicatorColoring.circularUpdater(for: circle))
     }
 
@@ -80,25 +107,33 @@ enum HUDIndicatorFactory {
             colorUpdater: HUDIndicatorColoring.barUpdater(for: bar))
     }
 
-    private static func builtInProgressUpdater(
-        for view: UIView, origin: HUDIndicator.Origin, libraryUpdater: HUDIndicator.ProgressUpdater?
-    ) -> HUDIndicator.ProgressUpdater? {
-        // Compatibility reuse retains the client view's declared or legacy progress contract.
-        switch origin {
-        case .library: libraryUpdater
-        case .client: clientProgressUpdater(for: view, allowsLegacyProgress: true)
+    private static func indicator<View: UIView>(
+        from resolved: ViewResolution<View>, libraryProgressUpdater: HUDIndicator.ProgressUpdater?,
+        colorUpdater: @escaping HUDIndicator.ColorUpdater
+    ) -> HUDIndicator {
+        switch resolved {
+        case .library(let view):
+            return HUDIndicator(
+                view: view, origin: .library, progressUpdater: libraryProgressUpdater, colorUpdater: colorUpdater)
+        case .compatibilityClient(let view):
+            return clientIndicator(for: view, contract: .legacyCompatible, colorUpdater: colorUpdater)
         }
     }
 
-    private static func clientIndicator(for view: UIView, allowsLegacyProgress: Bool) -> HUDIndicator {
+    private static func clientIndicator(for view: UIView, contract: ClientProgressContract) -> HUDIndicator {
+        clientIndicator(for: view, contract: contract, colorUpdater: clientColorUpdater(for: view))
+    }
+
+    private static func clientIndicator(
+        for view: UIView, contract: ClientProgressContract, colorUpdater: @escaping HUDIndicator.ColorUpdater
+    ) -> HUDIndicator {
         HUDIndicator(
             view: view, origin: .client,
-            progressUpdater: clientProgressUpdater(for: view, allowsLegacyProgress: allowsLegacyProgress),
-            colorUpdater: clientColorUpdater(for: view))
+            progressUpdater: clientProgressUpdater(for: view, contract: contract), colorUpdater: colorUpdater)
     }
 
     private static func clientProgressUpdater(
-        for view: UIView, allowsLegacyProgress: Bool
+        for view: UIView, contract: ClientProgressContract
     ) -> HUDIndicator.ProgressUpdater? {
         switch view {
         case let reportingView as any TMProgressHudProgressReporting:
@@ -110,11 +145,15 @@ enum HUDIndicatorFactory {
         case let nativeProgressView as UIProgressView:
             return { nativeProgressView.progress = $0 }
         default:
-            guard allowsLegacyProgress, let legacyAdapter = HUDLegacyProgressAdapter(view: view) else {
-                return nil
-            }
-            return { legacyAdapter.updateProgress($0) }
+            return legacyProgressUpdater(for: view, contract: contract)
         }
+    }
+
+    private static func legacyProgressUpdater(
+        for view: UIView, contract: ClientProgressContract
+    ) -> HUDIndicator.ProgressUpdater? {
+        guard contract == .legacyCompatible, let adapter = HUDLegacyProgressAdapter(view: view) else { return nil }
+        return { adapter.updateProgress($0) }
     }
 
     private static func clientColorUpdater(for view: UIView) -> HUDIndicator.ColorUpdater {

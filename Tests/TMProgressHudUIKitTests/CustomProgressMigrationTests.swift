@@ -64,6 +64,25 @@ struct CustomProgressMigrationTests {
         #expect(spinner.progress == 0.75)
     }
 
+    @Test func compatibilityAdoptionEnablesLegacyProgressUntilTypedCustomSelection() {
+        let hud = TMProgressHud(frame: .zero)
+        let spinner = LegacySpinnerView(style: .medium)
+        hud.setContent(.custom(spinner))
+        hud.progress = 0.25
+        #expect(spinner.progress == 0)
+
+        hud.mode = .indeterminate
+        #expect(spinner.superview === hud.bezelView)
+        #expect(spinner.isAnimating)
+        #expect(spinner.progress == 0.25)
+        hud.progress = 0.75
+        #expect(spinner.progress == 0.75)
+
+        hud.setContent(.custom(spinner))
+        hud.progress = 1
+        #expect(spinner.progress == 0.75)
+    }
+
     @Test func compatibilityReuseKeepsTheSpinnersLegacyProgressContract() {
         let hud = TMProgressHud(frame: .zero)
         let spinner = LegacySpinnerView(style: .medium)

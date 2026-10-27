@@ -39,19 +39,13 @@ public enum TMProgressHudContent {
         }
     }
 
-    // Compatibility setters may reuse an activity view with an Objective-C progress contract.
-    var allowsLegacyProgress: Bool {
-        if case .custom = self { return false }
-        return true
-    }
-
     var selection: Selection {
         switch self {
         case .activity: .init(mode: .indeterminate, customView: nil)
         case .outlinedCircle: .init(mode: .determinate, customView: nil)
         case .ring: .init(mode: .annularDeterminate, customView: nil)
         case .bar: .init(mode: .determinateHorizontalBar, customView: nil)
-        case .custom(let view): .init(mode: .customView, customView: view, allowsLegacyProgress: allowsLegacyProgress)
+        case .custom(let view): .init(mode: .customView, customView: view, allowsLegacyProgress: false)
         case .legacyCustom(let view): .init(mode: .customView, customView: view)
         case .text: .init(mode: .text, customView: nil)
         }

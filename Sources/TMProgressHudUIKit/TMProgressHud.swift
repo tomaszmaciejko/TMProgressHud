@@ -19,7 +19,7 @@ open class TMProgressHud: UIView {
             guard contentSelection.mode != newValue else { return }
             contentSelection.mode = newValue
             contentSelection.allowsLegacyProgress = true
-            updateIndicator()
+            updateIndicator(context: .compatibilityProperties)
         }
     }
 
@@ -32,7 +32,7 @@ open class TMProgressHud: UIView {
             guard contentSelection.customView !== newValue else { return }
             contentSelection.customView = newValue
             contentSelection.allowsLegacyProgress = true
-            if mode == .customView { updateIndicator() }
+            if mode == .customView { updateIndicator(context: .compatibilityProperties) }
         }
     }
 
