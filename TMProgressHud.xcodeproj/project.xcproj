@@ -44,6 +44,18 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDBezelConstraints.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
+      "path": "Sources/TMProgressHudUIKit/HUDLayoutInstallation.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDLayout.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
