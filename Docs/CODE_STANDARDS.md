@@ -4,6 +4,8 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 
 ## Structure
 
+- Names must explain the purpose of methods, properties and local values without a supporting comment. Rename unclear concepts before documenting them.
+- Document non-obvious method contracts, especially internal methods: describe effects on hierarchy, constraints or observations, ownership, isolation and required call order. Comments explain behavior beyond the name rather than repeating it.
 - Use descriptive names and one primary type per file. Avoid generic `Manager`, `Helper` and `Utils` types.
 - Apply SOLID where it clarifies responsibilities. Introduce protocols at real boundaries, rather than for every type.
 - Avoid duplicated behavior, speculative abstractions and unnecessary state.
@@ -15,7 +17,7 @@ The UIKit facade exposes views and configuration. Separate owners handle layout 
 
 `HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations. `HUDIndicatorConstruction` selects a reusable typed view and preserves its progress contract; `HUDClientIndicatorAdapter` resolves the independent capabilities of arbitrary client views. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Reuse policy is explicit at facade call sites; reusing a client view preserves its resolved progress operation.
 
-`HUDLayout` coordinates one installation and its visibility observations. The installation preserves bezel placement while replacing only the content layout. Constraint groups own their activation and updates; client constraints stay outside those groups. Visibility observation reuse includes both content identity and its container.
+`HUDLayout` coordinates one installation and its visibility observations. The installation owns its invisible spacing views and preserves bezel placement while replacing only the content layout. Construction prepares constraints; explicit activation installs them. Constraint groups own their activation and updates; client constraints stay outside those groups. Visibility observation reuse includes both content identity and its container.
 
 ## Safety
 

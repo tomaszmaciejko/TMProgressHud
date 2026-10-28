@@ -13,35 +13,31 @@ final class HUDLayout {
         let isSquare: Bool
     }
 
-    private let topSpacer = UIView()
-    private let bottomSpacer = UIView()
-    private var installation: HUDLayoutInstallation?
+    private var installedLayout: HUDLayoutInstallation?
     private let visibilityObservation = HUDContentVisibilityObservation()
 
-    init() {
-        for spacer in [topSpacer, bottomSpacer] {
-            spacer.translatesAutoresizingMaskIntoConstraints = false
-            spacer.isHidden = true
-        }
-    }
-
+    /// Applies configuration to visible content, replacing the installation only when its container or bezel changes.
+    ///
+    /// Observes hidden content as well, so showing it can request a new constraint update.
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
-        visibilityObservation.update(content: content, container: container)
-        let views = visibleContent(in: content)
-        let current: HUDLayoutInstallation
-        if let installation, installation.matches(container: container, bezel: bezel) {
-            current = installation
+        visibilityObservation.observeVisibility(of: content, invalidating: container)
+        let visibleViews = visibleContent(in: content)
+        let activeInstallation: HUDLayoutInstallation
+        if let installedLayout, installedLayout.matches(container: container, bezel: bezel) {
+            activeInstallation = installedLayout
         } else {
-            installation?.deactivate()
-            current = HUDLayoutInstallation(
-                container: container, bezel: bezel, views: views, topSpacer: topSpacer, bottomSpacer: bottomSpacer)
-            installation = current
+            installedLayout?.deactivate()
+            activeInstallation = HUDLayoutInstallation(
+                container: container, bezel: bezel, visibleContent: visibleViews)
+            activeInstallation.activate()
+            installedLayout = activeInstallation
         }
-        current.update(content: views, in: bezel, configuration: configuration)
+        activeInstallation.update(visibleContent: visibleViews, configuration: configuration)
     }
 
+    /// Refreshes gaps after intrinsic content sizes change without rebuilding constraints.
     func updateInterItemSpacing() {
-        installation?.updateInterItemSpacing()
+        installedLayout?.updateInterItemSpacing()
     }
 
     private func visibleContent(in content: [UIView]) -> [UIView] {

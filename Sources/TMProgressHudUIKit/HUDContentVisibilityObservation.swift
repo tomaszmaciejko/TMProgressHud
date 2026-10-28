@@ -11,7 +11,10 @@ final class HUDContentVisibilityObservation {
     private var observedContent: [UIView] = []
     private var visibilityObservations: [NSKeyValueObservation] = []
 
-    func update(content: [UIView], container: UIView) {
+    /// Observes every supplied view and synchronously requests constraint updates on the weak container.
+    ///
+    /// Reuses observations only for the same content and container, invalidating previous tokens otherwise.
+    func observeVisibility(of content: [UIView], invalidating container: UIView) {
         let sameContent =
             observedContent.count == content.count
             && zip(observedContent, content).allSatisfy { $0.0 === $0.1 }

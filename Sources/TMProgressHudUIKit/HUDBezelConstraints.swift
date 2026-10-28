@@ -25,6 +25,7 @@ struct HUDBezelConstraints {
     var sizing: [NSLayoutConstraint] { [minimumWidth, minimumHeight, square] }
     var outerEdges: [NSLayoutConstraint] { [outerLeft, outerRight, outerTop, outerBottom] }
 
+    /// Prepares inactive positioning, outer-edge and size constraints for the supplied views.
     init(container: UIView, bezel: UIView) {
         left = bezel.leftAnchor.constraint(equalTo: container.leftAnchor)
         centerX = bezel.centerXAnchor.constraint(equalTo: container.centerXAnchor)
@@ -44,6 +45,7 @@ struct HUDBezelConstraints {
         for constraint in outerEdges { constraint.priority = HUDMetrics.sidePriority }
     }
 
+    /// Applies outer insets and selects active positioning and size constraints from the configuration.
     func update(_ configuration: HUDLayout.Configuration) {
         let layout = configuration.layout
         let insets = layout.hostInsets

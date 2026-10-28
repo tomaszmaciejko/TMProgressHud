@@ -20,7 +20,7 @@ final class HUDContentLayout {
             center = view.centerXAnchor.constraint(equalTo: bezel.centerXAnchor)
         }
 
-        func update(_ insets: UIEdgeInsets) {
+        func updateInsets(_ insets: UIEdgeInsets) {
             left.constant = insets.left
             right.constant = -insets.right
             // Center within the inset area using physical left/right edges.
@@ -46,7 +46,8 @@ final class HUDContentLayout {
             + horizontalConstraints.flatMap(\.allConstraints) + gaps.map(\.constraint)
     }
 
-    init(views: [UIView], bezel: UIView, topSpacer: UIView, bottomSpacer: UIView) {
+    /// Builds inactive constraints for visible content and the installation-owned spacing views.
+    init(visibleContent views: [UIView], bezel: UIView, topSpacer: UIView, bottomSpacer: UIView) {
         contentViews = views
         let arrangedViews = [topSpacer] + views + [bottomSpacer]
         horizontalConstraints = arrangedViews.map { HorizontalConstraints(view: $0, bezel: bezel) }
@@ -73,24 +74,28 @@ final class HUDContentLayout {
         paddingBalance = topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor)
     }
 
-    func matches(_ views: [UIView]) -> Bool {
+    /// Compares identity and order, allowing text and intrinsic sizes to change without rebuilding constraints.
+    func hasSameVisibleContent(as views: [UIView]) -> Bool {
         contentViews.count == views.count && zip(contentViews, views).allSatisfy { $0.0 === $0.1 }
     }
 
+    /// Activates only this content chain; its views must already share the bezel hierarchy.
     func activate() {
         NSLayoutConstraint.activate(allConstraints)
     }
 
+    /// Deactivates this content chain without removing views or modifying client constraints.
     func deactivate() {
         NSLayoutConstraint.deactivate(allConstraints)
     }
 
-    func update(_ insets: UIEdgeInsets) {
+    /// Applies inner insets and refreshes inter-item spacing without replacing constraints.
+    func updateContentInsets(_ insets: UIEdgeInsets) {
         topPadding.constant = insets.top
         bottomPadding.constant = insets.bottom
         // Split extra vertical space evenly, preserving the requested top/bottom difference.
         paddingBalance.constant = insets.top - insets.bottom
-        for constraints in horizontalConstraints { constraints.update(insets) }
+        for constraints in horizontalConstraints { constraints.updateInsets(insets) }
         updateInterItemSpacing()
     }
 

@@ -87,6 +87,73 @@ struct LayoutInstallationTests {
         #expect(container.invalidations == 1)
     }
 
+    @Test func replacingBezelRemovesOnlyOwnedSpacingViewsFromThePreviousBezel() {
+        let layout = HUDLayout()
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let previousBezel = makeBezel(in: container)
+        let previousLabel = makeLabel(in: previousBezel)
+        let hiddenClientView = UIView()
+        hiddenClientView.isHidden = true
+        previousBezel.addSubview(hiddenClientView)
+        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        layout.update(
+            container: container, bezel: previousBezel, content: [previousLabel], configuration: configuration)
+        let ownedSpacingViews = previousBezel.subviews.filter { $0 !== previousLabel && $0 !== hiddenClientView }
+        #expect(!ownedSpacingViews.isEmpty)
+        let replacementBezel = makeBezel(in: container)
+        let replacementLabel = makeLabel(in: replacementBezel)
+        layout.update(
+            container: container, bezel: replacementBezel, content: [replacementLabel], configuration: configuration)
+        #expect(ownedSpacingViews.allSatisfy { $0.superview !== previousBezel })
+        #expect(previousLabel.superview === previousBezel)
+        #expect(hiddenClientView.superview === previousBezel)
+        #expect(replacementLabel.superview === replacementBezel)
+    }
+
+    @Test func preparingInstallationLeavesHierarchyAndConstraintsUnchangedUntilActivation() {
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let bezel = makeBezel(in: container)
+        let label = makeLabel(in: bezel)
+        let clientConstraint = bezel.heightAnchor.constraint(greaterThanOrEqualToConstant: 40)
+        clientConstraint.isActive = true
+        let originalSubviews = bezel.subviews.map(ObjectIdentifier.init)
+        let originalConstraints = Set((container.constraints + bezel.constraints).map(ObjectIdentifier.init))
+        let installation = HUDLayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
+        #expect(bezel.subviews.map(ObjectIdentifier.init) == originalSubviews)
+        #expect(Set((container.constraints + bezel.constraints).map(ObjectIdentifier.init)) == originalConstraints)
+        installation.activate()
+        installation.update(
+            visibleContent: [label],
+            configuration: .init(layout: .init(), minimumSize: CGSize(width: 100, height: 100), isSquare: true))
+        container.layoutIfNeeded()
+        #expect(bezel.bounds.width >= 100)
+        #expect(bezel.bounds.width == bezel.bounds.height)
+        #expect(label.superview === bezel)
+        installation.deactivate()
+        #expect(clientConstraint.isActive)
+        #expect(bezel.subviews.map(ObjectIdentifier.init) == originalSubviews)
+        #expect(Set((container.constraints + bezel.constraints).map(ObjectIdentifier.init)) == originalConstraints)
+    }
+
+    @Test func preparedInstallationDoesNotRetainItsContainerOrBezel() {
+        weak var releasedContainer: UIView?
+        weak var releasedBezel: UIView?
+        let installation = autoreleasepool {
+            let container = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+            let bezel = makeBezel(in: container)
+            let label = makeLabel(in: bezel)
+            releasedContainer = container
+            releasedBezel = bezel
+            return HUDLayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
+        }
+        #expect(releasedContainer == nil)
+        #expect(releasedBezel == nil)
+        installation.activate()
+        installation.update(
+            visibleContent: [], configuration: .init(layout: .init(), minimumSize: .zero, isSquare: false))
+        installation.deactivate()
+    }
+
     private func makeBezel(in container: UIView) -> UIView {
         let bezel = UIView()
         bezel.translatesAutoresizingMaskIntoConstraints = false
