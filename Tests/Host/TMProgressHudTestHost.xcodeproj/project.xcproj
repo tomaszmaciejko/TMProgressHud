@@ -121,6 +121,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDContentLayout.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDLayout.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"
@@ -434,6 +440,12 @@
         },
         {
           "path": "../TMProgressHudUIKitTests/LayoutContractTests.swift",
+          "target-membership": [
+            "TMProgressHudUIKitTests/compile-sources"
+          ]
+        },
+        {
+          "path": "../TMProgressHudUIKitTests/LayoutInstallationTests.swift",
           "target-membership": [
             "TMProgressHudUIKitTests/compile-sources"
           ]

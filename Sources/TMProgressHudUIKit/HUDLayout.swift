@@ -30,7 +30,7 @@ final class HUDLayout {
         observeVisibility(of: content, in: container)
         let views = visibleViews(in: content)
         let current: HUDLayoutInstallation
-        if let installation, installation.matches(container: container, bezel: bezel, views: views) {
+        if let installation, installation.matches(container: container, bezel: bezel) {
             current = installation
         } else {
             installation?.deactivate()
@@ -38,7 +38,7 @@ final class HUDLayout {
                 container: container, bezel: bezel, views: views, topSpacer: topSpacer, bottomSpacer: bottomSpacer)
             installation = current
         }
-        current.update(configuration)
+        current.update(content: views, in: bezel, configuration: configuration)
     }
 
     func updatePadding() {

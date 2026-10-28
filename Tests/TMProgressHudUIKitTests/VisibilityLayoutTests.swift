@@ -75,4 +75,38 @@ struct VisibilityLayoutTests {
         window.layoutIfNeeded()
         #expect(hud.bezelView.bounds.height > 40)
     }
+    @Test func contentChangesKeepBezelPlacementAndSizingConstraints() {
+        let host = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let hud = TMProgressHud.showAdded(to: host, animated: false)
+        defer { hud.hide(animated: false) }
+        hud.label.text = "Loading"
+        hud.detailsLabel.text = "Please wait"
+        hud.minSize = CGSize(width: 120, height: 100)
+        hud.isSquare = true
+        host.layoutIfNeeded()
+        let placement = Set(hud.constraints.map(ObjectIdentifier.init))
+        let sizing = hud.bezelView.constraints.filter { constraint in
+            constraint.firstItem === hud.bezelView
+                && (constraint.secondItem == nil || constraint.secondItem === hud.bezelView)
+        }
+        #expect(!placement.isEmpty)
+        #expect(!sizing.isEmpty)
+        // UIKit rounds view frames to pixels; the detached tvOS fixture has a one-point pixel.
+        let pixelRoundingTolerance: CGFloat = 0.5
+        for content in [TMProgressHudContent.text, .ring, .bar, .activity] {
+            hud.setContent(content)
+            hud.detailsLabel.isHidden = true
+            host.layoutIfNeeded()
+            #expect(Set(hud.constraints.map(ObjectIdentifier.init)) == placement)
+            #expect(sizing.allSatisfy { $0.isActive })
+            hud.detailsLabel.isHidden = false
+            host.layoutIfNeeded()
+            #expect(Set(hud.constraints.map(ObjectIdentifier.init)) == placement)
+            #expect(sizing.allSatisfy { $0.isActive })
+            #expect(abs(hud.bezelView.frame.midX - host.bounds.midX) <= pixelRoundingTolerance)
+            #expect(abs(hud.bezelView.frame.midY - host.bounds.midY) <= pixelRoundingTolerance)
+            #expect(hud.bezelView.bounds.width == hud.bezelView.bounds.height)
+        }
+    }
+
 }

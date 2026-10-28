@@ -56,6 +56,12 @@
       ]
     },
     {
+      "path": "Sources/TMProgressHudUIKit/HUDContentLayout.swift",
+      "target-membership": [
+        "TMProgressHudUIKit/compile-sources"
+      ]
+    },
+    {
       "path": "Sources/TMProgressHudUIKit/HUDLayout.swift",
       "target-membership": [
         "TMProgressHudUIKit/compile-sources"
