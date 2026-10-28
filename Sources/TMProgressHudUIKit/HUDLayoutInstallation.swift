@@ -48,7 +48,7 @@ final class HUDLayoutInstallation {
         contentLayout.update(configuration.layout.contentInsets)
     }
 
-    func updatePadding() {
-        contentLayout.updatePadding()
+    func updateInterItemSpacing() {
+        contentLayout.updateInterItemSpacing()
     }
 }

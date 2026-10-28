@@ -28,12 +28,11 @@ final class HUDContentLayout {
     }
 
     private struct Gap {
-        let preceding: UIView
         let following: UIView
         let constraint: NSLayoutConstraint
     }
 
-    private let arrangedViews: [UIView]
+    private let contentViews: [UIView]
     private let horizontalConstraints: [HorizontalConstraints]
     private let gaps: [Gap]
     private let boundaryConstraints: [NSLayoutConstraint]
@@ -47,24 +46,34 @@ final class HUDContentLayout {
     }
 
     init(views: [UIView], bezel: UIView, topSpacer: UIView, bottomSpacer: UIView) {
-        arrangedViews = views
-        horizontalConstraints = views.map { HorizontalConstraints(view: $0, bezel: bezel) }
+        contentViews = views
+        let arrangedViews = [topSpacer] + views + [bottomSpacer]
+        horizontalConstraints = arrangedViews.map { HorizontalConstraints(view: $0, bezel: bezel) }
         gaps = zip(views, views.dropFirst()).map { preceding, following in
             Gap(
-                preceding: preceding, following: following,
+                following: following,
                 constraint: following.topAnchor.constraint(equalTo: preceding.bottomAnchor))
         }
-        boundaryConstraints = [
+        var boundaries = [
             topSpacer.topAnchor.constraint(equalTo: bezel.topAnchor),
             bottomSpacer.bottomAnchor.constraint(equalTo: bezel.bottomAnchor),
         ]
+        if let first = views.first, let last = views.last {
+            boundaries += [
+                first.topAnchor.constraint(equalTo: topSpacer.bottomAnchor),
+                bottomSpacer.topAnchor.constraint(equalTo: last.bottomAnchor),
+            ]
+        } else {
+            boundaries.append(bottomSpacer.topAnchor.constraint(equalTo: topSpacer.bottomAnchor))
+        }
+        boundaryConstraints = boundaries
         topPadding = topSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         bottomPadding = bottomSpacer.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         paddingBalance = topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor)
     }
 
     func matches(_ views: [UIView]) -> Bool {
-        arrangedViews.count == views.count && zip(arrangedViews, views).allSatisfy { $0.0 === $0.1 }
+        contentViews.count == views.count && zip(contentViews, views).allSatisfy { $0.0 === $0.1 }
     }
 
     func activate() {
@@ -80,18 +89,22 @@ final class HUDContentLayout {
         bottomPadding.constant = insets.bottom
         paddingBalance.constant = insets.top - insets.bottom
         for constraints in horizontalConstraints { constraints.update(insets) }
-        updatePadding()
+        updateInterItemSpacing()
     }
 
-    func updatePadding() {
-        var hasEarlierVisibleContent = false
+    /// Adds one gap before each nonempty item after the first, skipping empty items in between.
+    func updateInterItemSpacing() {
+        guard let first = contentViews.first else { return }
+        var hasEarlierContent = participatesInSpacing(first)
         for gap in gaps {
-            let isPrecedingVisible = !gap.preceding.isHidden && gap.preceding.intrinsicContentSize != .zero
-            let isFollowingVisible = !gap.following.isHidden && gap.following.intrinsicContentSize != .zero
-            let needsPadding = isFollowingVisible && (isPrecedingVisible || hasEarlierVisibleContent)
-            gap.constraint.constant = needsPadding ? HUDMetrics.padding : 0
-            hasEarlierVisibleContent = hasEarlierVisibleContent || isPrecedingVisible
+            let hasFollowingContent = participatesInSpacing(gap.following)
+            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.padding : 0
+            hasEarlierContent = hasEarlierContent || hasFollowingContent
         }
     }
 
+    private func participatesInSpacing(_ view: UIView) -> Bool {
+        // No intrinsic metric still permits client constraints to size the view; only an exact zero is empty.
+        !view.isHidden && view.intrinsicContentSize != .zero
+    }
 }

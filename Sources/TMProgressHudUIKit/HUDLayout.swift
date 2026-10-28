@@ -28,7 +28,7 @@ final class HUDLayout {
 
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
         observeVisibility(of: content, in: container)
-        let views = visibleViews(in: content)
+        let views = visibleContent(in: content)
         let current: HUDLayoutInstallation
         if let installation, installation.matches(container: container, bezel: bezel) {
             current = installation
@@ -41,8 +41,8 @@ final class HUDLayout {
         current.update(content: views, in: bezel, configuration: configuration)
     }
 
-    func updatePadding() {
-        installation?.updatePadding()
+    func updateInterItemSpacing() {
+        installation?.updateInterItemSpacing()
     }
 
     private func observeVisibility(of content: [UIView], in container: UIView) {
@@ -61,8 +61,8 @@ final class HUDLayout {
         }
     }
 
-    private func visibleViews(in content: [UIView]) -> [UIView] {
-        [topSpacer] + content.filter { !$0.isHidden } + [bottomSpacer]
+    private func visibleContent(in content: [UIView]) -> [UIView] {
+        content.filter { !$0.isHidden }
     }
 
 }

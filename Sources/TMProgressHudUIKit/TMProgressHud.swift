@@ -314,7 +314,7 @@ open class TMProgressHud: UIView {
     /// Updates hidden content and padding while preserving client constraints.
     open override func layoutSubviews() {
         if !needsUpdateConstraints() {
-            hudLayout.updatePadding()
+            hudLayout.updateInterItemSpacing()
         }
         super.layoutSubviews()
     }

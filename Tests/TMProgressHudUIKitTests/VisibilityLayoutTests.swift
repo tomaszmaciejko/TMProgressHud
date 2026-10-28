@@ -69,6 +69,7 @@ struct VisibilityLayoutTests {
         window.layoutIfNeeded()
         hud.label.isHidden = true
         hud.detailsLabel.isHidden = true
+        hud.button.isHidden = true
         window.layoutIfNeeded()
         #expect(hud.bezelView.bounds.height == 40)
         hud.label.isHidden = false
@@ -106,6 +107,33 @@ struct VisibilityLayoutTests {
             #expect(abs(hud.bezelView.frame.midX - host.bounds.midX) <= pixelRoundingTolerance)
             #expect(abs(hud.bezelView.frame.midY - host.bounds.midY) <= pixelRoundingTolerance)
             #expect(hud.bezelView.bounds.width == hud.bezelView.bounds.height)
+        }
+    }
+
+    @Test func emptyTitleBetweenCustomViewAndDetailsAddsOnlyOneGap() {
+        let host = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let hud = TMProgressHud.showAdded(to: host, animated: false)
+        defer { hud.hide(animated: false) }
+        let custom = UIView()
+        NSLayoutConstraint.activate([
+            custom.widthAnchor.constraint(equalToConstant: 100),
+            custom.heightAnchor.constraint(equalToConstant: 30),
+        ])
+        hud.setContent(.custom(custom))
+        hud.detailsLabel.text = "Details"
+        let pixelRoundingTolerance: CGFloat = 0.5
+        for title in [nil, "Loading", nil] as [String?] {
+            hud.label.text = title
+            host.layoutIfNeeded()
+            hud.setNeedsLayout()
+            hud.layoutIfNeeded()
+            #expect(custom.bounds.height == 30)
+            if title == nil {
+                #expect(abs(hud.detailsLabel.frame.minY - custom.frame.maxY - 4) <= pixelRoundingTolerance)
+            } else {
+                #expect(abs(hud.label.frame.minY - custom.frame.maxY - 4) <= pixelRoundingTolerance)
+                #expect(abs(hud.detailsLabel.frame.minY - hud.label.frame.maxY - 4) <= pixelRoundingTolerance)
+            }
         }
     }
 
