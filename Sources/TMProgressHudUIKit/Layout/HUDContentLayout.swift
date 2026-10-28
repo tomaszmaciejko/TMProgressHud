@@ -105,7 +105,7 @@ final class HUDContentLayout {
         var hasEarlierContent = participatesInSpacing(first)
         for gap in gaps {
             let hasFollowingContent = participatesInSpacing(gap.following)
-            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.interItemSpacing : 0
+            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.Layout.interItemSpacing : 0
             hasEarlierContent = hasEarlierContent || hasFollowingContent
         }
     }

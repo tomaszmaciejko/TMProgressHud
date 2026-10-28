@@ -8,7 +8,8 @@ import UIKit
 public struct TMProgressHudLayout: Sendable, Equatable {
     /// The default 20-point spacing on every edge.
     public static let defaultInsets = UIEdgeInsets(
-        top: HUDMetrics.margin, left: HUDMetrics.margin, bottom: HUDMetrics.margin, right: HUDMetrics.margin)
+        top: HUDMetrics.Layout.margin, left: HUDMetrics.Layout.margin, bottom: HUDMetrics.Layout.margin,
+        right: HUDMetrics.Layout.margin)
 
     /// The bezel alignment and offset.
     public var position: TMProgressHudPosition

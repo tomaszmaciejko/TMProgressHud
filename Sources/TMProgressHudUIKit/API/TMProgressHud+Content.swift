@@ -55,14 +55,14 @@ extension TMProgressHud {
         backgroundView.alpha = 0
         addSubview(backgroundView)
         bezelView.translatesAutoresizingMaskIntoConstraints = false
-        bezelView.layer.cornerRadius = HUDMetrics.bezelRadius
+        bezelView.layer.cornerRadius = HUDMetrics.Appearance.bezelRadius
         bezelView.alpha = 0
         addSubview(bezelView)
         configureLabels()
         for view in [label, detailsLabel, button] {
             view.translatesAutoresizingMaskIntoConstraints = false
-            view.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .horizontal)
-            view.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
+            view.setContentCompressionResistancePriority(HUDMetrics.Layout.contentPriority, for: .horizontal)
+            view.setContentCompressionResistancePriority(HUDMetrics.Layout.contentPriority, for: .vertical)
             bezelView.addSubview(view)
         }
     }
@@ -78,13 +78,14 @@ extension TMProgressHud {
             item.backgroundColor = .clear
         }
         label.font = UIFontMetrics(forTextStyle: .headline).scaledFont(
-            for: .boldSystemFont(ofSize: HUDMetrics.titleFontSize), compatibleWith: label.traitCollection)
+            for: .boldSystemFont(ofSize: HUDMetrics.Typography.titleFontSize), compatibleWith: label.traitCollection)
         detailsLabel.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
-            for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: detailsLabel.traitCollection)
+            for: .boldSystemFont(ofSize: HUDMetrics.Typography.detailFontSize),
+            compatibleWith: detailsLabel.traitCollection)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.lineBreakMode = .byTruncatingTail
         button.titleLabel?.font = UIFontMetrics(forTextStyle: .caption1).scaledFont(
-            for: .boldSystemFont(ofSize: HUDMetrics.detailFontSize), compatibleWith: button.traitCollection)
+            for: .boldSystemFont(ofSize: HUDMetrics.Typography.detailFontSize), compatibleWith: button.traitCollection)
         button.titleLabel?.adjustsFontForContentSizeCategory = true
         button.setTitleColor(contentColor, for: .normal)
     }
@@ -101,8 +102,8 @@ extension TMProgressHud {
         guard installIndicator(replacement, replacing: previousIndicator, generation: generation) else { return }
         let view = replacement?.view
         view?.translatesAutoresizingMaskIntoConstraints = false
-        view?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .horizontal)
-        view?.setContentCompressionResistancePriority(HUDMetrics.contentPriority, for: .vertical)
+        view?.setContentCompressionResistancePriority(HUDMetrics.Layout.contentPriority, for: .horizontal)
+        view?.setContentCompressionResistancePriority(HUDMetrics.Layout.contentPriority, for: .vertical)
         setNeedsUpdateConstraints()
         if view !== previousIndicator { replacement?.updateColor(contentColor) }
         guard generation == indicatorUpdateGeneration else { return }

@@ -36,7 +36,7 @@ open class TMProgressHud: UIView {
     }
 
     /// The default color for newly created indicators; changing it does not recolor existing content.
-    public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(HUDMetrics.contentAlpha)
+    public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(HUDMetrics.Appearance.contentAlpha)
 
     /// A bulk color for current content and newly created indicators.
     ///

@@ -38,8 +38,8 @@ extension TMProgressHud: HUDPresentationHost {
         } else {
             resolvedType = type
         }
-        let small = CGAffineTransform(scaleX: HUDMetrics.reducedScale, y: HUDMetrics.reducedScale)
-        let large = CGAffineTransform(scaleX: HUDMetrics.enlargedScale, y: HUDMetrics.enlargedScale)
+        let small = CGAffineTransform(scaleX: HUDMetrics.Animation.reducedScale, y: HUDMetrics.Animation.reducedScale)
+        let large = CGAffineTransform(scaleX: HUDMetrics.Animation.enlargedScale, y: HUDMetrics.Animation.enlargedScale)
         if isAppearing && bezelView.alpha == 0 {
             if resolvedType == .zoomIn {
                 bezelView.transform = small
@@ -48,7 +48,7 @@ extension TMProgressHud: HUDPresentationHost {
             }
         }
         UIView.animate(
-            springDuration: HUDMetrics.animationPerceivedDuration, bounce: 0,
+            springDuration: HUDMetrics.Animation.perceivedDuration, bounce: 0,
             initialSpringVelocity: 0, delay: 0, options: .beginFromCurrentState,
             animations: {
                 self.applyAnimationState(isAppearing: isAppearing, type: resolvedType)
@@ -63,8 +63,8 @@ extension TMProgressHud: HUDPresentationHost {
             scale = 1
         } else {
             switch type {
-            case .zoomIn: scale = HUDMetrics.enlargedScale
-            case .zoomOut: scale = HUDMetrics.reducedScale
+            case .zoomIn: scale = HUDMetrics.Animation.enlargedScale
+            case .zoomOut: scale = HUDMetrics.Animation.reducedScale
             default: scale = 1
             }
         }
@@ -105,8 +105,8 @@ extension TMProgressHud: HUDPresentationHost {
     private func motionEffect(key: String, type: UIInterpolatingMotionEffect.EffectType) -> UIInterpolatingMotionEffect
     {
         let effect = UIInterpolatingMotionEffect(keyPath: key, type: type)
-        effect.maximumRelativeValue = HUDMetrics.motionOffset
-        effect.minimumRelativeValue = -HUDMetrics.motionOffset
+        effect.maximumRelativeValue = HUDMetrics.Animation.motionOffset
+        effect.minimumRelativeValue = -HUDMetrics.Animation.motionOffset
         return effect
     }
 }

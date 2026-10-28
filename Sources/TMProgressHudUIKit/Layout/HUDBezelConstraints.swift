@@ -40,9 +40,9 @@ struct HUDBezelConstraints {
         outerRight = bezel.rightAnchor.constraint(lessThanOrEqualTo: container.rightAnchor)
         outerTop = bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor)
         outerBottom = bezel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor)
-        for constraint in positioning { constraint.priority = HUDMetrics.contentPriority }
-        for constraint in sizing { constraint.priority = HUDMetrics.sizePriority }
-        for constraint in outerEdges { constraint.priority = HUDMetrics.sidePriority }
+        for constraint in positioning { constraint.priority = HUDMetrics.Layout.contentPriority }
+        for constraint in sizing { constraint.priority = HUDMetrics.Layout.sizePriority }
+        for constraint in outerEdges { constraint.priority = HUDMetrics.Layout.sidePriority }
     }
 
     /// Applies outer insets and selects active positioning and size constraints from the configuration.

@@ -80,11 +80,11 @@ enum HUDIndicatorColoring {
         guard let color else { return nil }
         switch policy {
         case .compatibility:
-            return color.withAlphaComponent(HUDMetrics.remainingAlpha)
+            return color.withAlphaComponent(HUDMetrics.Appearance.remainingAlpha)
         case .explicit:
             return UIColor { traits in
                 let resolvedColor = color.resolvedColor(with: traits)
-                let trackAlpha = resolvedColor.cgColor.alpha * HUDMetrics.remainingAlpha
+                let trackAlpha = resolvedColor.cgColor.alpha * HUDMetrics.Appearance.remainingAlpha
                 return resolvedColor.withAlphaComponent(trackAlpha)
             }
         }
