@@ -1,9 +1,9 @@
 [
   {
     "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
-    "sha256": "eb745e4ab06b20a6d62d6a323693b8c18dfbfc8a3373443e5ebe20001c55cf93",
+    "sha256": "9fff9d8a8bfbc6e0357c715f43362d3e361a60e09e8150f36124b797c094c937",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Reviewed declaration-only cleanup: current-product docs and priority rationale; enum raw values, Sendable conformance and numeric defaults unchanged. No executable-line exclusion."
+    "decision": "Reviewed static declarations: padding renamed to interItemSpacing for clarity; all values and priorities unchanged. Swift/LLVM still emits no source coverage regions; layout/default tests exercise the constants. No executable-line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",

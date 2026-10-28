@@ -27,5 +27,4 @@ final class HUDContentVisibilityObservation {
             }
         }
     }
-
 }

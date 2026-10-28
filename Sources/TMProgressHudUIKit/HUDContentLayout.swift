@@ -12,7 +12,7 @@ final class HUDContentLayout {
         let right: NSLayoutConstraint
         let center: NSLayoutConstraint
 
-        var all: [NSLayoutConstraint] { [center, left, right] }
+        var allConstraints: [NSLayoutConstraint] { [center, left, right] }
 
         init(view: UIView, bezel: UIView) {
             left = view.leftAnchor.constraint(greaterThanOrEqualTo: bezel.leftAnchor)
@@ -23,6 +23,7 @@ final class HUDContentLayout {
         func update(_ insets: UIEdgeInsets) {
             left.constant = insets.left
             right.constant = -insets.right
+            // Center within the inset area using physical left/right edges.
             center.constant = (insets.left - insets.right) / 2
         }
     }
@@ -42,7 +43,7 @@ final class HUDContentLayout {
 
     private var allConstraints: [NSLayoutConstraint] {
         boundaryConstraints + [topPadding, bottomPadding, paddingBalance]
-            + horizontalConstraints.flatMap(\.all) + gaps.map(\.constraint)
+            + horizontalConstraints.flatMap(\.allConstraints) + gaps.map(\.constraint)
     }
 
     init(views: [UIView], bezel: UIView, topSpacer: UIView, bottomSpacer: UIView) {
@@ -87,6 +88,7 @@ final class HUDContentLayout {
     func update(_ insets: UIEdgeInsets) {
         topPadding.constant = insets.top
         bottomPadding.constant = insets.bottom
+        // Split extra vertical space evenly, preserving the requested top/bottom difference.
         paddingBalance.constant = insets.top - insets.bottom
         for constraints in horizontalConstraints { constraints.update(insets) }
         updateInterItemSpacing()
@@ -98,7 +100,7 @@ final class HUDContentLayout {
         var hasEarlierContent = participatesInSpacing(first)
         for gap in gaps {
             let hasFollowingContent = participatesInSpacing(gap.following)
-            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.padding : 0
+            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.interItemSpacing : 0
             hasEarlierContent = hasEarlierContent || hasFollowingContent
         }
     }

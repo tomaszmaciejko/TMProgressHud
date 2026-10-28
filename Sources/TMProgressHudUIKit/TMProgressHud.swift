@@ -311,7 +311,7 @@ open class TMProgressHud: UIView {
         super.updateConstraints()
     }
 
-    /// Updates hidden content and padding while preserving client constraints.
+    /// Refreshes inter-item spacing when the layout constraints are already current.
     open override func layoutSubviews() {
         if !needsUpdateConstraints() {
             hudLayout.updateInterItemSpacing()

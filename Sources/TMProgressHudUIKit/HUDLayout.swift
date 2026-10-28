@@ -47,5 +47,4 @@ final class HUDLayout {
     private func visibleContent(in content: [UIView]) -> [UIView] {
         content.filter { !$0.isHidden }
     }
-
 }

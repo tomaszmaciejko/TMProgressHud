@@ -15,6 +15,8 @@ The UIKit facade exposes views and configuration. Separate owners handle layout 
 
 `HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations. `HUDIndicatorConstruction` selects a reusable typed view and preserves its progress contract; `HUDClientIndicatorAdapter` resolves the independent capabilities of arbitrary client views. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Reuse policy is explicit at facade call sites; reusing a client view preserves its resolved progress operation.
 
+`HUDLayout` coordinates one installation and its visibility observations. The installation preserves bezel placement while replacing only the content layout. Constraint groups own their activation and updates; client constraints stay outside those groups. Visibility observation reuse includes both content identity and its container.
+
 ## Safety
 
 Use Swift 6 isolation; UI state and callbacks belong to the main actor. Scheduled actions and observers need explicit owners and cancellation. Preserve the documented timing and callback contracts unless an intentional change is described and covered by regression tests.

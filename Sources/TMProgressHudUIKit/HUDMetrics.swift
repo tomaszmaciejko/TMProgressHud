@@ -7,7 +7,7 @@ import UIKit
 // Shared layout, appearance and presentation defaults.
 enum HUDMetrics {
     static let margin: CGFloat = 20
-    static let padding: CGFloat = 4
+    static let interItemSpacing: CGFloat = 4
     static let titleFontSize: CGFloat = 16
     static let detailFontSize: CGFloat = 12
     static let contentAlpha: CGFloat = 0.7
