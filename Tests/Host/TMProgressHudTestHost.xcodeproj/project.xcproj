@@ -127,6 +127,12 @@
           ]
         },
         {
+          "path": "../../Sources/TMProgressHudUIKit/HUDContentVisibilityObservation.swift",
+          "target-membership": [
+            "TMProgressHudUIKit/compile-sources"
+          ]
+        },
+        {
           "path": "../../Sources/TMProgressHudUIKit/HUDLayout.swift",
           "target-membership": [
             "TMProgressHudUIKit/compile-sources"

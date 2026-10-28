@@ -16,8 +16,7 @@ final class HUDLayout {
     private let topSpacer = UIView()
     private let bottomSpacer = UIView()
     private var installation: HUDLayoutInstallation?
-    private var observedContent: [UIView] = []
-    private var visibilityObservations: [NSKeyValueObservation] = []
+    private let visibilityObservation = HUDContentVisibilityObservation()
 
     init() {
         for spacer in [topSpacer, bottomSpacer] {
@@ -27,7 +26,7 @@ final class HUDLayout {
     }
 
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
-        observeVisibility(of: content, in: container)
+        visibilityObservation.update(content: content, container: container)
         let views = visibleContent(in: content)
         let current: HUDLayoutInstallation
         if let installation, installation.matches(container: container, bezel: bezel) {
@@ -43,22 +42,6 @@ final class HUDLayout {
 
     func updateInterItemSpacing() {
         installation?.updateInterItemSpacing()
-    }
-
-    private func observeVisibility(of content: [UIView], in container: UIView) {
-        let sameContent =
-            observedContent.count == content.count
-            && zip(observedContent, content).allSatisfy { $0.0 === $0.1 }
-        guard !sameContent else { return }
-        for observation in visibilityObservations { observation.invalidate() }
-        observedContent = content
-        visibilityObservations = content.map { view in
-            view.observe(\.isHidden) { [weak container] _, _ in
-                // KVO is synchronous with UIKit's main-actor-only isHidden setter.
-                // Verify that executor before invalidating constraints; never defer the layout request.
-                MainActor.assumeIsolated { container?.setNeedsUpdateConstraints() }
-            }
-        }
     }
 
     private func visibleContent(in content: [UIView]) -> [UIView] {

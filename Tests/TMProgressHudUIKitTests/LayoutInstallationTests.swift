@@ -2,6 +2,16 @@ import Testing
 import UIKit
 @testable import TMProgressHudUIKit
 
+@MainActor
+private final class LayoutInvalidationView: UIView {
+    var invalidations = 0
+
+    override func setNeedsUpdateConstraints() {
+        invalidations += 1
+        super.setNeedsUpdateConstraints()
+    }
+}
+
 @Suite(.serialized)
 @MainActor
 struct LayoutInstallationTests {
@@ -37,6 +47,44 @@ struct LayoutInstallationTests {
         #expect(secondBezel.frame.midX == secondContainer.bounds.midX)
         #expect(secondBezel.frame.midY == secondContainer.bounds.midY)
         #expect(clientConstraint.isActive)
+    }
+
+    @Test func identicalContentInvalidatesOnlyItsNewContainer() {
+        let layout = HUDLayout()
+        let first = LayoutInvalidationView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let second = LayoutInvalidationView(frame: first.bounds)
+        let bezel = makeBezel(in: first)
+        let label = makeLabel(in: bezel)
+        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        layout.update(container: first, bezel: bezel, content: [label], configuration: configuration)
+        second.addSubview(bezel)
+        layout.update(container: second, bezel: bezel, content: [label], configuration: configuration)
+        first.invalidations = 0
+        second.invalidations = 0
+        label.isHidden = true
+        #expect(first.invalidations == 0)
+        #expect(second.invalidations == 1)
+    }
+
+    @Test func repeatedUpdatesObserveOnceAndReplacedContentStopsInvalidating() {
+        let layout = HUDLayout()
+        let container = LayoutInvalidationView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
+        let bezel = makeBezel(in: container)
+        let label = makeLabel(in: bezel)
+        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        for _ in 0..<3 {
+            layout.update(container: container, bezel: bezel, content: [label], configuration: configuration)
+        }
+        container.invalidations = 0
+        label.isHidden = true
+        #expect(container.invalidations == 1)
+        let replacement = makeLabel(in: bezel)
+        layout.update(container: container, bezel: bezel, content: [replacement], configuration: configuration)
+        container.invalidations = 0
+        label.isHidden = false
+        #expect(container.invalidations == 0)
+        replacement.isHidden = true
+        #expect(container.invalidations == 1)
     }
 
     private func makeBezel(in container: UIView) -> UIView {
