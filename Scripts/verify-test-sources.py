@@ -13,7 +13,7 @@ for project_path, targets_to_check in registries:
     data = read_project(bundle)
     for name, directory in targets_to_check:
         files = compiled_swift_sources(data, bundle.parent, name)
-        expected = {path.resolve() for path in (root / directory).glob("*.swift")}
+        expected = {path.resolve() for path in (root / directory).rglob("*.swift")}
         if files != expected:
             raise SystemExit(f"Source registry differs for {project_path}/{name}: {files ^ expected}")
 print("Hosted tests and shipping framework compile every registered Swift source exactly once.")

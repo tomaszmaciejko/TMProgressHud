@@ -1,24 +1,24 @@
 [
   {
-    "file": "Sources/TMProgressHudUIKit/HUDMetrics.swift",
+    "file": "Sources/TMProgressHudUIKit/Support/HUDMetrics.swift",
     "sha256": "9fff9d8a8bfbc6e0357c715f43362d3e361a60e09e8150f36124b797c094c937",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
     "decision": "Reviewed static declarations: padding renamed to interItemSpacing for clarity; all values and priorities unchanged. Swift/LLVM still emits no source coverage regions; layout/default tests exercise the constants. No executable-line exclusion."
   },
   {
-    "file": "Sources/TMProgressHudUIKit/TMProgressHudTypes.swift",
+    "file": "Sources/TMProgressHudUIKit/API/TMProgressHudTypes.swift",
     "sha256": "2f68f339894f5a01f1498101683ee2aca0da870bff491227b7eb04a39bc320e8",
     "reason": "Swift/LLVM emits no source coverage regions for these enum/typealias/global constant declarations; raw values and offset are asserted in enumCasesPreserveRawValues.",
     "decision": "Reviewed declaration-only cleanup: current-product docs and priority rationale; enum raw values, Sendable conformance and numeric defaults unchanged. No executable-line exclusion."
   },
   {
-    "file": "Sources/TMProgressHudUIKit/TMProgressHudDelegate.swift",
+    "file": "Sources/TMProgressHudUIKit/API/TMProgressHudDelegate.swift",
     "sha256": "12605dd14b93ae658e23673ada7621b73598e44c6bb132b563329b062cf77601",
     "reason": "Protocol method declaration has no executable body; concrete optional callback delivery is tested in repeatedHideRetainsCallbackOrdering.",
     "decision": "Declaration-only protocol; corrected stale documentation to the tested once-per-presentation callback contract. No executable body or line exclusion."
   },
   {
-    "file": "Sources/TMProgressHudUIKit/TMProgressHudProgressReporting.swift",
+    "file": "Sources/TMProgressHudUIKit/API/TMProgressHudProgressReporting.swift",
     "sha256": "69165c6683a91eb6972278d5e179c460e18fa1a750f9333ec55de1a1a17d6f36",
     "reason": "Public protocol declaration has no executable body; Swift/LLVM emitted no coverage regions in the hosted iOS report. Native Swift custom progress delivery is verified by IndicatorContractTests.",
     "decision": "Declaration-only accounting, not an executable-line exclusion. Reviewed for typed custom indicators."

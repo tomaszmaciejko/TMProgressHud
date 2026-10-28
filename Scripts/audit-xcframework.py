@@ -106,7 +106,7 @@ def main():
     variants = {(entry["SupportedPlatform"], entry.get("SupportedPlatformVariant", "device")) for entry in entries}
     require(len(entries) == 4 and variants == EXPECTED_VARIANTS, "Expected iOS/tvOS device and simulator slices")
     version = (ROOT / "VERSION").read_text().strip()
-    report = {"version": version, "result": "passed", "signature": audit_signature(artifact, args.require_signature, args.expected_certificate_sha256), "slices": [audit_slice(artifact, entry, version) for entry in entries], "sourceSHA256": {str(path.relative_to(ROOT)): sha256(path) for path in sorted((ROOT / "Sources/TMProgressHudUIKit").glob("*.swift"))}}
+    report = {"version": version, "result": "passed", "signature": audit_signature(artifact, args.require_signature, args.expected_certificate_sha256), "slices": [audit_slice(artifact, entry, version) for entry in entries], "sourceSHA256": {str(path.relative_to(ROOT)): sha256(path) for path in sorted((ROOT / "Sources/TMProgressHudUIKit").rglob("*.swift"))}}
     archive = artifact.with_suffix(".xcframework.zip")
     if archive.exists():
         report["archiveSHA256"] = sha256(archive)

@@ -220,4 +220,16 @@ class DistributionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "reviewed source"):
                 distribution.verify_remote_source(plan)
             (checkout / "View.swift").write_text("reviewed source")
+            nested_source = source.parent / "Indicators/Nested.swift"
+            nested_source.parent.mkdir()
+            nested_source.write_text("reviewed nested source")
+            nested_checkout = checkout / "Indicators/Nested.swift"
+            nested_checkout.parent.mkdir()
+            nested_checkout.write_text("different nested source")
+            with self.assertRaisesRegex(ValueError, "reviewed source"):
+                distribution.verify_remote_source(plan)
+            nested_checkout.write_text("reviewed nested source")
             distribution.verify_remote_source(plan)
+            (checkout / "Extra.swift").write_text("unexpected source")
+            with self.assertRaisesRegex(ValueError, "reviewed source"):
+                distribution.verify_remote_source(plan)

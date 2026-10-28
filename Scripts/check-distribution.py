@@ -168,9 +168,15 @@ def verify_remote_source(plan):
         checkout = plan.work / "Pods" / POD_NAME
         if f":commit: {plan.remote_source.revision}" not in (plan.work / "Podfile.lock").read_text():
             raise ValueError("CocoaPods lockfile does not record the requested commit")
-    for source in (plan.root / "Sources/TMProgressHudUIKit").glob("*.swift"):
-        if source.read_bytes() != (checkout / "Sources/TMProgressHudUIKit" / source.name).read_bytes():
-            raise ValueError(f"Resolved remote source differs from the reviewed source: {source.name}")
+    reviewed_root = plan.root / "Sources/TMProgressHudUIKit"
+    resolved_root = checkout / "Sources/TMProgressHudUIKit"
+    reviewed_sources = {path.relative_to(reviewed_root) for path in reviewed_root.rglob("*.swift")}
+    resolved_sources = {path.relative_to(resolved_root) for path in resolved_root.rglob("*.swift")}
+    if reviewed_sources != resolved_sources:
+        raise ValueError("Resolved remote source set differs from the reviewed source")
+    for relative in sorted(reviewed_sources):
+        if (reviewed_root / relative).read_bytes() != (resolved_root / relative).read_bytes():
+            raise ValueError(f"Resolved remote source differs from the reviewed source: {relative}")
 
 
 def wait_for_receipt(receipt, identifier):

@@ -24,7 +24,8 @@ class ProjectFormatTests(unittest.TestCase):
             sources.mkdir(parents=True)
             tests.mkdir(parents=True)
             (sources / "First.swift").write_text("struct First {}")
-            (tests / "ExampleTests.swift").write_text("struct ExampleTests {}")
+            (tests / "Layout").mkdir()
+            (tests / "Layout/ExampleTests.swift").write_text("struct ExampleTests {}")
             bundle = root / "Host.xcodeproj"
             bundle.mkdir()
             original = read_project(SCRIPTS.parent / "Tests/Host/TMProgressHudTestHost.xcodeproj")
@@ -32,12 +33,32 @@ class ProjectFormatTests(unittest.TestCase):
             with mock.patch.object(factory, "ROOT", root):
                 factory.generate(bundle, "test-sources")
                 (sources / "First.swift").unlink()
-                (sources / "Second.swift").write_text("struct Second {}")
+                (sources / "Layout").mkdir()
+                (sources / "Layout/Second.swift").write_text("struct Second {}")
                 factory.generate(bundle, "test-sources")
             result = read_project(bundle)
-            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKit"), {(sources / "Second.swift").resolve()})
-            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKitTests"), {(tests / "ExampleTests.swift").resolve()})
+            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKit"), {(sources / "Layout/Second.swift").resolve()})
+            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKitTests"), {(tests / "Layout/ExampleTests.swift").resolve()})
             self.assertEqual({key: value for key, value in result.items() if key != "files"}, {key: value for key, value in original.items() if key != "files"})
+
+    def test_shipping_registry_discovers_nested_sources_without_adding_a_test_target(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            nested = root / "Sources/TMProgressHudUIKit/Layout"
+            nested.mkdir(parents=True)
+            source = nested / "Layout.swift"
+            source.write_text("struct Layout {}")
+            bundle = root / "Library.xcodeproj"
+            bundle.mkdir()
+            original = read_project(SCRIPTS.parent / "TMProgressHud.xcodeproj")
+            (bundle / "project.xcproj").write_text(json.dumps(original))
+            with mock.patch.object(factory, "ROOT", root):
+                factory.generate(bundle, "test-sources")
+            result = read_project(bundle)
+            self.assertEqual(compiled_swift_sources(result, bundle.parent, "TMProgressHudUIKit"), {source.resolve()})
+            self.assertEqual(result["targets"], original["targets"])
+            library = next(entry for entry in result["files"] if entry.get("name") == "TMProgressHudUIKit")
+            self.assertEqual([entry["name"] for entry in library["children"]], ["Layout"])
 
     def test_host_registry_is_idempotent_and_preserves_reference_resources(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -80,7 +101,7 @@ class ProjectFormatTests(unittest.TestCase):
             project = read_project(bundle)
             self.assertFalse((bundle / "project.pbxproj").exists())
             sources = compiled_swift_sources(project, bundle.parent, "TMProgressHudUIKit")
-            self.assertEqual(sources, {p.resolve() for p in (SCRIPTS.parent / "Sources/TMProgressHudUIKit").glob("*.swift")})
+            self.assertEqual(sources, {p.resolve() for p in (SCRIPTS.parent / "Sources/TMProgressHudUIKit").rglob("*.swift")})
             scheme = (bundle / "xcshareddata/xcschemes/TMProgressHudUIKit.xcscheme").read_text()
             self.assertIn('BlueprintIdentifier="' + project["targets"][0]["id"] + '"', scheme)
 

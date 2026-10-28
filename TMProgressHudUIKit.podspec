@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.cocoapods_version = '>= 1.16'
   s.ios.deployment_target = '17.0'
   s.tvos.deployment_target = '17.0'
-  s.source_files = 'Sources/TMProgressHudUIKit/*.swift'
+  s.source_files = 'Sources/TMProgressHudUIKit/**/*.swift'
   s.resource_bundles = { 'TMProgressHudUIKit' => ['Sources/TMProgressHudUIKit/PrivacyInfo.xcprivacy', 'Sources/TMProgressHudUIKit/Resources/*'] }
   s.preserve_paths = 'LICENSE', 'THIRD_PARTY_NOTICES.md'
   s.frameworks = 'UIKit', 'Foundation', 'CoreGraphics', 'QuartzCore'

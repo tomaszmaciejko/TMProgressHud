@@ -63,17 +63,29 @@ def synchronize_test_sources(bundle):
                     result.append(entry)
         return result
 
+    def source_entries(directory, target):
+        entries = []
+        for path in sorted(directory.iterdir()):
+            if path.is_dir():
+                children = source_entries(path, target)
+                if children:
+                    entries.append({"kind": "group", "name": path.name, "children": children})
+            elif path.suffix == ".swift":
+                entries.append({"path": os.path.relpath(path, bundle.parent),
+                                "target-membership": [target + "/compile-sources"]})
+        return entries
+
     project["files"] = preserved(project["files"])
+    targets = {target["name"] for target in project["targets"]}
     for name, directory, target in (
-        ("Swift library sources", "Sources/TMProgressHudUIKit", "TMProgressHudUIKit"),
-        ("Swift tests", "Tests/TMProgressHudUIKitTests", "TMProgressHudUIKitTests"),
+        ("TMProgressHudUIKit", "Sources/TMProgressHudUIKit", "TMProgressHudUIKit"),
+        ("TMProgressHudUIKitTests", "Tests/TMProgressHudUIKitTests", "TMProgressHudUIKitTests"),
     ):
+        if target not in targets:
+            continue
         if not (ROOT / directory).is_dir():
             raise ValueError(f"Missing source directory: {directory}")
-        children = [
-            {"path": os.path.relpath(path, bundle.parent), "target-membership": [target + "/compile-sources"]}
-            for path in sorted((ROOT / directory).glob("*.swift"))
-        ]
+        children = source_entries(ROOT / directory, target)
         project["files"].append({"kind": "group", "name": name, "children": children})
     (bundle / "project.xcproj").write_text(json.dumps(project, indent=2, ensure_ascii=False) + "\n")
 
@@ -148,7 +160,7 @@ def generate(output, kind, platform="ios", artifact=None, remote_source=None, pr
     project = Project()
     file_refs, source_builds, resource_builds = [], [], []
     library = ROOT / "Sources/TMProgressHudUIKit"
-    sources = sorted(library.glob("*.swift")) if framework else [ROOT / "Examples/UIKitDemo/DemoApp.swift"]
+    sources = sorted(library.rglob("*.swift")) if framework else [ROOT / "Examples/UIKitDemo/DemoApp.swift"]
     resources = [
         library / "PrivacyInfo.xcprivacy",
         *sorted((library / "Resources").glob("*.txt")),
@@ -241,6 +253,8 @@ def generate(output, kind, platform="ios", artifact=None, remote_source=None, pr
         "objects": project.objects, "rootObject": root,
     }
     write_project(output, document, project_format)
+    if framework and project_format == "json":
+        synchronize_test_sources(output)
     write_scheme(output, target, product_name, extension)
 
 
