@@ -13,7 +13,10 @@ func formattedAccessibilityPercentage(for progress: Float, locale: Locale) -> St
     guard progress.isFinite else { return nil }
     let fraction = boundedProgressFraction(progress)
     let displayFraction = progress < 1 ? min(fraction, maximumIncompleteDisplayFraction) : fraction
-    return displayFraction.formatted(.percent.precision(.fractionLength(0)).locale(locale))
+    let percentageFormat: FloatingPointFormatStyle<Float>.Percent = .percent
+        .precision(.fractionLength(0))
+        .locale(locale)
+    return displayFraction.formatted(percentageFormat)
 }
 
 /// Resolves an accessibility language identifier, using the supplied fallback when nil or blank.
