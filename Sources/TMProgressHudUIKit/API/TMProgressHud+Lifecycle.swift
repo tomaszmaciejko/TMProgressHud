@@ -4,6 +4,14 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
+private enum AnimationMetrics {
+    static let motionOffset: CGFloat = 10
+    // Perceived duration in seconds; the spring may settle after this interval.
+    static let perceivedDuration: TimeInterval = 0.3
+    static let reducedScale: CGFloat = 0.5
+    static let enlargedScale: CGFloat = 1.5
+}
+
 extension TMProgressHud: PresentationHost {
     func showPresentation(animated: Bool) {
         bezelView.layer.removeAllAnimations()
@@ -39,9 +47,9 @@ extension TMProgressHud: PresentationHost {
             resolvedType = type
         }
         let small = CGAffineTransform(
-            scaleX: DefaultMetrics.Animation.reducedScale, y: DefaultMetrics.Animation.reducedScale)
+            scaleX: AnimationMetrics.reducedScale, y: AnimationMetrics.reducedScale)
         let large = CGAffineTransform(
-            scaleX: DefaultMetrics.Animation.enlargedScale, y: DefaultMetrics.Animation.enlargedScale)
+            scaleX: AnimationMetrics.enlargedScale, y: AnimationMetrics.enlargedScale)
         if isAppearing && bezelView.alpha == 0 {
             if resolvedType == .zoomIn {
                 bezelView.transform = small
@@ -50,7 +58,7 @@ extension TMProgressHud: PresentationHost {
             }
         }
         UIView.animate(
-            springDuration: DefaultMetrics.Animation.perceivedDuration, bounce: 0,
+            springDuration: AnimationMetrics.perceivedDuration, bounce: 0,
             initialSpringVelocity: 0, delay: 0, options: .beginFromCurrentState,
             animations: {
                 self.applyAnimationState(isAppearing: isAppearing, type: resolvedType)
@@ -65,8 +73,8 @@ extension TMProgressHud: PresentationHost {
             scale = 1
         } else {
             switch type {
-            case .zoomIn: scale = DefaultMetrics.Animation.enlargedScale
-            case .zoomOut: scale = DefaultMetrics.Animation.reducedScale
+            case .zoomIn: scale = AnimationMetrics.enlargedScale
+            case .zoomOut: scale = AnimationMetrics.reducedScale
             default: scale = 1
             }
         }
@@ -107,8 +115,8 @@ extension TMProgressHud: PresentationHost {
     private func motionEffect(key: String, type: UIInterpolatingMotionEffect.EffectType) -> UIInterpolatingMotionEffect
     {
         let effect = UIInterpolatingMotionEffect(keyPath: key, type: type)
-        effect.maximumRelativeValue = DefaultMetrics.Animation.motionOffset
-        effect.minimumRelativeValue = -DefaultMetrics.Animation.motionOffset
+        effect.maximumRelativeValue = AnimationMetrics.motionOffset
+        effect.minimumRelativeValue = -AnimationMetrics.motionOffset
         return effect
     }
 }

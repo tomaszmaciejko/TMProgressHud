@@ -2,6 +2,8 @@
 // Copyright 2026 Tomasz Maciejko and TMProgressHud contributors.
 import UIKit
 
+private let remainingTrackAlpha: CGFloat = 0.1
+
 /// Builds color operations for known view types and resolves compatibility appearance rules.
 @MainActor
 enum IndicatorColoring {
@@ -80,11 +82,11 @@ enum IndicatorColoring {
         guard let color else { return nil }
         switch policy {
         case .compatibility:
-            return color.withAlphaComponent(DefaultMetrics.Appearance.remainingAlpha)
+            return color.withAlphaComponent(remainingTrackAlpha)
         case .explicit:
             return UIColor { traits in
                 let resolvedColor = color.resolvedColor(with: traits)
-                let trackAlpha = resolvedColor.cgColor.alpha * DefaultMetrics.Appearance.remainingAlpha
+                let trackAlpha = resolvedColor.cgColor.alpha * remainingTrackAlpha
                 return resolvedColor.withAlphaComponent(trackAlpha)
             }
         }

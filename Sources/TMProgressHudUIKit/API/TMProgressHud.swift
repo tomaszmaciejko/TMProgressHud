@@ -4,6 +4,8 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
+private let defaultContentAlpha: CGFloat = 0.7
+
 /// A progress and status view hosted in a caller-provided UIKit view.
 @MainActor
 @objc(TMProgressHud)
@@ -37,7 +39,7 @@ open class TMProgressHud: UIView {
 
     /// The default color for newly created indicators; changing it does not recolor existing content.
     public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(
-        DefaultMetrics.Appearance.contentAlpha)
+        defaultContentAlpha)
 
     /// A bulk color for current content and newly created indicators.
     ///

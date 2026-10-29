@@ -4,6 +4,8 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
+private let interItemSpacing: CGFloat = 4
+
 /// Owns the content chain and its inner spacing independently of bezel placement.
 @MainActor
 final class ContentLayout {
@@ -106,7 +108,7 @@ final class ContentLayout {
         for gap in gaps {
             let hasFollowingContent = participatesInSpacing(gap.following)
             gap.constraint.constant =
-                hasEarlierContent && hasFollowingContent ? DefaultMetrics.Layout.interItemSpacing : 0
+                hasEarlierContent && hasFollowingContent ? interItemSpacing : 0
             hasEarlierContent = hasEarlierContent || hasFollowingContent
         }
     }

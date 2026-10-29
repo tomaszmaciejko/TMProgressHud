@@ -2,14 +2,16 @@
 // Copyright 2026 Tomasz Maciejko and TMProgressHud contributors.
 import UIKit
 
+private let defaultMargin: CGFloat = 20
+
 /// Independent position, inner content padding and minimum outer spacing in points.
 ///
 /// Insets use physical edges. The host bounds remain the reference area; safe areas are not applied implicitly.
 public struct TMProgressHudLayout: Sendable, Equatable {
     /// The default 20-point spacing on every edge.
     public static let defaultInsets = UIEdgeInsets(
-        top: DefaultMetrics.Layout.margin, left: DefaultMetrics.Layout.margin, bottom: DefaultMetrics.Layout.margin,
-        right: DefaultMetrics.Layout.margin)
+        top: defaultMargin, left: defaultMargin, bottom: defaultMargin,
+        right: defaultMargin)
 
     /// The bezel alignment and offset.
     public var position: TMProgressHudPosition

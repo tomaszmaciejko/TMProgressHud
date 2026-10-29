@@ -9,6 +9,7 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 - Use descriptive names and one primary type per file. Avoid generic `Manager`, `Helper` and `Utils` types.
 - Apply SOLID where it clarifies responsibilities. Introduce protocols at real boundaries, rather than for every type.
 - Avoid duplicated behavior, speculative abstractions and unnecessary state.
+- Keep constants private to their consumer file unless multiple files need the same value and meaning.
 - Name domain, layout and timing constants with their meaning and units. Explain non-obvious formulas. Ordinary literals such as zero need no wrapper.
 - Internal type names describe their responsibility without library prefixes; the module provides their namespace. Public and explicit Objective-C names remain deliberate API contracts.
 - Default to private or internal. Public APIs need documentation, deliberate defaults and clear ownership.

@@ -1,9 +1,9 @@
 [
   {
-    "file": "Sources/TMProgressHudUIKit/Support/DefaultMetrics.swift",
-    "sha256": "7c2df8d1c51bf0ce6a6c3cc47cdf490bd1bfc3d42c36f4615339e1f261922b54",
-    "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Declaration-only type renamed to DefaultMetrics. Existing grouped constants and numeric values unchanged; absence of executable regions still enforced. No executable-line exclusion."
+    "file": "Sources/TMProgressHudUIKit/Layout/LayoutPriorities.swift",
+    "sha256": "f737d161759c4ad0fc5617b30da736e889f7c8762413352e14881a913bf4e125",
+    "reason": "Swift/LLVM emits no source coverage regions for this shared static priority declaration; content compression and bezel positioning are exercised by layout tests.",
+    "decision": "Replaces the former DefaultMetrics declaration-only entry after moving 13 local constants into their consumer files. Only the shared content priority remains here; no executable-line exclusions."
   },
   {
     "file": "Sources/TMProgressHudUIKit/API/TMProgressHudTypes.swift",

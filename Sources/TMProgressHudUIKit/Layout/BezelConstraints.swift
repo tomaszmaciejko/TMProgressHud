@@ -4,6 +4,12 @@
 // Reference: 4a7c5f3e53cdea77c5dcb8578c2ee5acacdf6781. See THIRD_PARTY_NOTICES.md.
 import UIKit
 
+private enum BezelLayoutPriorities {
+    // Outer margins outrank content; optional size preferences yield first in a small host.
+    static let outerEdges = UILayoutPriority(999)
+    static let preferredSize = UILayoutPriority(997)
+}
+
 /// Owns bezel positioning and sizing relative to its container.
 @MainActor
 struct BezelConstraints {
@@ -40,9 +46,9 @@ struct BezelConstraints {
         outerRight = bezel.rightAnchor.constraint(lessThanOrEqualTo: container.rightAnchor)
         outerTop = bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor)
         outerBottom = bezel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor)
-        for constraint in positioning { constraint.priority = DefaultMetrics.Layout.contentPriority }
-        for constraint in sizing { constraint.priority = DefaultMetrics.Layout.sizePriority }
-        for constraint in outerEdges { constraint.priority = DefaultMetrics.Layout.sidePriority }
+        for constraint in positioning { constraint.priority = LayoutPriorities.content }
+        for constraint in sizing { constraint.priority = BezelLayoutPriorities.preferredSize }
+        for constraint in outerEdges { constraint.priority = BezelLayoutPriorities.outerEdges }
     }
 
     /// Applies outer insets and selects active positioning and size constraints from the configuration.

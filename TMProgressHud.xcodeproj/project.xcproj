@@ -222,6 +222,12 @@
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
+            },
+            {
+              "path": "Sources/TMProgressHudUIKit/Layout/LayoutPriorities.swift",
+              "target-membership": [
+                "TMProgressHudUIKit/compile-sources"
+              ]
             }
           ]
         },
@@ -283,12 +289,6 @@
           "kind": "group",
           "name": "Support",
           "children": [
-            {
-              "path": "Sources/TMProgressHudUIKit/Support/DefaultMetrics.swift",
-              "target-membership": [
-                "TMProgressHudUIKit/compile-sources"
-              ]
-            },
             {
               "path": "Sources/TMProgressHudUIKit/Support/NotificationToken.swift",
               "target-membership": [
