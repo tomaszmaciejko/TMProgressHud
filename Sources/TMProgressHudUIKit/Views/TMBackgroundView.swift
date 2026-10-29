@@ -69,13 +69,11 @@ open class TMBackgroundView: UIView {
     private var storedColor: UIColor?
 
     private var effectView: UIVisualEffectView?
-    lazy var transparencyPreference = HUDSystemPreference(
-        name: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
-        read: { UIAccessibility.isReduceTransparencyEnabled }
-    ) { [weak self] in self?.updateBackground() }
+    private var reduceTransparencyObservation: HUDNotificationToken?
+    private var readReduceTransparency: @MainActor () -> Bool = { UIAccessibility.isReduceTransparencyEnabled }
 
     private var usesOpaqueBackground: Bool {
-        style == .blur && blurPolicy.usesOpaqueBackground(systemValue: transparencyPreference.value)
+        style == .blur && blurPolicy.usesOpaqueBackground(systemValue: readReduceTransparency())
     }
 
     /// Creates a background using the default blur material.
@@ -84,11 +82,17 @@ open class TMBackgroundView: UIView {
         configureBackground()
     }
 
-    init(frame: CGRect, style: TMProgressHudBackgroundStyle, blurPolicy: TMProgressHudBlurPolicy = .system) {
+    /// Supplies the initial configuration and system inputs before rendering and registering observation.
+    init(
+        frame: CGRect, style: TMProgressHudBackgroundStyle, blurPolicy: TMProgressHudBlurPolicy = .system,
+        notificationCenter: NotificationCenter = .default,
+        reduceTransparencyEnabled: @escaping @MainActor () -> Bool = { UIAccessibility.isReduceTransparencyEnabled }
+    ) {
         self.style = style
         self.blurPolicy = blurPolicy
+        readReduceTransparency = reduceTransparencyEnabled
         super.init(frame: frame)
-        configureBackground()
+        configureBackground(notificationCenter: notificationCenter)
     }
 
     /// Decodes a background and applies the supported Swift background defaults.
@@ -109,11 +113,19 @@ open class TMBackgroundView: UIView {
     /// The smallest intrinsic size; surrounding content determines the final size.
     open override var intrinsicContentSize: CGSize { .zero }
 
-    private func configureBackground() {
+    /// Configures initial rendering and observes transparency changes for the lifetime of the view.
+    private func configureBackground(notificationCenter: NotificationCenter = .default) {
         clipsToBounds = true
         updateBackground()
+        let token = notificationCenter.addObserver(
+            forName: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in self?.updateBackground() }
+        }
+        reduceTransparencyObservation = HUDNotificationToken(center: notificationCenter, token: token)
     }
 
+    /// Reconciles the owned blur and tint with the current style, policy and system setting.
     func updateBackground() {
         switch style {
         case .blur:

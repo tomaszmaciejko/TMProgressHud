@@ -62,20 +62,20 @@ struct BackgroundAccessibilityTests {
     }
 
     @Test func systemChangesUpdateAnExistingBackground() async throws {
-        let view = TMBackgroundView(frame: .zero)
         let preference = TransparencyPreferenceStub()
         let center = NotificationCenter()
-        view.transparencyPreference = HUDSystemPreference(
-            center: center, name: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
-            read: { preference.enabled }
-        ) { [weak view] in
-            view?.updateBackground()
-            preference.updated.signal()
-        }
-        view.updateBackground()
+        let view = TMBackgroundView(
+            frame: .zero, style: .blur, notificationCenter: center,
+            reduceTransparencyEnabled: {
+                preference.updated.signal()
+                return preference.enabled
+            })
+        preference.updated = CallbackExpectation()
         let effect = try #require(view.subviews.first as? UIVisualEffectView)
         preference.enabled = true
-        center.post(name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
+        await Task.detached {
+            center.post(name: UIAccessibility.reduceTransparencyStatusDidChangeNotification, object: nil)
+        }.value
         try await preference.updated.wait()
         #expect(effect.effect == nil)
         #expect(view.backgroundColor?.cgColor.alpha == 1)

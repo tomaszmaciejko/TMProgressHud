@@ -317,7 +317,7 @@
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Support/HUDSystemPreference.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Support/HUDNotificationToken.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]

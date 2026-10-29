@@ -11,9 +11,10 @@ final class HUDMotionSettings {
         }
     }
 
-    var shouldReduceMotion: Bool { policy.reducesMotion(systemValue: preference.value) }
+    var shouldReduceMotion: Bool { policy.reducesMotion(systemValue: readReduceMotion()) }
 
-    private let preference: HUDSystemPreference
+    private let readReduceMotion: @MainActor () -> Bool
+    private var reduceMotionObservation: HUDNotificationToken?
     private let onChange: @MainActor () -> Void
 
     init(
@@ -22,8 +23,12 @@ final class HUDMotionSettings {
         onChange: @escaping @MainActor () -> Void
     ) {
         self.onChange = onChange
-        preference = HUDSystemPreference(
-            center: center, name: UIAccessibility.reduceMotionStatusDidChangeNotification,
-            read: systemValue, onChange: onChange)
+        readReduceMotion = systemValue
+        let token = center.addObserver(
+            forName: UIAccessibility.reduceMotionStatusDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in self?.onChange() }
+        }
+        reduceMotionObservation = HUDNotificationToken(center: center, token: token)
     }
 }

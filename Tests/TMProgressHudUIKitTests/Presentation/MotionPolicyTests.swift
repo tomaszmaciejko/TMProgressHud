@@ -8,6 +8,8 @@ private final class MotionPreferenceStub {
     var enabled = false
 }
 
+private final class NotificationCapture: Sendable {}
+
 @Suite(.serialized, .timeLimit(.minutes(1)))
 @MainActor
 struct MotionPolicyTests {
@@ -80,6 +82,32 @@ struct MotionPolicyTests {
         try await updated.wait()
         #expect(hud.bezelView.motionEffects.isEmpty)
         #expect(hud.areDefaultMotionEffectsEnabled)
+    }
+
+    @Test func releasingATokenRemovesOnlyItsOwnRegistration() async throws {
+        let center = NotificationCenter()
+        let name = UIAccessibility.reduceMotionStatusDidChangeNotification
+        let unrelatedDelivery = CallbackExpectation()
+        let unrelatedToken = center.addObserver(forName: name, object: nil, queue: nil) { _ in
+            unrelatedDelivery.signal()
+        }
+        defer { center.removeObserver(unrelatedToken) }
+
+        weak var retainedByRegistration: NotificationCapture?
+        autoreleasepool {
+            let capture = NotificationCapture()
+            retainedByRegistration = capture
+            let token = center.addObserver(forName: name, object: nil, queue: nil) { [capture] _ in
+                withExtendedLifetime(capture) {}
+            }
+            let registration = HUDNotificationToken(center: center, token: token)
+            withExtendedLifetime(registration) {
+                #expect(retainedByRegistration != nil)
+            }
+        }
+        #expect(retainedByRegistration == nil)
+        center.post(name: name, object: nil)
+        try await unrelatedDelivery.wait()
     }
 
     @Test func observationDoesNotRetainItsOwners() {
