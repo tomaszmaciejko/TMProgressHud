@@ -4,7 +4,7 @@ import UIKit
 
 /// A ready-to-use indicator view with its progress and color operations.
 @MainActor
-struct HUDIndicator {
+struct Indicator {
     enum Origin {
         case library
         case client

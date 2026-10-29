@@ -85,7 +85,7 @@ open class TMRoundProgressView: UIView {
     /// An application-supplied accessibility value takes precedence; nil restores automatic formatting.
     open override var accessibilityValue: String? {
         get {
-            super.accessibilityValue ?? HUDProgressAccessibility.value(for: progress, language: accessibilityLanguage)
+            super.accessibilityValue ?? ProgressAccessibility.value(for: progress, language: accessibilityLanguage)
         }
         set { super.accessibilityValue = newValue }
     }
@@ -115,7 +115,7 @@ open class TMRoundProgressView: UIView {
         let circleBounds = CGRect(
             x: bounds.midX - diameter / 2, y: bounds.midY - diameter / 2,
             width: diameter, height: diameter)
-        let fraction = CGFloat(HUDProgressValue.boundedFraction(progress))
+        let fraction = CGFloat(ProgressValue.boundedFraction(progress))
         if isAnnular {
             drawRing(in: circleBounds, fraction: fraction)
         } else {

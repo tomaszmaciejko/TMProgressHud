@@ -6,7 +6,7 @@ import UIKit
 
 /// Owns bezel positioning and sizing relative to its container.
 @MainActor
-struct HUDBezelConstraints {
+struct BezelConstraints {
     let left: NSLayoutConstraint
     let centerX: NSLayoutConstraint
     let right: NSLayoutConstraint
@@ -40,13 +40,13 @@ struct HUDBezelConstraints {
         outerRight = bezel.rightAnchor.constraint(lessThanOrEqualTo: container.rightAnchor)
         outerTop = bezel.topAnchor.constraint(greaterThanOrEqualTo: container.topAnchor)
         outerBottom = bezel.bottomAnchor.constraint(lessThanOrEqualTo: container.bottomAnchor)
-        for constraint in positioning { constraint.priority = HUDMetrics.Layout.contentPriority }
-        for constraint in sizing { constraint.priority = HUDMetrics.Layout.sizePriority }
-        for constraint in outerEdges { constraint.priority = HUDMetrics.Layout.sidePriority }
+        for constraint in positioning { constraint.priority = DefaultMetrics.Layout.contentPriority }
+        for constraint in sizing { constraint.priority = DefaultMetrics.Layout.sizePriority }
+        for constraint in outerEdges { constraint.priority = DefaultMetrics.Layout.sidePriority }
     }
 
     /// Applies outer insets and selects active positioning and size constraints from the configuration.
-    func update(_ configuration: HUDLayout.Configuration) {
+    func update(_ configuration: LayoutCoordinator.Configuration) {
         let layout = configuration.layout
         let insets = layout.hostInsets
         outerLeft.constant = insets.left

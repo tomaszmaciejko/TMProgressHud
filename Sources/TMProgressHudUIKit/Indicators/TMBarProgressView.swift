@@ -84,7 +84,7 @@ open class TMBarProgressView: UIView {
     /// An application-supplied accessibility value takes precedence; nil restores automatic formatting.
     open override var accessibilityValue: String? {
         get {
-            super.accessibilityValue ?? HUDProgressAccessibility.value(for: progress, language: accessibilityLanguage)
+            super.accessibilityValue ?? ProgressAccessibility.value(for: progress, language: accessibilityLanguage)
         }
         set { super.accessibilityValue = newValue }
     }
@@ -125,7 +125,7 @@ open class TMBarProgressView: UIView {
 
         let interior = rect.insetBy(dx: Geometry.inset, dy: Geometry.inset)
         guard interior.width > 0, interior.height > 0 else { return }
-        let fraction = CGFloat(HUDProgressValue.boundedFraction(progress))
+        let fraction = CGFloat(ProgressValue.boundedFraction(progress))
         context.addPath(capsule(in: interior).cgPath)
         context.clip()
         context.setFillColor(progressColor.cgColor)

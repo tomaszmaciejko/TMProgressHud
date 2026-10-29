@@ -4,7 +4,7 @@ import UIKit
 
 /// Builds known indicators and delegates adaptation of client views.
 @MainActor
-enum HUDIndicatorFactory {
+enum IndicatorFactory {
     enum ReusePolicy {
         /// A complete selection must not adopt a view supplied by the client.
         case libraryViewsOnly
@@ -14,8 +14,8 @@ enum HUDIndicatorFactory {
 
     /// A nil selection represents compatibility custom content without a view.
     static func make(
-        for content: TMProgressHudContent?, reusing previous: HUDIndicator?, reusePolicy: ReusePolicy
-    ) -> HUDIndicator? {
+        for content: TMProgressHudContent?, reusing previous: Indicator?, reusePolicy: ReusePolicy
+    ) -> Indicator? {
         guard let content else { return nil }
         switch content {
         case .activity: return activityIndicator(reusing: previous, policy: reusePolicy)
@@ -23,13 +23,13 @@ enum HUDIndicatorFactory {
         case .ring: return circularIndicator(reusing: previous, policy: reusePolicy, isAnnular: true)
         case .bar: return barIndicator()
         case .custom(let view, let updateProgress):
-            return HUDClientIndicatorAdapter.make(for: view, updateProgress: updateProgress)
+            return ClientIndicatorAdapter.make(for: view, updateProgress: updateProgress)
         case .text: return nil
         }
     }
 
-    private static func activityIndicator(reusing previous: HUDIndicator?, policy: ReusePolicy) -> HUDIndicator {
-        let construction = HUDIndicatorConstruction<UIActivityIndicatorView>(reusing: previous, policy: policy) {
+    private static func activityIndicator(reusing previous: Indicator?, policy: ReusePolicy) -> Indicator {
+        let construction = IndicatorConstruction<UIActivityIndicatorView>(reusing: previous, policy: policy) {
             let spinner = UIActivityIndicatorView(style: .large)
             spinner.color = .white
             return spinner
@@ -37,28 +37,28 @@ enum HUDIndicatorFactory {
         let spinner = construction.view
         spinner.startAnimating()
         return construction.makeIndicator(
-            libraryProgressUpdater: nil, colorUpdater: HUDIndicatorColoring.activityUpdater(for: spinner))
+            libraryProgressUpdater: nil, colorUpdater: IndicatorColoring.activityUpdater(for: spinner))
     }
 
     private static func circularIndicator(
-        reusing previous: HUDIndicator?, policy: ReusePolicy, isAnnular: Bool
-    ) -> HUDIndicator {
-        let construction = HUDIndicatorConstruction(reusing: previous, policy: policy) { TMRoundProgressView() }
+        reusing previous: Indicator?, policy: ReusePolicy, isAnnular: Bool
+    ) -> Indicator {
+        let construction = IndicatorConstruction(reusing: previous, policy: policy) { TMRoundProgressView() }
         let circle = construction.view
         if circle.isAnnular != isAnnular {
             circle.isAnnular = isAnnular
         }
         return construction.makeIndicator(
             libraryProgressUpdater: { circle.progress = $0 },
-            colorUpdater: HUDIndicatorColoring.circularUpdater(for: circle))
+            colorUpdater: IndicatorColoring.circularUpdater(for: circle))
     }
 
-    private static func barIndicator() -> HUDIndicator {
+    private static func barIndicator() -> Indicator {
         // Compatibility preserves the historical fresh-bar behavior, unlike circles and spinners.
         // Repeating an unchanged selection is handled by the HUD before it reaches this factory.
         let bar = TMBarProgressView()
-        return HUDIndicator(
+        return Indicator(
             view: bar, origin: .library, progressUpdater: { bar.progress = $0 },
-            colorUpdater: HUDIndicatorColoring.barUpdater(for: bar))
+            colorUpdater: IndicatorColoring.barUpdater(for: bar))
     }
 }

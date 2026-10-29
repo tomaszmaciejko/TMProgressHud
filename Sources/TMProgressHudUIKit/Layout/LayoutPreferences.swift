@@ -3,7 +3,7 @@
 import UIKit
 
 /// One source of layout values, with projections for the compatibility properties.
-struct HUDLayoutPreferences: Equatable {
+struct LayoutPreferences: Equatable {
     enum Position: Equatable {
         case legacy(CGPoint)
         case configured(TMProgressHudPosition)

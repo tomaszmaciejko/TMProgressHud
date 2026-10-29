@@ -6,7 +6,7 @@ import UIKit
 
 /// Keeps one visibility observation per content view, invalidating only its current container.
 @MainActor
-final class HUDContentVisibilityObservation {
+final class ContentVisibilityObservation {
     private weak var container: UIView?
     private var observedContent: [UIView] = []
     private var visibilityObservations: [NSKeyValueObservation] = []

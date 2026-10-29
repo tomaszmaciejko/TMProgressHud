@@ -7,14 +7,14 @@ import Testing
 struct SchedulingTests {
     @Test func actionsAreOneShotAndCancellationIsIdempotent() {
         var calls = 0
-        let pending = HUDScheduledAction { calls += 1 }
+        let pending = ScheduledAction { calls += 1 }
         #expect(pending.isPending)
         pending.fire()
         pending.fire()
         pending.cancel()
         #expect(!pending.isPending)
         #expect(calls == 1)
-        let cancelled = HUDScheduledAction { calls += 1 }
+        let cancelled = ScheduledAction { calls += 1 }
         cancelled.cancel()
         cancelled.cancel()
         cancelled.fire()
@@ -23,10 +23,10 @@ struct SchedulingTests {
 
     @Test(arguments: [0.0, -1.0, -Double.infinity, Double.nan])
     func immediateActionsRunOnTheMainActor(interval: Double) async throws {
-        var scheduled: HUDScheduledAction?
+        var scheduled: ScheduledAction?
         var calls = 0
         let completed = CallbackExpectation()
-        scheduled = HUDScheduledAction.scheduled(after: interval) {
+        scheduled = ScheduledAction.scheduled(after: interval) {
             #expect(!Task.isCancelled)
             calls += 1
             completed.signal()
@@ -41,7 +41,7 @@ struct SchedulingTests {
 
     @Test func cancellationStopsQueuedDelivery() async {
         var calls = 0
-        let pending = HUDScheduledAction.scheduled(after: 0) { calls += 1 }
+        let pending = ScheduledAction.scheduled(after: 0) { calls += 1 }
         pending.cancel()
         await Task.yield()
         #expect(calls == 0)
@@ -49,9 +49,9 @@ struct SchedulingTests {
     }
 
     @Test func droppingOwnerReleasesPendingAction() async {
-        weak var reference: HUDScheduledAction?
+        weak var reference: ScheduledAction?
         autoreleasepool {
-            let pending = HUDScheduledAction.scheduled(after: 60) { Issue.record("Released action fired") }
+            let pending = ScheduledAction.scheduled(after: 60) { Issue.record("Released action fired") }
             reference = pending
         }
         #expect(reference == nil)
@@ -60,7 +60,7 @@ struct SchedulingTests {
 
     @Test(arguments: [1e15, Double.infinity, Double.greatestFiniteMagnitude])
     func longPositiveDelaysRemainCancellable(interval: Double) {
-        let pending = HUDScheduledAction.scheduled(after: interval) { Issue.record("Unbounded delay fired") }
+        let pending = ScheduledAction.scheduled(after: interval) { Issue.record("Unbounded delay fired") }
         #expect(pending.isPending)
         pending.cancel()
         #expect(!pending.isPending)
@@ -68,7 +68,7 @@ struct SchedulingTests {
 
     @Test func elapsedTimePreservesFractionalSeconds() {
         let start = ContinuousClock.now
-        let environment = HUDTimingEnvironment(now: { start.advanced(by: .milliseconds(1250)) })
+        let environment = TimingEnvironment(now: { start.advanced(by: .milliseconds(1250)) })
         #expect(environment.elapsed(since: start) == 1.25)
     }
 }

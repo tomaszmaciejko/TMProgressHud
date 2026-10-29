@@ -20,7 +20,7 @@ extension TMProgressHud {
     /// are delivered after the completed selection; offset projects edge anchors to legacy extremes,
     /// while margin reads the top content inset.
     public func setLayout(_ layout: TMProgressHudLayout) {
-        let preferences = HUDLayoutPreferences(
+        let preferences = LayoutPreferences(
             position: .configured(layout.position), contentInsets: layout.contentInsets, hostInsets: layout.hostInsets)
         guard layoutPreferences != preferences else { return }
         var changedKeys: [String] = []

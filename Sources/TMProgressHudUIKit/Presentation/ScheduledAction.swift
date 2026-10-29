@@ -6,7 +6,7 @@ import Foundation
 
 /// A one-shot main-actor action whose owner can cancel it before delivery.
 @MainActor
-final class HUDScheduledAction {
+final class ScheduledAction {
     private var action: (@MainActor () -> Void)?
     private var task: Task<Void, Never>?
 
@@ -20,8 +20,8 @@ final class HUDScheduledAction {
         task?.cancel()
     }
 
-    static func scheduled(after interval: TimeInterval, action: @escaping @MainActor () -> Void) -> HUDScheduledAction {
-        let scheduled = HUDScheduledAction(action: action)
+    static func scheduled(after interval: TimeInterval, action: @escaping @MainActor () -> Void) -> ScheduledAction {
+        let scheduled = ScheduledAction(action: action)
         // Unrepresentable positive delays stay pending until cancelled.
         guard interval < Double(Int64.max) || interval.isNaN else { return scheduled }
         let delay = interval > 0 ? interval : 0

@@ -167,31 +167,31 @@
           "name": "Indicators",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Indicators/HUDClientIndicatorAdapter.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Indicators/ClientIndicatorAdapter.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Indicators/HUDIndicator.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Indicators/Indicator.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Indicators/HUDIndicatorColoring.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Indicators/IndicatorColoring.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Indicators/HUDIndicatorConstruction.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Indicators/IndicatorConstruction.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Indicators/HUDIndicatorFactory.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Indicators/IndicatorFactory.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
@@ -215,37 +215,37 @@
           "name": "Layout",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDBezelConstraints.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/BezelConstraints.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDContentLayout.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/ContentLayout.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDContentVisibilityObservation.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/ContentVisibilityObservation.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDLayout.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/LayoutCoordinator.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDLayoutInstallation.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/LayoutInstallation.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Layout/HUDLayoutPreferences.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Layout/LayoutPreferences.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
@@ -257,25 +257,25 @@
           "name": "Presentation",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Presentation/HUDMotionSettings.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Presentation/MotionSettings.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Presentation/HUDPresentation.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Presentation/Presentation.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Presentation/HUDScheduledAction.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Presentation/ScheduledAction.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Presentation/HUDTimingEnvironment.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Presentation/TimingEnvironment.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
@@ -287,19 +287,19 @@
           "name": "Progress",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Progress/HUDProgressAccessibility.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Progress/ProgressAccessibility.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Progress/HUDProgressBinding.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Progress/ProgressBinding.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Progress/HUDProgressValue.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Progress/ProgressValue.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
@@ -311,13 +311,13 @@
           "name": "Support",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Support/HUDMetrics.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Support/DefaultMetrics.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Support/HUDNotificationToken.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Support/NotificationToken.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]
@@ -329,7 +329,7 @@
           "name": "Views",
           "children": [
             {
-              "path": "../../Sources/TMProgressHudUIKit/Views/HUDRoundedButtonView.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Views/RoundedButtonView.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]

@@ -6,15 +6,15 @@ import UIKit
 
 /// Coordinates the installed layout and observes visibility without touching client constraints.
 @MainActor
-final class HUDLayout {
+final class LayoutCoordinator {
     struct Configuration {
         let layout: TMProgressHudLayout
         let minimumSize: CGSize
         let isSquare: Bool
     }
 
-    private var installedLayout: HUDLayoutInstallation?
-    private let visibilityObservation = HUDContentVisibilityObservation()
+    private var installedLayout: LayoutInstallation?
+    private let visibilityObservation = ContentVisibilityObservation()
 
     /// Applies configuration to visible content, replacing the installation only when its container or bezel changes.
     ///
@@ -22,12 +22,12 @@ final class HUDLayout {
     func update(container: UIView, bezel: UIView, content: [UIView], configuration: Configuration) {
         visibilityObservation.observeVisibility(of: content, invalidating: container)
         let visibleViews = visibleContent(in: content)
-        let activeInstallation: HUDLayoutInstallation
+        let activeInstallation: LayoutInstallation
         if let installedLayout, installedLayout.matches(container: container, bezel: bezel) {
             activeInstallation = installedLayout
         } else {
             installedLayout?.deactivate()
-            activeInstallation = HUDLayoutInstallation(
+            activeInstallation = LayoutInstallation(
                 container: container, bezel: bezel, visibleContent: visibleViews)
             activeInstallation.activate()
             installedLayout = activeInstallation

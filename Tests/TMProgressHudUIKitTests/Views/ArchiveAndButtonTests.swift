@@ -29,7 +29,7 @@ struct ArchiveAndButtonTests {
         let background = try archiveRoundTrip(TMBackgroundView(frame: frame))
         #expect(background.frame == frame)
         #expect(background.style == .blur)
-        let button = try archiveRoundTrip(HUDRoundedButtonView(frame: frame))
+        let button = try archiveRoundTrip(RoundedButtonView(frame: frame))
         #expect(button.layer.borderWidth == 1)
     }
 
@@ -89,7 +89,7 @@ struct ArchiveAndButtonTests {
 
     @Test(arguments: [UIControl.Event.touchUpInside, .primaryActionTriggered])
     func actionButtonVisibilityShapeAndColors(event: UIControl.Event) {
-        let button = HUDRoundedButtonView(frame: CGRect(x: 0, y: 0, width: 120, height: 31))
+        let button = RoundedButtonView(frame: CGRect(x: 0, y: 0, width: 120, height: 31))
         #expect(button.intrinsicContentSize == .zero)
         let receiver = ActionReceiver()
         button.addTarget(receiver, action: #selector(ActionReceiver.press), for: event)
@@ -112,7 +112,7 @@ struct ArchiveAndButtonTests {
 
     @Test(arguments: [CGFloat(17), 31])
     func actionButtonRespectsDirectFontAndTitleChanges(fontSize: CGFloat) {
-        let button = HUDRoundedButtonView(type: .custom)
+        let button = RoundedButtonView(type: .custom)
         let baseline = UIButton(type: .custom)
         let receiver = ActionReceiver()
         button.addTarget(receiver, action: #selector(ActionReceiver.press), for: .primaryActionTriggered)
@@ -131,7 +131,7 @@ struct ArchiveAndButtonTests {
     }
 
     @Test func actionButtonSupportsSwiftActionsAndStateTitles() {
-        let button = HUDRoundedButtonView(type: .custom)
+        let button = RoundedButtonView(type: .custom)
         let normalTitle = "Cancel"
         let selectedTitle = "Retry"
         button.setTitle(normalTitle, for: .normal)
@@ -154,7 +154,7 @@ struct ArchiveAndButtonTests {
     }
 
     @Test func inactiveStateColorsDoNotReplaceTheActiveBorder() {
-        let button = HUDRoundedButtonView(type: .custom)
+        let button = RoundedButtonView(type: .custom)
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.gray, for: .disabled)
         button.setTitleColor(.green, for: .selected)
@@ -175,7 +175,7 @@ struct ArchiveAndButtonTests {
     }
 
     @Test func removingAStateColorUsesUIKitFallback() {
-        let button = HUDRoundedButtonView(type: .custom)
+        let button = RoundedButtonView(type: .custom)
         button.setTitleColor(.red, for: .normal)
         button.setTitleColor(.green, for: .selected)
         button.isSelected = true

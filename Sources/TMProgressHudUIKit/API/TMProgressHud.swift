@@ -36,7 +36,8 @@ open class TMProgressHud: UIView {
     }
 
     /// The default color for newly created indicators; changing it does not recolor existing content.
-    public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(HUDMetrics.Appearance.contentAlpha)
+    public var defaultIndicatorColor: UIColor? = UIColor.label.withAlphaComponent(
+        DefaultMetrics.Appearance.contentAlpha)
 
     /// A bulk color for current content and newly created indicators.
     ///
@@ -111,7 +112,7 @@ open class TMProgressHud: UIView {
     @objc open dynamic var margin: CGFloat {
         get { layoutPreferences.compatibilityMargin }
         set {
-            let insets = HUDLayoutPreferences.uniformInsets(newValue)
+            let insets = LayoutPreferences.uniformInsets(newValue)
             guard layoutPreferences.contentInsets != insets || layoutPreferences.hostInsets != insets else { return }
             layoutPreferences.contentInsets = insets
             layoutPreferences.hostInsets = insets
@@ -181,16 +182,16 @@ open class TMProgressHud: UIView {
     private let storedBackgroundView = TMBackgroundView(frame: .zero, style: .solidColor)
     private let storedLabel = UILabel()
     private let storedDetailsLabel = UILabel()
-    private let storedButton: UIButton = HUDRoundedButtonView(type: .custom)
-    private let hudLayout = HUDLayout()
-    private lazy var presentation = HUDPresentation(host: self)
-    private lazy var progressBinding = HUDProgressBinding { [weak self] in self?.progress = $0 }
+    private let storedButton: UIButton = RoundedButtonView(type: .custom)
+    private let hudLayout = LayoutCoordinator()
+    private lazy var presentation = Presentation(host: self)
+    private lazy var progressBinding = ProgressBinding { [weak self] in self?.progress = $0 }
 
-    var layoutPreferences = HUDLayoutPreferences()
+    var layoutPreferences = LayoutPreferences()
     var contentSelection = TMProgressHudContent.Selection(mode: .indeterminate, customView: nil)
-    lazy var motionSettings = HUDMotionSettings { [weak self] in self?.updateBezelMotionEffects() }
+    lazy var motionSettings = MotionSettings { [weak self] in self?.updateBezelMotionEffects() }
     var indicatorUpdateGeneration = UUID()
-    var managedIndicator: HUDIndicator?
+    var managedIndicator: Indicator?
     var indicator: UIView? { managedIndicator?.view }
     var bezelMotionEffects: UIMotionEffectGroup?
     var hasHideRequest: Bool { presentation.hasHideRequest }
@@ -321,7 +322,7 @@ open class TMProgressHud: UIView {
 
     // MARK: - Internal coordination
 
-    func setTimingEnvironment(_ timing: HUDTimingEnvironment) {
+    func setTimingEnvironment(_ timing: TimingEnvironment) {
         presentation.timing = timing
     }
 

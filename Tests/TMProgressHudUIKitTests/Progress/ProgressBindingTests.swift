@@ -31,7 +31,7 @@ struct ProgressBindingTests {
     }
     @Test func inactiveBindingReadsLatestValueWhenStarted() {
         var values: [Float] = []
-        let binding = HUDProgressBinding { values.append($0) }
+        let binding = ProgressBinding { values.append($0) }
         let source = Progress(totalUnitCount: 100)
         source.completedUnitCount = 25
         binding.replace(with: source)
@@ -58,7 +58,7 @@ struct ProgressBindingTests {
         let source = Progress(totalUnitCount: 100)
         let completed = CallbackExpectation()
         var values: [Float] = []
-        let binding = HUDProgressBinding { value in
+        let binding = ProgressBinding { value in
             #expect(Thread.isMainThread)
             values.append(value)
             if value == 0.5 {
@@ -77,7 +77,7 @@ struct ProgressBindingTests {
         let source = Progress(totalUnitCount: 1000)
         let completed = CallbackExpectation()
         var values: [Float] = []
-        let binding = HUDProgressBinding { value in
+        let binding = ProgressBinding { value in
             values.append(value)
             if value == 1 {
                 completed.signal()
@@ -97,7 +97,7 @@ struct ProgressBindingTests {
         second.completedUnitCount = 80
         let completed = CallbackExpectation()
         var values: [Float] = []
-        let binding = HUDProgressBinding { value in
+        let binding = ProgressBinding { value in
             values.append(value)
             if value == 0.9 {
                 completed.signal()
@@ -118,7 +118,7 @@ struct ProgressBindingTests {
         let source = Progress(totalUnitCount: 100)
         let completed = CallbackExpectation()
         var values: [Float] = []
-        let binding = HUDProgressBinding { value in
+        let binding = ProgressBinding { value in
             values.append(value)
             if value == 0.8 {
                 completed.signal()
@@ -141,7 +141,7 @@ struct ProgressBindingTests {
         let child = Progress(totalUnitCount: 10)
         parent.addChild(child, withPendingUnitCount: 100)
         let completed = CallbackExpectation()
-        let binding = HUDProgressBinding { value in
+        let binding = ProgressBinding { value in
             if value == 0.5 {
                 completed.signal()
             }
@@ -156,11 +156,11 @@ struct ProgressBindingTests {
     }
 
     @Test func activeBindingAndSourceAreReleased() async {
-        weak var bindingReference: HUDProgressBinding?
+        weak var bindingReference: ProgressBinding?
         weak var sourceReference: Progress?
         autoreleasepool {
             let source = Progress(totalUnitCount: 100)
-            let binding = HUDProgressBinding { _ in }
+            let binding = ProgressBinding { _ in }
             binding.replace(with: source)
             binding.start()
             bindingReference = binding

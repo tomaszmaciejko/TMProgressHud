@@ -6,7 +6,7 @@ import UIKit
 
 /// Owns the content chain and its inner spacing independently of bezel placement.
 @MainActor
-final class HUDContentLayout {
+final class ContentLayout {
     private struct HorizontalConstraints {
         let left: NSLayoutConstraint
         let right: NSLayoutConstraint
@@ -105,7 +105,8 @@ final class HUDContentLayout {
         var hasEarlierContent = participatesInSpacing(first)
         for gap in gaps {
             let hasFollowingContent = participatesInSpacing(gap.following)
-            gap.constraint.constant = hasEarlierContent && hasFollowingContent ? HUDMetrics.Layout.interItemSpacing : 0
+            gap.constraint.constant =
+                hasEarlierContent && hasFollowingContent ? DefaultMetrics.Layout.interItemSpacing : 0
             hasEarlierContent = hasEarlierContent || hasFollowingContent
         }
     }

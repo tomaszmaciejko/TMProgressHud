@@ -6,10 +6,10 @@ import Foundation
 
 /// A monotonic clock and typed scheduling boundary, replaceable in deterministic tests.
 @MainActor
-struct HUDTimingEnvironment {
+struct TimingEnvironment {
     var now: () -> ContinuousClock.Instant = { .now }
-    var schedule: (TimeInterval, @escaping @MainActor () -> Void) -> HUDScheduledAction = {
-        HUDScheduledAction.scheduled(after: $0, action: $1)
+    var schedule: (TimeInterval, @escaping @MainActor () -> Void) -> ScheduledAction = {
+        ScheduledAction.scheduled(after: $0, action: $1)
     }
 
     func elapsed(since instant: ContinuousClock.Instant) -> TimeInterval {

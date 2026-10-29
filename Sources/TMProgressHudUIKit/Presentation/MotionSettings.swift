@@ -4,7 +4,7 @@ import UIKit
 
 /// Owns the motion policy and observation of the system accessibility setting.
 @MainActor
-final class HUDMotionSettings {
+final class MotionSettings {
     var policy: TMProgressHudMotionPolicy = .system {
         didSet {
             if oldValue != policy { onChange() }
@@ -14,7 +14,7 @@ final class HUDMotionSettings {
     var shouldReduceMotion: Bool { policy.reducesMotion(systemValue: readReduceMotion()) }
 
     private let readReduceMotion: @MainActor () -> Bool
-    private var reduceMotionObservation: HUDNotificationToken?
+    private var reduceMotionObservation: NotificationToken?
     private let onChange: @MainActor () -> Void
 
     init(
@@ -29,6 +29,6 @@ final class HUDMotionSettings {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in self?.onChange() }
         }
-        reduceMotionObservation = HUDNotificationToken(center: center, token: token)
+        reduceMotionObservation = NotificationToken(center: center, token: token)
     }
 }

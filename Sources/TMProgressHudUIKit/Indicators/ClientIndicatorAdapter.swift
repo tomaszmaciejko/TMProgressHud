@@ -4,22 +4,22 @@ import UIKit
 
 /// Adapts client views, resolving progress and coloring independently.
 @MainActor
-enum HUDClientIndicatorAdapter {
+enum ClientIndicatorAdapter {
     static func make(
-        for view: UIView, updateProgress: HUDIndicator.ProgressUpdater?
-    ) -> HUDIndicator {
-        let resolvedProgressUpdater: HUDIndicator.ProgressUpdater?
+        for view: UIView, updateProgress: Indicator.ProgressUpdater?
+    ) -> Indicator {
+        let resolvedProgressUpdater: Indicator.ProgressUpdater?
         if let updateProgress {
             resolvedProgressUpdater = updateProgress
         } else {
             resolvedProgressUpdater = progressUpdater(for: view)
         }
-        return HUDIndicator(
+        return Indicator(
             view: view, origin: .client,
             progressUpdater: resolvedProgressUpdater, colorUpdater: colorUpdater(for: view))
     }
 
-    private static func progressUpdater(for view: UIView) -> HUDIndicator.ProgressUpdater? {
+    private static func progressUpdater(for view: UIView) -> Indicator.ProgressUpdater? {
         // A subclass may explicitly declare a progress contract different from its native superclass.
         switch view {
         case let reportingView as any TMProgressHudProgressReporting:
@@ -35,16 +35,16 @@ enum HUDClientIndicatorAdapter {
         }
     }
 
-    private static func colorUpdater(for view: UIView) -> HUDIndicator.ColorUpdater {
+    private static func colorUpdater(for view: UIView) -> Indicator.ColorUpdater {
         switch view {
         case let circle as TMRoundProgressView:
-            return HUDIndicatorColoring.circularUpdater(for: circle)
+            return IndicatorColoring.circularUpdater(for: circle)
         case let bar as TMBarProgressView:
-            return HUDIndicatorColoring.barUpdater(for: bar)
+            return IndicatorColoring.barUpdater(for: bar)
         case let spinner as UIActivityIndicatorView:
-            return HUDIndicatorColoring.activityUpdater(for: spinner)
+            return IndicatorColoring.activityUpdater(for: spinner)
         default:
-            return HUDIndicatorColoring.tintUpdater(for: view)
+            return IndicatorColoring.tintUpdater(for: view)
         }
     }
 }

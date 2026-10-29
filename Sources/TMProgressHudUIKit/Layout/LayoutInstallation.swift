@@ -6,13 +6,13 @@ import UIKit
 
 /// Owns a bezel's prepared constraints and invisible spacing views for one container/bezel pair.
 @MainActor
-final class HUDLayoutInstallation {
+final class LayoutInstallation {
     private weak var container: UIView?
     private weak var bezel: UIView?
     private let topSpacer = UIView()
     private let bottomSpacer = UIView()
-    private let bezelConstraints: HUDBezelConstraints
-    private var contentLayout: HUDContentLayout
+    private let bezelConstraints: BezelConstraints
+    private var contentLayout: ContentLayout
 
     /// Prepares inactive constraints and owned spacing views without changing the supplied hierarchy.
     init(container: UIView, bezel: UIView, visibleContent: [UIView]) {
@@ -23,8 +23,8 @@ final class HUDLayoutInstallation {
             // Invisible spacing views distribute vertical room above and below the content.
             spacer.isHidden = true
         }
-        bezelConstraints = HUDBezelConstraints(container: container, bezel: bezel)
-        contentLayout = HUDContentLayout(
+        bezelConstraints = BezelConstraints(container: container, bezel: bezel)
+        contentLayout = ContentLayout(
             visibleContent: visibleContent, bezel: bezel, topSpacer: topSpacer, bottomSpacer: bottomSpacer)
     }
 
@@ -56,11 +56,11 @@ final class HUDLayoutInstallation {
     /// Applies position, sizing, content insets and spacing, rebuilding only changed visible content.
     ///
     /// Does nothing after the bound bezel is released; activate before updating a new installation.
-    func update(visibleContent visibleViews: [UIView], configuration: HUDLayout.Configuration) {
+    func update(visibleContent visibleViews: [UIView], configuration: LayoutCoordinator.Configuration) {
         guard let bezel else { return }
         if !contentLayout.hasSameVisibleContent(as: visibleViews) {
             contentLayout.deactivate()
-            contentLayout = HUDContentLayout(
+            contentLayout = ContentLayout(
                 visibleContent: visibleViews, bezel: bezel, topSpacer: topSpacer, bottomSpacer: bottomSpacer)
             contentLayout.activate()
         }

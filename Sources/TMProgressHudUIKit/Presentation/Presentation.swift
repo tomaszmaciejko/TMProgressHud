@@ -6,7 +6,7 @@ import Foundation
 
 /// The UI effects and live timing settings needed by a presentation.
 @MainActor
-protocol HUDPresentationHost: AnyObject {
+protocol PresentationHost: AnyObject {
     var graceTime: TimeInterval { get }
     var minShowTime: TimeInterval { get }
     func showPresentation(animated: Bool)
@@ -16,7 +16,7 @@ protocol HUDPresentationHost: AnyObject {
 
 /// Owns one presentation's phases, scheduled work and completion delivery.
 @MainActor
-final class HUDPresentation {
+final class Presentation {
     enum Phase {
         case idle
         case waitingForGrace
@@ -27,18 +27,18 @@ final class HUDPresentation {
     }
 
     private(set) var phase: Phase = .idle
-    var timing = HUDTimingEnvironment()
-    private weak var host: (any HUDPresentationHost)?
+    var timing = TimingEnvironment()
+    private weak var host: (any PresentationHost)?
     private var generation = UUID()
     private var hideCompletion: (@MainActor () -> Void)?
     private var shownAt: ContinuousClock.Instant?
-    private var graceAction: HUDScheduledAction? {
+    private var graceAction: ScheduledAction? {
         didSet { oldValue?.cancel() }
     }
-    private var minimumAction: HUDScheduledAction? {
+    private var minimumAction: ScheduledAction? {
         didSet { oldValue?.cancel() }
     }
-    private var delayedHideAction: HUDScheduledAction? {
+    private var delayedHideAction: ScheduledAction? {
         didSet { oldValue?.cancel() }
     }
 
@@ -51,7 +51,7 @@ final class HUDPresentation {
         }
     }
 
-    init(host: any HUDPresentationHost) {
+    init(host: any PresentationHost) {
         self.host = host
     }
 

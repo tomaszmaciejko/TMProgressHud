@@ -10,6 +10,7 @@ Readability takes priority over cleverness. Follow the Swift API Design Guidelin
 - Apply SOLID where it clarifies responsibilities. Introduce protocols at real boundaries, rather than for every type.
 - Avoid duplicated behavior, speculative abstractions and unnecessary state.
 - Name domain, layout and timing constants with their meaning and units. Explain non-obvious formulas. Ordinary literals such as zero need no wrapper.
+- Internal type names describe their responsibility without library prefixes; the module provides their namespace. Public and explicit Objective-C names remain deliberate API contracts.
 - Default to private or internal. Public APIs need documentation, deliberate defaults and clear ownership.
 - New customization uses composition, TMProgressHudProgressReporting or an explicit main-actor progress function. New facade methods are not subclass hooks; preserve the existing open surface only for compatibility.
 
@@ -17,9 +18,9 @@ Keep related source types in responsibility folders (API, Indicators, Layout, Pr
 
 The UIKit facade exposes views and configuration. Separate owners handle layout constraints, presentation phases, scheduled actions and Progress observation. Review each boundary for clear ownership and a concrete reason to exist.
 
-`HUDIndicator` stores a ready view and its update operations. `HUDIndicatorFactory` constructs known indicators with typed operations. `HUDIndicatorConstruction` selects a reusable typed view and preserves its progress contract; `HUDClientIndicatorAdapter` resolves the independent capabilities of arbitrary client views. `HUDIndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Reuse policy is explicit at facade call sites; reusing a client view preserves its resolved progress operation.
+`Indicator` stores a ready view and its update operations. `IndicatorFactory` constructs known indicators with typed operations. `IndicatorConstruction` selects a reusable typed view and preserves its progress contract; `ClientIndicatorAdapter` resolves the independent capabilities of arbitrary client views. `IndicatorColoring` owns appearance resolution; it does not select content or decide reuse. Reuse policy is explicit at facade call sites; reusing a client view preserves its resolved progress operation.
 
-`HUDLayout` coordinates one installation and its visibility observations. The installation owns its invisible spacing views and preserves bezel placement while replacing only the content layout. Construction prepares constraints; explicit activation installs them. Constraint groups own their activation and updates; client constraints stay outside those groups. Visibility observation reuse includes both content identity and its container.
+`LayoutCoordinator` coordinates one installation and its visibility observations. The installation owns its invisible spacing views and preserves bezel placement while replacing only the content layout. Construction prepares constraints; explicit activation installs them. Constraint groups own their activation and updates; client constraints stay outside those groups. Visibility observation reuse includes both content identity and its container.
 
 ## Safety
 

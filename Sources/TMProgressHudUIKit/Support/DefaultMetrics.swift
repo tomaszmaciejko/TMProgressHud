@@ -5,7 +5,7 @@
 import UIKit
 
 /// Default values grouped by the HUD responsibility that uses them.
-enum HUDMetrics {
+enum DefaultMetrics {
     enum Layout {
         static let margin: CGFloat = 20
         static let interItemSpacing: CGFloat = 4

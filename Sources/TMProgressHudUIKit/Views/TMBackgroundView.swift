@@ -69,7 +69,7 @@ open class TMBackgroundView: UIView {
     private var storedColor: UIColor?
 
     private var effectView: UIVisualEffectView?
-    private var reduceTransparencyObservation: HUDNotificationToken?
+    private var reduceTransparencyObservation: NotificationToken?
     private var readReduceTransparency: @MainActor () -> Bool = { UIAccessibility.isReduceTransparencyEnabled }
 
     private var usesOpaqueBackground: Bool {
@@ -122,7 +122,7 @@ open class TMBackgroundView: UIView {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in self?.updateBackground() }
         }
-        reduceTransparencyObservation = HUDNotificationToken(center: notificationCenter, token: token)
+        reduceTransparencyObservation = NotificationToken(center: notificationCenter, token: token)
     }
 
     /// Reconciles the owned blur and tint with the current style, policy and system setting.

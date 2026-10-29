@@ -5,7 +5,7 @@
 import UIKit
 
 @MainActor
-final class HUDRoundedButtonView: UIButton {
+final class RoundedButtonView: UIButton {
     private enum Metrics {
         static let borderWidth: CGFloat = 1
         static let horizontalPadding: CGFloat = 20
@@ -112,7 +112,7 @@ final class HUDRoundedButtonView: UIButton {
 
     private func configureBorder() {
         registerForTraitChanges(UITraitCollection.systemTraitsAffectingColorAppearance) {
-            (button: HUDRoundedButtonView, _) in
+            (button: RoundedButtonView, _) in
             button.updateStateAppearance()
         }
         updateStateAppearance()

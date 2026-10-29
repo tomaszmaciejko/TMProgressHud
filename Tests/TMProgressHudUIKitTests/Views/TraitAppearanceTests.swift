@@ -44,7 +44,7 @@ struct TraitAppearanceTests {
 
     @Test(arguments: [false, true])
     func buttonBorderFollowsItsOwnAppearanceTraits(decoded: Bool) throws {
-        let original = HUDRoundedButtonView(frame: .zero)
+        let original = RoundedButtonView(frame: .zero)
         original.setTitleColor(.blue, for: .normal)
         #expect(original.layer.borderColor == UIColor.blue.cgColor)
         let button = try decoded ? archiveRoundTrip(original) : original
@@ -69,7 +69,7 @@ struct TraitAppearanceTests {
     }
 
     @Test func decodedButtonPreservesArchivedBorderAcrossAppearanceChanges() throws {
-        let button = try archiveRoundTrip(HUDRoundedButtonView(frame: .zero))
+        let button = try archiveRoundTrip(RoundedButtonView(frame: .zero))
         let archivedBorder = button.layer.borderColor
         button.traitOverrides.userInterfaceStyle = .light
         button.updateTraitsIfNeeded()
@@ -79,7 +79,7 @@ struct TraitAppearanceTests {
     }
 
     @Test func buttonBorderUsesActiveStateColorAndUIKitFallback() {
-        let button = HUDRoundedButtonView(frame: .zero)
+        let button = RoundedButtonView(frame: .zero)
         button.traitOverrides.userInterfaceStyle = .light
         button.updateTraitsIfNeeded()
         button.setTitleColor(.green, for: .normal)
@@ -105,11 +105,11 @@ struct TraitAppearanceTests {
     }
 
     @Test func appearanceRegistrationsDoNotRetainViews() {
-        weak var button: HUDRoundedButtonView?
+        weak var button: RoundedButtonView?
         weak var bar: TMBarProgressView?
         weak var round: TMRoundProgressView?
         autoreleasepool {
-            let createdButton = HUDRoundedButtonView(frame: .zero)
+            let createdButton = RoundedButtonView(frame: .zero)
             createdButton.setTitleColor(adaptiveColor(), for: .normal)
             button = createdButton
             let createdBar = TMBarProgressView()

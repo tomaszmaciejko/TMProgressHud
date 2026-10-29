@@ -6,7 +6,7 @@ import Foundation
 
 /// Observes progress only while active, delivering current values on the main actor.
 @MainActor
-final class HUDProgressBinding {
+final class ProgressBinding {
     private(set) var source: Progress?
     private var isActive = false
     private var observation: NSKeyValueObservation?

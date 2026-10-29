@@ -4,8 +4,8 @@ import UIKit
 
 /// Builds color operations for known view types and resolves compatibility appearance rules.
 @MainActor
-enum HUDIndicatorColoring {
-    private typealias ColorPolicy = HUDIndicator.ColorPolicy
+enum IndicatorColoring {
+    private typealias ColorPolicy = Indicator.ColorPolicy
 
     private enum AppearanceProperty {
         case activityColor
@@ -15,7 +15,7 @@ enum HUDIndicatorColoring {
         case barOutlineColor
     }
 
-    static func activityUpdater(for view: UIActivityIndicatorView) -> HUDIndicator.ColorUpdater {
+    static func activityUpdater(for view: UIActivityIndicatorView) -> Indicator.ColorUpdater {
         { color, policy in
             let selectedColor: UIColor?
             if let preferredColor = preferredColor(for: .activityColor, policy: policy, suppliedColor: color) {
@@ -27,7 +27,7 @@ enum HUDIndicatorColoring {
         }
     }
 
-    static func circularUpdater(for view: TMRoundProgressView) -> HUDIndicator.ColorUpdater {
+    static func circularUpdater(for view: TMRoundProgressView) -> Indicator.ColorUpdater {
         { color, policy in
             view.progressTintColor = resolveColor(
                 for: .circleProgressColor, policy: policy,
@@ -39,7 +39,7 @@ enum HUDIndicatorColoring {
         }
     }
 
-    static func barUpdater(for view: TMBarProgressView) -> HUDIndicator.ColorUpdater {
+    static func barUpdater(for view: TMBarProgressView) -> Indicator.ColorUpdater {
         { color, policy in
             view.progressColor = resolveColor(
                 for: .barProgressColor, policy: policy,
@@ -70,7 +70,7 @@ enum HUDIndicatorColoring {
         return suppliedColor()
     }
 
-    static func tintUpdater(for view: UIView) -> HUDIndicator.ColorUpdater {
+    static func tintUpdater(for view: UIView) -> Indicator.ColorUpdater {
         { color, _ in
             if let color { view.tintColor = color }
         }
@@ -80,11 +80,11 @@ enum HUDIndicatorColoring {
         guard let color else { return nil }
         switch policy {
         case .compatibility:
-            return color.withAlphaComponent(HUDMetrics.Appearance.remainingAlpha)
+            return color.withAlphaComponent(DefaultMetrics.Appearance.remainingAlpha)
         case .explicit:
             return UIColor { traits in
                 let resolvedColor = color.resolvedColor(with: traits)
-                let trackAlpha = resolvedColor.cgColor.alpha * HUDMetrics.Appearance.remainingAlpha
+                let trackAlpha = resolvedColor.cgColor.alpha * DefaultMetrics.Appearance.remainingAlpha
                 return resolvedColor.withAlphaComponent(trackAlpha)
             }
         }

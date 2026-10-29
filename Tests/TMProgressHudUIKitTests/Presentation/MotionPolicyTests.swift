@@ -53,7 +53,7 @@ struct MotionPolicyTests {
         let center = NotificationCenter()
         let preference = MotionPreferenceStub()
         let changed = CallbackExpectation()
-        let settings = HUDMotionSettings(center: center, systemValue: { preference.enabled }) {
+        let settings = MotionSettings(center: center, systemValue: { preference.enabled }) {
             #expect(Thread.isMainThread)
             changed.signal()
         }
@@ -71,7 +71,7 @@ struct MotionPolicyTests {
         let center = NotificationCenter()
         let preference = MotionPreferenceStub()
         let updated = CallbackExpectation()
-        hud.motionSettings = HUDMotionSettings(center: center, systemValue: { preference.enabled }) { [weak hud] in
+        hud.motionSettings = MotionSettings(center: center, systemValue: { preference.enabled }) { [weak hud] in
             hud?.updateBezelMotionEffects()
             updated.signal()
         }
@@ -100,7 +100,7 @@ struct MotionPolicyTests {
             let token = center.addObserver(forName: name, object: nil, queue: nil) { [capture] _ in
                 withExtendedLifetime(capture) {}
             }
-            let registration = HUDNotificationToken(center: center, token: token)
+            let registration = NotificationToken(center: center, token: token)
             withExtendedLifetime(registration) {
                 #expect(retainedByRegistration != nil)
             }
@@ -112,7 +112,7 @@ struct MotionPolicyTests {
 
     @Test func observationDoesNotRetainItsOwners() {
         weak var hudReference: TMProgressHud?
-        weak var settingsReference: HUDMotionSettings?
+        weak var settingsReference: MotionSettings?
         autoreleasepool {
             let hud = TMProgressHud(frame: .zero)
             hud.motionPolicy = .full

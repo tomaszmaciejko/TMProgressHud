@@ -16,11 +16,11 @@ private final class LayoutInvalidationView: UIView {
 @MainActor
 struct LayoutInstallationTests {
     @Test func changingBezelAndContainerDetachesOnlyOwnedConstraints() {
-        let layout = HUDLayout()
+        let layout = LayoutCoordinator()
         let firstContainer = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
         let firstBezel = makeBezel(in: firstContainer)
         let firstLabel = makeLabel(in: firstBezel)
-        let configuration = HUDLayout.Configuration(
+        let configuration = LayoutCoordinator.Configuration(
             layout: .init(), minimumSize: CGSize(width: 100, height: 100), isSquare: true)
         layout.update(container: firstContainer, bezel: firstBezel, content: [firstLabel], configuration: configuration)
         firstContainer.layoutIfNeeded()
@@ -50,12 +50,12 @@ struct LayoutInstallationTests {
     }
 
     @Test func identicalContentInvalidatesOnlyItsNewContainer() {
-        let layout = HUDLayout()
+        let layout = LayoutCoordinator()
         let first = LayoutInvalidationView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
         let second = LayoutInvalidationView(frame: first.bounds)
         let bezel = makeBezel(in: first)
         let label = makeLabel(in: bezel)
-        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        let configuration = LayoutCoordinator.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
         layout.update(container: first, bezel: bezel, content: [label], configuration: configuration)
         second.addSubview(bezel)
         layout.update(container: second, bezel: bezel, content: [label], configuration: configuration)
@@ -67,11 +67,11 @@ struct LayoutInstallationTests {
     }
 
     @Test func repeatedUpdatesObserveOnceAndReplacedContentStopsInvalidating() {
-        let layout = HUDLayout()
+        let layout = LayoutCoordinator()
         let container = LayoutInvalidationView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
         let bezel = makeBezel(in: container)
         let label = makeLabel(in: bezel)
-        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        let configuration = LayoutCoordinator.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
         for _ in 0..<3 {
             layout.update(container: container, bezel: bezel, content: [label], configuration: configuration)
         }
@@ -88,14 +88,14 @@ struct LayoutInstallationTests {
     }
 
     @Test func replacingBezelRemovesOnlyOwnedSpacingViewsFromThePreviousBezel() {
-        let layout = HUDLayout()
+        let layout = LayoutCoordinator()
         let container = UIView(frame: CGRect(x: 0, y: 0, width: 400, height: 600))
         let previousBezel = makeBezel(in: container)
         let previousLabel = makeLabel(in: previousBezel)
         let hiddenClientView = UIView()
         hiddenClientView.isHidden = true
         previousBezel.addSubview(hiddenClientView)
-        let configuration = HUDLayout.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
+        let configuration = LayoutCoordinator.Configuration(layout: .init(), minimumSize: .zero, isSquare: false)
         layout.update(
             container: container, bezel: previousBezel, content: [previousLabel], configuration: configuration)
         let ownedSpacingViews = previousBezel.subviews.filter { $0 !== previousLabel && $0 !== hiddenClientView }
@@ -118,7 +118,7 @@ struct LayoutInstallationTests {
         clientConstraint.isActive = true
         let originalSubviews = bezel.subviews.map(ObjectIdentifier.init)
         let originalConstraints = Set((container.constraints + bezel.constraints).map(ObjectIdentifier.init))
-        let installation = HUDLayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
+        let installation = LayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
         #expect(bezel.subviews.map(ObjectIdentifier.init) == originalSubviews)
         #expect(Set((container.constraints + bezel.constraints).map(ObjectIdentifier.init)) == originalConstraints)
         installation.activate()
@@ -144,7 +144,7 @@ struct LayoutInstallationTests {
             let label = makeLabel(in: bezel)
             releasedContainer = container
             releasedBezel = bezel
-            return HUDLayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
+            return LayoutInstallation(container: container, bezel: bezel, visibleContent: [label])
         }
         #expect(releasedContainer == nil)
         #expect(releasedBezel == nil)

@@ -5,7 +5,7 @@ import Foundation
 /// Removes one block-based registration on release, including from a nonisolated deinit.
 ///
 /// Registration, preference reads and main-actor delivery remain with the consumer.
-final class HUDNotificationToken {
+final class NotificationToken {
     private let center: NotificationCenter
     private let token: any NSObjectProtocol
 

@@ -1,9 +1,9 @@
 [
   {
-    "file": "Sources/TMProgressHudUIKit/Support/HUDMetrics.swift",
-    "sha256": "154347a2c40b6cf5bfbebe80bae5776df7f53bec997e23acc3e47c43bd7439dc",
+    "file": "Sources/TMProgressHudUIKit/Support/DefaultMetrics.swift",
+    "sha256": "7c2df8d1c51bf0ce6a6c3cc47cdf490bd1bfc3d42c36f4615339e1f261922b54",
     "reason": "Swift/LLVM emits no source coverage regions for these static constant declarations; exercised by default/layout and byte-identical drawing comparisons.",
-    "decision": "Reviewed declaration-only grouping into Layout, Typography, Appearance and Animation. Numeric values and priorities unchanged; compiler coverage regions remain checked by the coverage gate. No executable-line exclusion."
+    "decision": "Declaration-only type renamed to DefaultMetrics. Existing grouped constants and numeric values unchanged; absence of executable regions still enforced. No executable-line exclusion."
   },
   {
     "file": "Sources/TMProgressHudUIKit/API/TMProgressHudTypes.swift",

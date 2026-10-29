@@ -6,12 +6,12 @@ import UIKit
 ///
 /// Exists only while building an indicator; the result never retains this construction value.
 @MainActor
-struct HUDIndicatorConstruction<View: UIView> {
+struct IndicatorConstruction<View: UIView> {
     let view: View
-    private let reusedIndicator: HUDIndicator?
+    private let reusedIndicator: Indicator?
 
     init(
-        reusing previous: HUDIndicator?, policy: HUDIndicatorFactory.ReusePolicy,
+        reusing previous: Indicator?, policy: IndicatorFactory.ReusePolicy,
         createView: () -> View
     ) {
         if let previous,
@@ -27,16 +27,16 @@ struct HUDIndicatorConstruction<View: UIView> {
     }
 
     func makeIndicator(
-        libraryProgressUpdater: HUDIndicator.ProgressUpdater?,
-        colorUpdater: @escaping HUDIndicator.ColorUpdater
-    ) -> HUDIndicator {
+        libraryProgressUpdater: Indicator.ProgressUpdater?,
+        colorUpdater: @escaping Indicator.ColorUpdater
+    ) -> Indicator {
         if let reusedIndicator, reusedIndicator.origin == .client {
             // Copy the operation directly; wrapping the old indicator would retain a chain of adapters.
-            return HUDIndicator(
+            return Indicator(
                 view: view, origin: .client, progressUpdater: reusedIndicator.progressUpdater,
                 colorUpdater: colorUpdater)
         }
-        return HUDIndicator(
+        return Indicator(
             view: view, origin: .library, progressUpdater: libraryProgressUpdater, colorUpdater: colorUpdater)
     }
 }

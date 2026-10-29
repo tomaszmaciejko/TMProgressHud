@@ -4,14 +4,14 @@ import Foundation
 @MainActor
 final class ManualHUDTime {
     private(set) var instant = ContinuousClock.now
-    private(set) var actions: [HUDScheduledAction] = []
+    private(set) var actions: [ScheduledAction] = []
     private(set) var requestedIntervals: [TimeInterval] = []
 
-    var environment: HUDTimingEnvironment {
-        HUDTimingEnvironment(
+    var environment: TimingEnvironment {
+        TimingEnvironment(
             now: { self.instant },
             schedule: { interval, action in
-                let scheduled = HUDScheduledAction(action: action)
+                let scheduled = ScheduledAction(action: action)
                 self.actions.append(scheduled)
                 self.requestedIntervals.append(interval)
                 return scheduled

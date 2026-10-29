@@ -3,7 +3,7 @@ import Testing
 @testable import TMProgressHudUIKit
 
 @MainActor
-private final class PresentationSpy: HUDPresentationHost {
+private final class PresentationSpy: PresentationHost {
     var graceTime: TimeInterval = 0
     var minShowTime: TimeInterval = 0
     var showAnimations: [Bool] = []
@@ -29,7 +29,7 @@ private final class PresentationSpy: HUDPresentationHost {
 struct PresentationTests {
     @Test func immediateTransitionsDeliverOneCompletion() throws {
         let host = PresentationSpy()
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         #expect(presentation.phase == .idle)
         #expect(!presentation.hasHideRequest)
         presentation.show(animated: false)
@@ -51,7 +51,7 @@ struct PresentationTests {
         let host = PresentationSpy()
         let time = ManualHUDTime()
         defer { time.invalidate() }
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.timing = time.environment
         host.graceTime = 3
         host.minShowTime = 5
@@ -74,7 +74,7 @@ struct PresentationTests {
 
     @Test func obsoleteAnimationCannotFinishNewPresentation() throws {
         let host = PresentationSpy()
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.show(animated: true)
         presentation.hide(animated: true)
         let oldCompletion = try #require(host.hideCompletions.first)
@@ -95,7 +95,7 @@ struct PresentationTests {
         let host = PresentationSpy()
         let time = ManualHUDTime()
         defer { time.invalidate() }
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.timing = time.environment
         host.graceTime = 5
         presentation.show(animated: true)
@@ -110,7 +110,7 @@ struct PresentationTests {
         let host = PresentationSpy()
         let time = ManualHUDTime()
         defer { time.invalidate() }
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.timing = time.environment
         presentation.hide(animated: false, afterDelay: 5)
         let beforeShow = try #require(time.actions.last)
@@ -133,7 +133,7 @@ struct PresentationTests {
         let host = PresentationSpy()
         let time = ManualHUDTime()
         defer { time.invalidate() }
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.timing = time.environment
         if withGrace {
             host.graceTime = 10
@@ -150,7 +150,7 @@ struct PresentationTests {
 
     @Test func completionCanReentrantlyStartNextPresentation() throws {
         let host = PresentationSpy()
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         host.onFinish = { presentation.show(animated: false) }
         presentation.show(animated: false)
         presentation.hide(animated: false)
@@ -167,10 +167,10 @@ struct PresentationTests {
         let time = ManualHUDTime()
         defer { time.invalidate() }
         weak var hostReference: PresentationSpy?
-        weak var presentationReference: HUDPresentation?
+        weak var presentationReference: Presentation?
         autoreleasepool {
             let host = PresentationSpy()
-            let presentation = HUDPresentation(host: host)
+            let presentation = Presentation(host: host)
             presentation.timing = time.environment
             host.graceTime = 60
             presentation.show(animated: true)
@@ -186,7 +186,7 @@ struct PresentationTests {
         let host = PresentationSpy()
         let time = ManualHUDTime()
         defer { time.invalidate() }
-        let presentation = HUDPresentation(host: host)
+        let presentation = Presentation(host: host)
         presentation.timing = time.environment
         presentation.show(animated: false)
         presentation.hide(animated: true, afterDelay: 5)
