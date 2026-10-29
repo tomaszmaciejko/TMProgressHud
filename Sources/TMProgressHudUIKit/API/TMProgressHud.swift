@@ -329,13 +329,8 @@ open class TMProgressHud: UIView {
     }
 
     func updateProgressObservation() {
-        if window != nil && presentation.isShowingContent {
-            progressBinding.replace(with: progressObject)
-            progressBinding.start()
-        } else {
-            progressBinding.stop()
-            progressBinding.replace(with: nil)
-        }
+        let source = window != nil && presentation.isShowingContent ? progressObject : nil
+        progressBinding.bind(to: source)
     }
 
 }

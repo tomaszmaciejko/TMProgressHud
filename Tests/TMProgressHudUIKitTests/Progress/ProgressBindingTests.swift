@@ -29,29 +29,84 @@ struct ProgressBindingTests {
         #expect(reference == nil)
         reference?.hide(animated: false)
     }
-    @Test func inactiveBindingReadsLatestValueWhenStarted() {
+    @Test func bindingDeliversImmediatelyAndReadsLatestValueWhenRebound() {
         var values: [Float] = []
         let binding = ProgressBinding { values.append($0) }
         let source = Progress(totalUnitCount: 100)
         source.completedUnitCount = 25
-        binding.replace(with: source)
-        binding.replace(with: source)
-        #expect(binding.source === source)
         #expect(values.isEmpty)
-        binding.start()
-        binding.start()
+        binding.bind(to: source)
+        binding.bind(to: source)
         #expect(values == [0.25])
-        binding.stop()
-        binding.stop()
+        binding.bind(to: nil)
+        binding.bind(to: nil)
         source.completedUnitCount = 50
         #expect(values == [0.25])
-        binding.start()
+        binding.bind(to: source)
         #expect(values == [0.25, 0.5])
-        binding.replace(with: nil)
-        #expect(binding.source == nil)
-        binding.stop()
-        binding.start()
-        binding.stop()
+        binding.bind(to: nil)
+        binding.bind(to: nil)
+    }
+
+    @Test func unbindingReleasesTheSourceWhileTheBindingRemainsAlive() {
+        let binding = ProgressBinding { _ in }
+        weak var sourceReference: Progress?
+        autoreleasepool {
+            let source = Progress(totalUnitCount: 100)
+            sourceReference = source
+            binding.bind(to: source)
+            binding.bind(to: nil)
+        }
+        #expect(sourceReference == nil)
+        withExtendedLifetime(binding) {}
+    }
+
+    @Test func initialDeliveryCanUnbind() async throws {
+        let source = Progress(totalUnitCount: 100)
+        source.completedUnitCount = 25
+        let updated = CallbackExpectation()
+        var values: [Float] = []
+        weak var callbackBinding: ProgressBinding?
+        let binding = ProgressBinding { value in
+            values.append(value)
+            if value == 0.25 {
+                callbackBinding?.bind(to: nil)
+            }
+            if value == 0.75 { updated.signal() }
+        }
+        callbackBinding = binding
+        binding.bind(to: source)
+        #expect(values == [0.25])
+        source.completedUnitCount = 50
+        binding.bind(to: source)
+        defer { binding.bind(to: nil) }
+        #expect(values == [0.25, 0.5])
+        source.completedUnitCount = 75
+        try await updated.wait()
+        #expect(values == [0.25, 0.5, 0.75])
+    }
+
+    @Test func initialDeliveryCanReplaceTheSource() async throws {
+        let first = Progress(totalUnitCount: 100)
+        first.completedUnitCount = 25
+        let second = Progress(totalUnitCount: 100)
+        second.completedUnitCount = 80
+        let updated = CallbackExpectation()
+        var values: [Float] = []
+        weak var callbackBinding: ProgressBinding?
+        let binding = ProgressBinding { value in
+            values.append(value)
+            if value == 0.25 { callbackBinding?.bind(to: second) }
+            if value == 0.9 { updated.signal() }
+        }
+        callbackBinding = binding
+        binding.bind(to: first)
+        defer { binding.bind(to: nil) }
+        #expect(values == [0.25, 0.8])
+        first.completedUnitCount = 50
+        second.completedUnitCount = 90
+        try await updated.wait()
+        #expect(values == [0.25, 0.8, 0.9])
     }
 
     @Test func backgroundUpdatesArriveOnMainActor() async throws {
@@ -65,9 +120,8 @@ struct ProgressBindingTests {
                 completed.signal()
             }
         }
-        binding.replace(with: source)
-        binding.start()
-        defer { binding.stop() }
+        binding.bind(to: source)
+        defer { binding.bind(to: nil) }
         DispatchQueue.global().async { source.completedUnitCount = 50 }
         try await completed.wait()
         #expect(values.last == 0.5)
@@ -83,9 +137,8 @@ struct ProgressBindingTests {
                 completed.signal()
             }
         }
-        binding.replace(with: source)
-        binding.start()
-        defer { binding.stop() }
+        binding.bind(to: source)
+        defer { binding.bind(to: nil) }
         for count in 1...1000 { source.completedUnitCount = Int64(count) }
         try await completed.wait()
         #expect(values == [0, 1])
@@ -103,18 +156,17 @@ struct ProgressBindingTests {
                 completed.signal()
             }
         }
-        binding.replace(with: first)
-        binding.start()
-        defer { binding.stop() }
+        binding.bind(to: first)
+        defer { binding.bind(to: nil) }
         first.completedUnitCount = 25
-        binding.replace(with: second)
+        binding.bind(to: second)
         first.completedUnitCount = 50
         second.completedUnitCount = 90
         try await completed.wait()
         #expect(values == [0, 0.8, 0.9])
     }
 
-    @Test func stopAndRestartDiscardQueuedValues() async throws {
+    @Test func unbindingAndRebindingDiscardQueuedValues() async throws {
         let source = Progress(totalUnitCount: 100)
         let completed = CallbackExpectation()
         var values: [Float] = []
@@ -124,13 +176,12 @@ struct ProgressBindingTests {
                 completed.signal()
             }
         }
-        binding.replace(with: source)
-        binding.start()
-        defer { binding.stop() }
+        binding.bind(to: source)
+        defer { binding.bind(to: nil) }
         source.completedUnitCount = 50
-        binding.stop()
+        binding.bind(to: nil)
         source.completedUnitCount = 75
-        binding.start()
+        binding.bind(to: source)
         source.completedUnitCount = 80
         try await completed.wait()
         #expect(values == [0, 0.75, 0.8])
@@ -146,9 +197,8 @@ struct ProgressBindingTests {
                 completed.signal()
             }
         }
-        binding.replace(with: parent)
-        binding.start()
-        defer { binding.stop() }
+        binding.bind(to: parent)
+        defer { binding.bind(to: nil) }
         DispatchQueue.global().async { child.completedUnitCount = 5 }
         try await completed.wait()
         #expect(parent.fractionCompleted == 0.5)
@@ -161,8 +211,7 @@ struct ProgressBindingTests {
         autoreleasepool {
             let source = Progress(totalUnitCount: 100)
             let binding = ProgressBinding { _ in }
-            binding.replace(with: source)
-            binding.start()
+            binding.bind(to: source)
             bindingReference = binding
             sourceReference = source
         }
