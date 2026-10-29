@@ -10,6 +10,7 @@
 
 ### Behavior and accessibility
 
+- Reserve accessible `100%` for finite progress of at least `1`; retain whole-percent rounding below completion. Treat blank accessibility languages like an unset language.
 - Honor custom progress protocols on activity-indicator subclasses and keep newer content selections made during custom-view configuration, attachment, removal or coloring.
 
 - Make presentation callbacks single-use, reject obsolete work, use monotonic timing and stop observing Progress when hidden or detached.

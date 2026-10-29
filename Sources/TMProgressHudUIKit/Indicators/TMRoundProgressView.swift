@@ -83,9 +83,14 @@ open class TMRoundProgressView: UIView {
     /// A localized percentage for finite progress, bounded to 0...100 percent.
     ///
     /// An application-supplied accessibility value takes precedence; nil restores automatic formatting.
+    /// Automatic percentages round to whole numbers and remain below 100% until finite progress reaches 1.
+    /// A missing or blank accessibility language uses the current locale.
     open override var accessibilityValue: String? {
         get {
-            super.accessibilityValue ?? ProgressAccessibility.value(for: progress, language: accessibilityLanguage)
+            if let customValue = super.accessibilityValue { return customValue }
+            let currentProgress = progress
+            let locale = accessibilityLocale(for: accessibilityLanguage, fallback: .current)
+            return formattedAccessibilityPercentage(for: currentProgress, locale: locale)
         }
         set { super.accessibilityValue = newValue }
     }
