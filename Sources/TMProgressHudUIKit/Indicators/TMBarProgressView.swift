@@ -125,7 +125,7 @@ open class TMBarProgressView: UIView {
 
         let interior = rect.insetBy(dx: Geometry.inset, dy: Geometry.inset)
         guard interior.width > 0, interior.height > 0 else { return }
-        let fraction = CGFloat(ProgressValue.boundedFraction(progress))
+        let fraction = CGFloat(boundedProgressFraction(progress))
         context.addPath(capsule(in: interior).cgPath)
         context.clip()
         context.setFillColor(progressColor.cgColor)

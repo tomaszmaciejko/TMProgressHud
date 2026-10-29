@@ -305,7 +305,7 @@
               ]
             },
             {
-              "path": "../../Sources/TMProgressHudUIKit/Progress/ProgressValue.swift",
+              "path": "../../Sources/TMProgressHudUIKit/Progress/ProgressFraction.swift",
               "target-membership": [
                 "TMProgressHudUIKit/compile-sources"
               ]

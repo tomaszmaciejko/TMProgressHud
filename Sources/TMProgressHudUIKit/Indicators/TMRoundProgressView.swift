@@ -115,7 +115,7 @@ open class TMRoundProgressView: UIView {
         let circleBounds = CGRect(
             x: bounds.midX - diameter / 2, y: bounds.midY - diameter / 2,
             width: diameter, height: diameter)
-        let fraction = CGFloat(ProgressValue.boundedFraction(progress))
+        let fraction = CGFloat(boundedProgressFraction(progress))
         if isAnnular {
             drawRing(in: circleBounds, fraction: fraction)
         } else {
